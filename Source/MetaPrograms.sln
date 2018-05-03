@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2003
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeModel.Imperative", "CodeModel.Imperative", "{F02E1BB6-916B-43F6-9E9A-5A84D83D90AD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Roslyn", "Roslyn", "{81809F62-2FE8-49F6-8D44-B7DCCF60C3D3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reflection", "Reflection", "{F8C4E111-8087-4CEF-8064-10E60EEAE334}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JavaScript", "JavaScript", "{5CB12491-0D94-452D-8B53-C5534097A220}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.Reflection", "MetaPrograms.Adapters.Reflection\MetaPrograms.Adapters.Reflection.csproj", "{E549BD67-EA4E-4081-ABD6-68F176ACF63D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.Roslyn", "MetaPrograms.Adapters.Roslyn\MetaPrograms.Adapters.Roslyn.csproj", "{A9AE1E9D-4E56-421D-8D99-296E5DC235FB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.JavaScript", "MetaPrograms.Adapters.JavaScript\MetaPrograms.Adapters.JavaScript.csproj", "{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaPrograms.CodeModel.Imperative", "MetaPrograms.CodeModel.Imperative\MetaPrograms.CodeModel.Imperative.csproj", "{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E549BD67-EA4E-4081-ABD6-68F176ACF63D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E549BD67-EA4E-4081-ABD6-68F176ACF63D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E549BD67-EA4E-4081-ABD6-68F176ACF63D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E549BD67-EA4E-4081-ABD6-68F176ACF63D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9AE1E9D-4E56-421D-8D99-296E5DC235FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9AE1E9D-4E56-421D-8D99-296E5DC235FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9AE1E9D-4E56-421D-8D99-296E5DC235FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9AE1E9D-4E56-421D-8D99-296E5DC235FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E549BD67-EA4E-4081-ABD6-68F176ACF63D} = {F8C4E111-8087-4CEF-8064-10E60EEAE334}
+		{A9AE1E9D-4E56-421D-8D99-296E5DC235FB} = {81809F62-2FE8-49F6-8D44-B7DCCF60C3D3}
+		{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D} = {5CB12491-0D94-452D-8B53-C5534097A220}
+		{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172} = {F02E1BB6-916B-43F6-9E9A-5A84D83D90AD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {150905B7-0BC7-470A-90D3-229DADEA4A4F}
+	EndGlobalSection
+EndGlobal
