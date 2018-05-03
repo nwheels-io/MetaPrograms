@@ -1,37 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class AttributeDescription
     {
-        public AttributeDescription()
+        public AttributeDescription(
+            TypeMember attributeType, 
+            ImmutableList<AbstractExpression> constructorArguments, 
+            ImmutableList<PropertyValue> propertyValues)
         {
-            this.ConstructorArguments = new List<AbstractExpression>();
-            this.PropertyValues = new List<PropertyValue>();
+            AttributeType = attributeType;
+            ConstructorArguments = constructorArguments;
+            PropertyValues = propertyValues;
         }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         public override string ToString()
         {
             return (AttributeType?.Name ?? base.ToString());
         }
 
-        //------------------------------------------------- ----------------------------------------------------------------------------------------------------
-
-        public TypeMember AttributeType { get; set; }
-        public List<AbstractExpression> ConstructorArguments { get; private set; }
-        public List<PropertyValue> PropertyValues { get; private set; }
-        public Attribute Binding { get; set; }
+        public TypeMember AttributeType { get; }
+        public ImmutableList<AbstractExpression> ConstructorArguments { get; }
+        public ImmutableList<PropertyValue> PropertyValues { get; }
     }
-
-    //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
     public class PropertyValue
     {
-        public string Name { get; set; }
-        public AbstractExpression Value { get; set; }
+        public string Name { get; }
+        public AbstractExpression Value { get; }
     }
 }

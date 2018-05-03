@@ -1,31 +1,44 @@
-﻿using System.Reflection;
+﻿using System.Collections.Immutable;
+using System.Reflection;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class EventMember : AbstractMember
     {
-        public EventMember()
+        public EventMember(
+            string name, 
+            TypeMember declaringType, 
+            MemberStatus status, 
+            MemberVisibility visibility, 
+            MemberModifier modifier, 
+            ImmutableList<AttributeDescription> attributes, 
+            TypeMember delegateType, 
+            MethodMember adder, 
+            MethodMember remover) 
+            : base(name, declaringType, status, visibility, modifier, attributes)
         {
+            DelegateType = delegateType;
+            Adder = adder;
+            Remover = remover;
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public EventMember(MemberVisibility visibility, MemberModifier modifier, TypeMember delegateType, string name)
-            : base(visibility, modifier, name)
+        public EventMember(
+            EventMember source, 
+            Mutator<string>? name = null, 
+            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberStatus>? status = null, 
+            Mutator<MemberVisibility>? visibility = null, 
+            Mutator<MemberModifier>? modifier = null, 
+            Mutator<ImmutableList<AttributeDescription>>? attributes = null,
+            Mutator<TypeMember>? delegateType = null,
+            Mutator<MethodMember>? adder = null,
+            Mutator<MethodMember>? remover = null) 
+            : base(source, name, declaringType, status, visibility, modifier, attributes)
         {
-            this.DelegateType = delegateType;
+            DelegateType = delegateType.MutatedOrOriginal(source.DeclaringType);
+            Adder = adder.MutatedOrOriginal(source.Adder);
+            Remover = remover.MutatedOrOriginal(source.Remover);
         }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public EventMember(EventInfo clrBinding)
-            : base(clrBinding)
-        {
-            this.ClrBinding = ClrBinding;
-            this.DelegateType = clrBinding.DeclaringType;
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {
@@ -44,11 +57,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public TypeMember DelegateType { get; set; }
-        public MethodMember Adder { get; set; }
-        public MethodMember Remover { get; set; }
-        public EventInfo ClrBinding { get; set; }
+        public TypeMember DelegateType { get; }
+        public MethodMember Adder { get; }
+        public MethodMember Remover { get; }
     }
 }

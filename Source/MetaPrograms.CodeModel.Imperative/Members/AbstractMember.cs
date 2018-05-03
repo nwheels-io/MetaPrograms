@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -7,49 +8,44 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public abstract class AbstractMember
     {
-        protected AbstractMember()
+        protected AbstractMember(
+            string name, 
+            TypeMember declaringType, 
+            MemberStatus status, 
+            MemberVisibility visibility, 
+            MemberModifier modifier, 
+            ImmutableList<AttributeDescription> attributes)
         {
-            this.Attributes = new List<AttributeDescription>();
-            this.Status = MemberStatus.Generator;
+            Name = name;
+            DeclaringType = declaringType;
+            Status = status;
+            Visibility = visibility;
+            Modifier = modifier;
+            Attributes = attributes;
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        protected AbstractMember(MemberVisibility visibility, MemberModifier modifier, string name)
-            : this()
+        protected AbstractMember(
+            AbstractMember source,
+            Mutator<string>? name = null,
+            Mutator<TypeMember>? declaringType = null,
+            Mutator<MemberStatus>? status = null,
+            Mutator<MemberVisibility>? visibility = null,
+            Mutator<MemberModifier>? modifier = null,
+            Mutator<ImmutableList<AttributeDescription>>? attributes = null)
         {
-            this.Visibility = visibility;
-            this.Modifier = modifier;
-            this.Name = name;
+            Name = name.MutatedOrOriginal(source.Name);
+            DeclaringType = declaringType.MutatedOrOriginal(source.DeclaringType);
+            Status = status.MutatedOrOriginal(source.Status);
+            Visibility = visibility.MutatedOrOriginal(source.Visibility);
+            Modifier = modifier.MutatedOrOriginal(source.Modifier);
+            Attributes = attributes.MutatedOrOriginal(source.Attributes);
         }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        protected AbstractMember(TypeMember declaringType, MemberVisibility visibility, MemberModifier modifier, string name)
-            : this(visibility, modifier, name)
-        {
-            this.DeclaringType = declaringType;
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        protected AbstractMember(MemberInfo clrBinding)
-            : this()
-        {
-            this.Status = MemberStatus.Compiled;
-            this.Name = clrBinding.Name;
-            this.DeclaringType = clrBinding.DeclaringType;
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         public bool HasAttribute<TAttribute>()
             where TAttribute : Attribute
         {
             return TryGetAttribute<TAttribute>(out TAttribute attribute);
         }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         public bool TryGetAttribute<TAttribute>(out TAttribute attribute)
             where TAttribute : Attribute
@@ -58,8 +54,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             attribute = (description?.Binding as TAttribute);
             return (attribute != null);
         }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         public virtual void AcceptVisitor(MemberVisitor visitor)
         {
@@ -72,20 +66,16 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
         public override string ToString()
         {
             return $"{this.GetType().Name.TrimSuffix("Member")} {this.Name}";
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public string Name { get; set; }
-        public TypeMember DeclaringType { get; set; }
-        public MemberStatus Status { get; set; }
-        public MemberVisibility Visibility { get; set; }
-        public MemberModifier Modifier { get; set; }
-        public List<AttributeDescription> Attributes { get; }
+        public string Name { get; }
+        public TypeMember DeclaringType { get; }
+        public MemberStatus Status { get; }
+        public MemberVisibility Visibility { get; }
+        public MemberModifier Modifier { get; }
+        public ImmutableList<AttributeDescription> Attributes { get; }
     }
 }
