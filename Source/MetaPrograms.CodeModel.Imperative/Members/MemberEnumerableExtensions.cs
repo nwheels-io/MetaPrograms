@@ -58,10 +58,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
             //-------------------------------------------------------------------------------------------------------------------------------------------------
 
-            public IEnumerable<TMember> Attribute<TAttribute>()
-                where TAttribute : Attribute
+            public IEnumerable<TMember> Attribute(TypeMember attributeType)
             {
-                return _source.Where(t => t.Attributes.Any(a => a.AttributeType == typeof(TAttribute)));
+                return _source.Where(t => t.Attributes.Any(a => a.AttributeType == attributeType));
             }
         }
     }

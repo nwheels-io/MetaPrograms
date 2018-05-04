@@ -1,46 +1,44 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class MethodParameter
     {
-        public MethodParameter()
+        public MethodParameter(
+            string name, 
+            int position, 
+            TypeMember type, 
+            MethodParameterModifier modifier, 
+            ImmutableList<AttributeDescription> attributes)
         {
-            this.Attributes = new List<AttributeDescription>();
+            Name = name;
+            Position = position;
+            Type = type;
+            Modifier = modifier;
+            Attributes = attributes;
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public MethodParameter(string name, int position, TypeMember type, MethodParameterModifier modifier, params AttributeDescription[] attributes)
-            : this()
+        public MethodParameter(
+            MethodParameter source,
+            Mutator<string>? name = null,
+            Mutator<int>? position = null,
+            Mutator<TypeMember>? type = null,
+            Mutator<MethodParameterModifier>? modifier = null,
+            Mutator<ImmutableList<AttributeDescription>>? attributes = null)
         {
-            this.Name = name;
-            this.Position = position;
-            this.Type = type;
-            this.Modifier = modifier;
-
-            if (attributes != null)
-            {
-                this.Attributes.AddRange(attributes);
-            }
+            Name = name.MutatedOrOriginal(source.Name);
+            Position = position.MutatedOrOriginal(source.Position);
+            Type = type.MutatedOrOriginal(source.Type);
+            Modifier = modifier.MutatedOrOriginal(source.Modifier);
+            Attributes = attributes.MutatedOrOriginal(source.Attributes);
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public MethodParameter(string name, int position, TypeMember type)
-            : this(name, position, type, MethodParameterModifier.None)
-        {
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public string Name { get; set; }
-        public int Position { get; set; }
-        public TypeMember Type { get; set; }
-        public MethodParameterModifier Modifier { get; set; }
-        public List<AttributeDescription> Attributes { get; private set; }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
+        public string Name { get; }
+        public int Position { get; }
+        public TypeMember Type { get; }
+        public MethodParameterModifier Modifier { get; }
+        public ImmutableList<AttributeDescription> Attributes { get; }
 
         public static MethodParameter ReturnVoid => null;
     }

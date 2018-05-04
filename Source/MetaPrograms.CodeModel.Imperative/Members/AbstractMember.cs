@@ -41,19 +41,19 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Attributes = attributes.MutatedOrOriginal(source.Attributes);
         }
 
-        public bool HasAttribute<TAttribute>()
-            where TAttribute : Attribute
-        {
-            return TryGetAttribute<TAttribute>(out TAttribute attribute);
-        }
+        //public bool HasAttribute<TAttribute>()
+        //    where TAttribute : Attribute
+        //{
+        //    return TryGetAttribute<TAttribute>(out TAttribute attribute);
+        //}
 
-        public bool TryGetAttribute<TAttribute>(out TAttribute attribute)
-            where TAttribute : Attribute
-        {
-            var description = this.Attributes.FirstOrDefault(a => a.Binding is TAttribute);
-            attribute = (description?.Binding as TAttribute);
-            return (attribute != null);
-        }
+        //public bool TryGetAttribute<TAttribute>(out TAttribute attribute)
+        //    where TAttribute : Attribute
+        //{
+        //    var description = this.Attributes.FirstOrDefault(a => a.Binding is TAttribute);
+        //    attribute = (description?.Binding as TAttribute);
+        //    return (attribute != null);
+        //}
 
         public virtual void AcceptVisitor(MemberVisitor visitor)
         {

@@ -177,7 +177,7 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public TypeGeneratorInfo ToGeneratorInfo()
         {
-            return new TypeGeneratorInfo(this.FactoryType, this);
+            return new TypeGeneratorInfo(this.FactoryType, this, activationContract: this.PrimaryContract);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------

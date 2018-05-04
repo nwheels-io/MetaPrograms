@@ -1,60 +1,42 @@
-﻿using System.Reflection;
+﻿using System.Collections.Immutable;
+using System.Reflection;
+using MetaPrograms.CodeModel.Imperative.Statements;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class MethodMember : MethodMemberBase
     {
         public MethodMember(
-            MemberVisibility visibility, 
             string name, 
-            params MethodParameter[] parameters)
-            : this(visibility, MemberModifier.None, name, new MethodSignature() {  })
+            TypeMember declaringType, 
+            MemberStatus status, 
+            MemberVisibility visibility, 
+            MemberModifier modifier, 
+            ImmutableList<AttributeDescription> attributes, 
+            MethodSignature signature, 
+            BlockStatement body) 
+            : base(name, declaringType, status, visibility, modifier, attributes, signature, body)
         {
         }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         public MethodMember(
-            MemberVisibility visibility,
-            string name,
-            MethodSignature signature)
-            : this(visibility, MemberModifier.None, name, signature)
+            MethodMember source, 
+            Mutator<string>? name = null, 
+            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberStatus>? status = null, 
+            Mutator<MemberVisibility>? visibility = null, 
+            Mutator<MemberModifier>? modifier = null, 
+            Mutator<ImmutableList<AttributeDescription>>? attributes = null, 
+            Mutator<MethodSignature>? signature = null, 
+            Mutator<BlockStatement>? body = null) 
+            : base(source, name, declaringType, status, visibility, modifier, attributes, signature, body)
         {
         }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public MethodMember(
-            MemberVisibility visibility,
-            MemberModifier modifier,
-            string name,
-            MethodSignature signature)
-        {
-            this.Visibility = visibility;
-            this.Modifier = modifier;
-            this.Name = name;
-            this.Signature = signature;
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public MethodMember(MethodInfo clrBinding)
-            : base(clrBinding)
-        {
-            this.Name = Name;
-            this.Signature = new MethodSignature(clrBinding);
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {
             base.AcceptVisitor(visitor);
             visitor.VisitMethod(this);
         }
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public MethodInfo ClrBinding { get; set; }
     }
 }

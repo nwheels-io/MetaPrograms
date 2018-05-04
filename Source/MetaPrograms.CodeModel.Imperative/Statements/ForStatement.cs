@@ -1,15 +1,34 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 
 namespace MetaPrograms.CodeModel.Imperative.Statements
 {
     public class ForStatement : AbstractStatement
     {
-        public ForStatement()
+        public ForStatement(
+            ImmutableList<AbstractStatement> initializers, 
+            AbstractExpression condition, 
+            ImmutableList<AbstractStatement> iterators, 
+            BlockStatement body)
         {
-            this.Initializers = new List<AbstractStatement>();
-            this.Iterators = new List<AbstractStatement>();
-            this.Body = new BlockStatement();
+            Initializers = initializers;
+            Condition = condition;
+            Iterators = iterators;
+            Body = body;
+        }
+
+        public ForStatement(
+            ForStatement source,
+            Mutator<ImmutableList<AbstractStatement>>? initializers = null,
+            Mutator<AbstractExpression>? condition = null,
+            Mutator<ImmutableList<AbstractStatement>>? iterators = null,
+            Mutator<BlockStatement>? body = null)
+        {
+            Initializers = initializers.MutatedOrOriginal(source.Initializers);
+            Condition = condition.MutatedOrOriginal(source.Condition);
+            Iterators = iterators.MutatedOrOriginal(source.Iterators);
+            Body = body.MutatedOrOriginal(source.Body);
         }
 
         public override void AcceptVisitor(StatementVisitor visitor)
@@ -34,9 +53,9 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             Body.AcceptVisitor(visitor);
         }
 
-        public List<AbstractStatement> Initializers { get; }
-        public AbstractExpression Condition { get; set; }
-        public List<AbstractStatement> Iterators { get; }
+        public ImmutableList<AbstractStatement> Initializers { get; }
+        public AbstractExpression Condition { get; }
+        public ImmutableList<AbstractStatement> Iterators { get; }
         public BlockStatement Body { get; }
     }
 }

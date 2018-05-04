@@ -29,14 +29,15 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             {
                 visitor.VisitReferenceToTypeMember(typeMember);
             }
-            else if (Value is System.Type systemType)
-            {
-                visitor.VisitReferenceToTypeMember(systemType);
-            }
-            else if (Value != null)
-            {
-                visitor.VisitReferenceToTypeMember(Value.GetType());
-            }
+            //TODO: handle bindings
+            //else if (Value is System.Type systemType)
+            //{
+            //    visitor.VisitReferenceToTypeMember(systemType);
+            //}
+            //else if (Value != null)
+            //{
+            //    visitor.VisitReferenceToTypeMember(Value.GetType());
+            //}
         }
 
         public object Value { get; }

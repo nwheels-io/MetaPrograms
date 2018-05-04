@@ -19,13 +19,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public EnumMember(
             EnumMember source, 
-            Mutator<string>? name, 
-            Mutator<TypeMember>? declaringType, 
-            Mutator<MemberStatus>? status, 
-            Mutator<MemberVisibility>? visibility, 
-            Mutator<MemberModifier>? modifier, 
-            Mutator<ImmutableList<AttributeDescription>>? attributes,
-            Mutator<object>? value = null) : base(source, name, declaringType, status, visibility, modifier, attributes)
+            Mutator<string>? name = null, 
+            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberStatus>? status = null, 
+            Mutator<MemberVisibility>? visibility = null, 
+            Mutator<MemberModifier>? modifier = null, 
+            Mutator<ImmutableList<AttributeDescription>>? attributes = null,
+            Mutator<object>? value = null) 
+            : base(source, name, declaringType, status, visibility, modifier, attributes)
         {
             Value = value.MutatedOrOriginal(source.Value);
         }
