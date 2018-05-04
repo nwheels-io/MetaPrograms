@@ -21,6 +21,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.CodeModel.Impe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaPrograms.CodeModel.Imperative.Tests", "MetaPrograms.CodeModel.Imperative.Tests\MetaPrograms.CodeModel.Imperative.Tests.csproj", "{AFDBA58E-DB68-4CEE-B475-87E80B49ECFB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{FBB9D4CC-E0E5-4299-B3F1-D89A7D58312F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaPrograms.IntegrationTests", "MetaPrograms.IntegrationTests\MetaPrograms.IntegrationTests.csproj", "{FA8E847D-4A9F-4C30-9367-1D045307F20F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +51,10 @@ Global
 		{AFDBA58E-DB68-4CEE-B475-87E80B49ECFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFDBA58E-DB68-4CEE-B475-87E80B49ECFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFDBA58E-DB68-4CEE-B475-87E80B49ECFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA8E847D-4A9F-4C30-9367-1D045307F20F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA8E847D-4A9F-4C30-9367-1D045307F20F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA8E847D-4A9F-4C30-9367-1D045307F20F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA8E847D-4A9F-4C30-9367-1D045307F20F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +65,7 @@ Global
 		{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D} = {5CB12491-0D94-452D-8B53-C5534097A220}
 		{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172} = {F02E1BB6-916B-43F6-9E9A-5A84D83D90AD}
 		{AFDBA58E-DB68-4CEE-B475-87E80B49ECFB} = {F02E1BB6-916B-43F6-9E9A-5A84D83D90AD}
+		{FA8E847D-4A9F-4C30-9367-1D045307F20F} = {FBB9D4CC-E0E5-4299-B3F1-D89A7D58312F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {150905B7-0BC7-470A-90D3-229DADEA4A4F}

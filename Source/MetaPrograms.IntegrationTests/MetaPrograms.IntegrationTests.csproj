@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MetaPrograms.CodeModel.Imperative\MetaPrograms.CodeModel.Imperative.csproj" />
+    <ProjectReference Include="..\MetaPrograms.Adapters.JavaScript\MetaPrograms.Adapters.JavaScript.csproj" />
+    <ProjectReference Include="..\MetaPrograms.Adapters.Roslyn\MetaPrograms.Adapters.Roslyn.csproj" />
   </ItemGroup>
 
 </Project>
