@@ -18,6 +18,8 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         }
 
         public abstract void AcceptVisitor(StatementVisitor visitor);
+
+        public BindingCollection Bindings { get; } = new BindingCollection();
         public TypeMember Type { get; }
     }
 }

@@ -71,6 +71,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return $"{this.GetType().Name.TrimSuffix("Member")} {this.Name}";
         }
 
+        public BindingCollection Bindings { get; } = new BindingCollection();
+
         public string Name { get; }
         public TypeMember DeclaringType { get; }
         public MemberStatus Status { get; }

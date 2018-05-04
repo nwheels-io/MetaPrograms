@@ -2,6 +2,7 @@
 {
     public abstract class AbstractStatement
     {
+        public BindingCollection Bindings { get; } = new BindingCollection();
         public abstract void AcceptVisitor(StatementVisitor visitor);
     }
 }
