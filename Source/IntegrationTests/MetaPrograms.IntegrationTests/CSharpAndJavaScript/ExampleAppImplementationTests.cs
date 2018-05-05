@@ -21,7 +21,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             reader.AddProject(Path.Combine(ExamplesRootDirectory, "Example.App", "Example.App.csproj"));
             reader.Read();
             
-            var uiModel = new WebUIModel(reader.CodeModel);
+            var uiModel = new WebUIModel(reader.TypeMembers);
             
             var frontEndAdapter = new WebBrowserAdapter(outputStreamFactory: filePath => new MemoryStream());
             var frontEndOutputs = frontEndAdapter.GenerateImplementations(uiModel);
