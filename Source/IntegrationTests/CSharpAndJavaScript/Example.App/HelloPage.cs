@@ -1,4 +1,5 @@
-﻿using Example.WebUIModel;
+﻿
+using Example.WebUIModel;
 
 namespace Example.App
 {

@@ -1,11 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>7.2</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="nunit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
@@ -13,10 +11,12 @@
     <PackageReference Include="Shouldly" Version="3.0.0" />
     <PackageReference Include="Moq" Version="4.8.2" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\MetaPrograms.Adapters.JavaScript\MetaPrograms.Adapters.JavaScript.csproj" />
     <ProjectReference Include="..\..\MetaPrograms.Adapters.Roslyn\MetaPrograms.Adapters.Roslyn.csproj" />
+    <ProjectReference Include="..\CSharpAndJavaScript\Example.App\Example.App.csproj" />
+    <ProjectReference Include="..\CSharpAndJavaScript\Example.AspNetAdapter\Example.AspNetAdapter.csproj" />
+    <ProjectReference Include="..\CSharpAndJavaScript\Example.WebBrowserAdapter\Example.WebBrowserAdapter.csproj" />
+    <ProjectReference Include="..\CSharpAndJavaScript\Example.WebUIModel\Example.WebUIModel.csproj" />
   </ItemGroup>
-
 </Project>

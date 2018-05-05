@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Shouldly;
 
@@ -20,6 +21,11 @@ namespace MetaPrograms.IntegrationTests
             var tokens = code.Split(new[] {' ', '\t', '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             var normalized = string.Join(' ', tokens);
             return normalized;
+        }
+
+        public static void ShouldMatchTextFile(this Stream actual, string expectedFilePath)
+        {
+            
         }
     }
 }
