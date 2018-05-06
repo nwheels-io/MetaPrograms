@@ -32,15 +32,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExpectedOutput", "ExpectedO
 		IntegrationTests\CSharpAndJavaScript\ExpectedOutput\index.html = IntegrationTests\CSharpAndJavaScript\ExpectedOutput\index.html
 		IntegrationTests\CSharpAndJavaScript\ExpectedOutput\index.js = IntegrationTests\CSharpAndJavaScript\ExpectedOutput\index.js
 		IntegrationTests\CSharpAndJavaScript\ExpectedOutput\IndexController.cs = IntegrationTests\CSharpAndJavaScript\ExpectedOutput\IndexController.cs
+		IntegrationTests\CSharpAndJavaScript\ExpectedOutput\InvalidModelAutoResponderAttribute.cs = IntegrationTests\CSharpAndJavaScript\ExpectedOutput\InvalidModelAutoResponderAttribute.cs
+		tinyfx.js = tinyfx.js
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.App", "IntegrationTests\CSharpAndJavaScript\Example.App\Example.App.csproj", "{08B45DD1-A2EA-43CD-9798-C22FEE18B1C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.App", "IntegrationTests\CSharpAndJavaScript\Example.App\Example.App.csproj", "{08B45DD1-A2EA-43CD-9798-C22FEE18B1C2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.WebBrowserAdapter", "IntegrationTests\CSharpAndJavaScript\Example.WebBrowserAdapter\Example.WebBrowserAdapter.csproj", "{373AEDD3-69BC-47A4-8618-3F2D662F19B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.WebUIModel", "IntegrationTests\CSharpAndJavaScript\Example.WebUIModel\Example.WebUIModel.csproj", "{F097E339-E75B-43D7-AEFD-C5EDDAE98FA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.WebUIModel", "IntegrationTests\CSharpAndJavaScript\Example.WebUIModel\Example.WebUIModel.csproj", "{F097E339-E75B-43D7-AEFD-C5EDDAE98FA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.AspNetAdapter", "IntegrationTests\CSharpAndJavaScript\Example.AspNetAdapter\Example.AspNetAdapter.csproj", "{452A8E88-9779-4C72-9022-52EC50B47953}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.AspNetAdapter", "IntegrationTests\CSharpAndJavaScript\Example.AspNetAdapter\Example.AspNetAdapter.csproj", "{452A8E88-9779-4C72-9022-52EC50B47953}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

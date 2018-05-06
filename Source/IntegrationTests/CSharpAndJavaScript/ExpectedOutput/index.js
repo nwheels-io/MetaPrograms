@@ -1,40 +1,25 @@
-﻿(function() {
+﻿import { CreateTransactionFormBuilder, CreateServiceProxy } from './tinyfx.js';
 
-    let model = {
+document.addEventListener('DOMContentLoaded', () => {
+
+    const model = {
         name: '',
         greeting: null
     };
 
-    function scatterModel() {
-        document.getElementById('HelloPage_Form_Name').value = model.name;
-        document.getElementById('HelloPage_Form_Greeting').innerText = model.greeting;
+    const greetingService = CreateServiceProxy('api/index');
+
+    async function form_submitting() {
+        model.greeting = await greetingService.invoke('getGreetingForName', { name: model.name });
+        console.log(model);
     }
 
-    function gatherModel() {
-        model.name = document.getElementById('HelloPage_Form_Name').value;
-    }
+    const form = CreateTransactionFormBuilder()
+        .bindModel(model)
+        .bindElement(document.getElementById('helloPage_form'))
+        .field('name')
+        .field('greeting', f => f.isOutput())
+        .onSubmit(form_submitting)
+        .buildComponent();
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('HelloPage_Form').addEventListener('submit', () => {
-            const apiParams = {
-                name: model.name
-            };
-            const fetchOptions = {
-                method: 'POST',
-                body: JSON.stringify(apiParams),
-                headers: new Headers({
-                    'Content-Type': 'application/json'
-                })
-            };
-            fetch('api/getGreetingForName', fetchOptions)
-                .then((response) => {
-                    model.greeting = response.json();
-                    scatterModel();
-                })
-                .catch((error) => {
-                    alert(error);
-                });
-        });
-    });
-
-})();
+});

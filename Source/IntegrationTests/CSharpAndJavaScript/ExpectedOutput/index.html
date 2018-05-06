@@ -1,18 +1,26 @@
-﻿<html>
+﻿<!DOCTYPE html>
+<html>
 <head>
-    <title>Example.App</title>
+    <meta charset="utf-8" />
+    <title>Example App</title>
 </head>
 <body>
-
-    <form id="HelloPage_Form">
-        <label for="HelloPage_Form_Name">Name</label>
-        <input id="HelloPage_Form_Name" name="name" type="text" required="" />
-        <input type="submit" />
-        <label for="HelloPage_Form_Greeting">System says</label>
-        <span id="HelloPage_Form_Greeting" style="display: none"></span>
+    <form id="helloPage_form">
+        <div id="helloPage_form_name">
+            <label for="helloPage_form_name__input">Name</label>
+            <input id="helloPage_form_name__input" name="name" type="text" required="" />
+        </div>
+        <div id="helloPage_form__buttons">
+            <input id="helloPage_form__buttons_Submit" type="submit" />
+        </div>
+        <div id="helloPage_form__status" style="display: none">
+            <span id="helloPage_form__status__static"></span>
+        </div>
+        <div id="helloPage_form_greeting" style="display: none">
+            <label for="helloPage_form_greeting__static">Server says:</label>
+            <span id="helloPage_form_greeting__static"></span>
+        </div>
     </form>
-
-    <script src="index.js" />
-
+    <script src="index.js" type="module"></script>
 </body>
 </html>
