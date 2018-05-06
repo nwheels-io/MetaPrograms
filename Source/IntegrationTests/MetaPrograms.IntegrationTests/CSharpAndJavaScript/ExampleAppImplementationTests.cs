@@ -4,6 +4,7 @@ using Example.AspNetAdapter;
 using Example.WebBrowserAdapter;
 using Example.WebUIModel;
 using MetaPrograms.Adapters.Roslyn;
+using MetaPrograms.Adapters.Roslyn.Reader;
 using NUnit.Framework;
 using Shouldly;
 
@@ -17,11 +18,11 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
         {
             // act
 
-            var reader = new RoslynCodeModelReader();
+            var reader = new RoslynCodeModelReader(new BuildalyzerWorkspaceLoader());
             reader.AddProject(Path.Combine(ExamplesRootDirectory, "Example.App", "Example.App.csproj"));
             reader.Read();
             
-            var uiModel = new WebUIModel(reader.TypeMembers);
+            var uiModel = new WebUIModel(reader.CodeModel);
             
             var frontEndAdapter = new WebBrowserAdapter(outputStreamFactory: filePath => new MemoryStream());
             var frontEndOutputs = frontEndAdapter.GenerateImplementations(uiModel);

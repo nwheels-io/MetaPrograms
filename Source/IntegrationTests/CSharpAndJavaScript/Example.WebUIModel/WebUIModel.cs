@@ -6,7 +6,7 @@ namespace Example.WebUIModel
 {
     public class WebUIModel
     {
-        public WebUIModel(CodeMemberCollection codeModel)
+        public WebUIModel(ImmutableCodeModel codeModel)
         {
         }
     }
