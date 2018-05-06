@@ -10,7 +10,7 @@ namespace Example.AspNetAdapter
         {
         }
 
-        public ImmutableDictionary<string, Stream> GenerateImplementations(WebUIModel.WebUIModel model) =>
+        public ImmutableDictionary<string, Stream> GenerateImplementations(WebUIModel.Metadata.WebUIMetadata metadata) =>
             ImmutableDictionary<string, Stream>.Empty;
     }
 }

@@ -1,4 +1,4 @@
-﻿
+﻿using Example.App.Services;
 using Example.WebUIModel;
 
 namespace Example.App
@@ -19,11 +19,10 @@ namespace Example.App
         public class HelloModel
         {
             [PropertyContract.Semantic.Input]
-            [PropertyContract.Validation.Required]
+            [PropertyContract.Validation.Required(AllowEmpty = false, MaxLength = 50)]
             public string Name { get; set; }
 
             [PropertyContract.Semantic.Output]
-            [PropertyContract.Presentation.HideIfNullOrEmpty]
             [PropertyContract.I18n.Label("SystemSaid")]
             public string Greeting { get; set; }
         }

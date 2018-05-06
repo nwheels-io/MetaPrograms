@@ -10,6 +10,8 @@ namespace Example.WebUIModel
         {
             public class RequiredAttribute : Attribute
             {
+                public int MaxLength { get; set; }
+                public bool AllowEmpty { get; set; }
             }
         }
 

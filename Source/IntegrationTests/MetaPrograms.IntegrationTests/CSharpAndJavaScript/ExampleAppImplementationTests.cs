@@ -3,6 +3,7 @@ using System.Linq;
 using Example.AspNetAdapter;
 using Example.WebBrowserAdapter;
 using Example.WebUIModel;
+using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.Roslyn;
 using MetaPrograms.Adapters.Roslyn.Reader;
 using NUnit.Framework;
@@ -22,13 +23,13 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             reader.AddProject(Path.Combine(ExamplesRootDirectory, "Example.App", "Example.App.csproj"));
             reader.Read();
             
-            var uiModel = new WebUIModel(reader.CodeModel);
+            var uiMetadata = new WebUIMetadata(reader.CodeModel);
             
             var frontEndAdapter = new WebBrowserAdapter(outputStreamFactory: filePath => new MemoryStream());
-            var frontEndOutputs = frontEndAdapter.GenerateImplementations(uiModel);
+            var frontEndOutputs = frontEndAdapter.GenerateImplementations(uiMetadata);
             
             var backEndAdapter = new AspNetAdapter(outputStreamFactory: filePath => new MemoryStream());
-            var backEndOutputs = backEndAdapter.GenerateImplementations(uiModel);
+            var backEndOutputs = backEndAdapter.GenerateImplementations(uiMetadata);
             
             // assert
 
