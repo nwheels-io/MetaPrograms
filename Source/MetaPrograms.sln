@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExpectedOutput", "ExpectedO
 		IntegrationTests\CSharpAndJavaScript\ExpectedOutput\index.js = IntegrationTests\CSharpAndJavaScript\ExpectedOutput\index.js
 		IntegrationTests\CSharpAndJavaScript\ExpectedOutput\IndexController.cs = IntegrationTests\CSharpAndJavaScript\ExpectedOutput\IndexController.cs
 		IntegrationTests\CSharpAndJavaScript\ExpectedOutput\InvalidModelAutoResponderAttribute.cs = IntegrationTests\CSharpAndJavaScript\ExpectedOutput\InvalidModelAutoResponderAttribute.cs
-		tinyfx.js = tinyfx.js
+		IntegrationTests\CSharpAndJavaScript\ExpectedOutput\tinyfx.js = IntegrationTests\CSharpAndJavaScript\ExpectedOutput\tinyfx.js
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.App", "IntegrationTests\CSharpAndJavaScript\Example.App\Example.App.csproj", "{08B45DD1-A2EA-43CD-9798-C22FEE18B1C2}"
