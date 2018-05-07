@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
@@ -19,6 +20,27 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             }
 
             return string.Join(".", Enumerable.Reverse(namespaceHierarchy));
+        }
+
+        public static string GetFullyQualifiedMetadataName(this INamespaceOrTypeSymbol symbol)
+        {
+            var result = new StringBuilder(symbol.MetadataName, capacity: 255);
+            
+            for (
+                var outerSymbol = symbol.ContainingSymbol;
+                outerSymbol != null && !outerSymbol.IsGlobalNamespace();
+                outerSymbol = outerSymbol.ContainingSymbol)
+            {
+                result.Insert(0, outerSymbol is INamespaceSymbol ? '.' : '+');
+                result.Insert(0, outerSymbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
+            }
+
+            return result.ToString();
+        }
+
+        public static bool IsGlobalNamespace(this ISymbol symbol)
+        {
+            return (symbol is INamespaceSymbol ns && ns.IsGlobalNamespace);
         }
     }
 }
