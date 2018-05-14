@@ -28,10 +28,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.IsNullable = this.IsNullable.Assign(builder.IsNullable);
             this.IsAwaitable = this.IsAwaitable.Assign(builder.IsAwaitable);
             this.IsGenericType = this.IsGenericType.Assign(builder.IsGenericType);
-            this.IsGenericTypeDefinition = this.IsGenericTypeDefinition.Assign(builder.IsGenericTypeDefinition);
+            this.IsGenericDefinition = this.IsGenericDefinition.Assign(builder.IsGenericDefinition);
+            this.IsGenericParameter = this.IsGenericParameter.Assign(builder.IsGenericParameter);
             this.GenericTypeDefinition = this.GenericTypeDefinition.Assign(builder.GenericTypeDefinition);
-            this.GenericTypeArguments = this.GenericTypeArguments.Assign(builder.GenericTypeArguments?.ToImmutableList());
-            this.GenericTypeParameters = this.GenericTypeParameters.Assign(builder.GenericTypeParameters?.ToImmutableList());
+            this.GenericArguments = this.GenericArguments.Assign(builder.GenericArguments?.ToImmutableList());
+            this.GenericParameters = this.GenericParameters.Assign(builder.GenericParameters?.ToImmutableList());
             this.UnderlyingType = this.UnderlyingType.Assign(builder.UnderlyingType);
             this.Members = this.Members.Assign(builder.Members?.ToImmutableList());
             this.Generator = this.Generator.Assign(builder.Generator);
@@ -55,10 +56,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public Mutator<bool>? IsNullable { get; set; }
         public Mutator<bool>? IsAwaitable { get; set; }
         public Mutator<bool>? IsGenericType { get; set; }
-        public Mutator<bool>? IsGenericTypeDefinition { get; set; }
+        public Mutator<bool>? IsGenericDefinition { get; set; }
+        public Mutator<bool>? IsGenericParameter { get; set; }
         public Mutator<TypeMember>? GenericTypeDefinition { get; set; }
-        public Mutator<ImmutableList<TypeMember>>? GenericTypeArguments { get; set; }
-        public Mutator<ImmutableList<TypeMember>>? GenericTypeParameters { get; set; }
+        public Mutator<ImmutableList<TypeMember>>? GenericArguments { get; set; }
+        public Mutator<ImmutableList<TypeMember>>? GenericParameters { get; set; }
         public Mutator<TypeMember>? UnderlyingType { get; set; }
         public Mutator<ImmutableList<AbstractMember>>? Members { get; set; }
         public Mutator<TypeGeneratorInfo>? Generator { get; set; }

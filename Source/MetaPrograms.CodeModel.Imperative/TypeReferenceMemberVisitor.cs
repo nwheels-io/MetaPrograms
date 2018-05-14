@@ -110,16 +110,16 @@ namespace MetaPrograms.CodeModel.Imperative
                 }
                 else
                 {
-                    if (!type.IsGenericType || type.IsGenericTypeDefinition)
+                    if (!type.IsGenericType || type.IsGenericDefinition)
                     {
                         typeSet.Add(type);
                     }
 
-                    if (type.IsGenericType && !type.IsGenericTypeDefinition)
+                    if (type.IsGenericType && !type.IsGenericDefinition)
                     {
                         AddReferencedType(typeSet, type.GenericTypeDefinition);
 
-                        foreach (var argument in type.GenericTypeArguments)
+                        foreach (var argument in type.GenericArguments)
                         {
                             AddReferencedType(typeSet, argument);
                         }

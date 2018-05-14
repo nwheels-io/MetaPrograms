@@ -35,7 +35,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public bool IsNullable { get; set; }
         public bool IsAwaitable { get; set; }
         public bool IsGenericType { get; set; }
-        public bool IsGenericTypeDefinition { get; set; }
+        public bool IsGenericDefinition { get; set; }
+        public bool IsGenericParameter { get; set; }
         public TypeMember GenericTypeDefinition { get; set; }
         public List<TypeMember> GenericTypeArguments { get; }
         public List<TypeMember> GenericTypeParameters { get; }

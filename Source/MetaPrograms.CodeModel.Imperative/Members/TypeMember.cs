@@ -29,10 +29,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.IsNullable = builder.IsNullable;
             this.IsAwaitable = builder.IsAwaitable;
             this.IsGenericType = builder.IsGenericType;
-            this.IsGenericTypeDefinition = builder.IsGenericTypeDefinition;
+            this.IsGenericDefinition = builder.IsGenericDefinition;
+            this.IsGenericParameter = builder.IsGenericParameter;
             this.GenericTypeDefinition = builder.GenericTypeDefinition;
-            this.GenericTypeArguments = builder.GenericTypeArguments.ToImmutableList();
-            this.GenericTypeParameters = builder.GenericTypeParameters.ToImmutableList();
+            this.GenericArguments = builder.GenericTypeArguments.ToImmutableList();
+            this.GenericParameters = builder.GenericTypeParameters.ToImmutableList();
             this.UnderlyingType = builder.UnderlyingType;
             this.Members = builder.Members.ToImmutableList();
             this.Generator = builder.Generator;
@@ -60,10 +61,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.IsNullable = mutator.IsNullable.MutatedOrOriginal(source.IsNullable);
             this.IsAwaitable = mutator.IsAwaitable.MutatedOrOriginal(source.IsAwaitable);
             this.IsGenericType = mutator.IsGenericType.MutatedOrOriginal(source.IsGenericType);
-            this.IsGenericTypeDefinition = mutator.IsGenericTypeDefinition.MutatedOrOriginal(source.IsGenericTypeDefinition);
+            this.IsGenericDefinition = mutator.IsGenericDefinition.MutatedOrOriginal(source.IsGenericDefinition);
+            this.IsGenericParameter = mutator.IsGenericParameter.MutatedOrOriginal(source.IsGenericParameter);
             this.GenericTypeDefinition = mutator.GenericTypeDefinition.MutatedOrOriginal(source.GenericTypeDefinition);
-            this.GenericTypeArguments = mutator.GenericTypeArguments.MutatedOrOriginal(source.GenericTypeArguments);
-            this.GenericTypeParameters = mutator.GenericTypeParameters.MutatedOrOriginal(source.GenericTypeParameters);
+            this.GenericArguments = mutator.GenericArguments.MutatedOrOriginal(source.GenericArguments);
+            this.GenericParameters = mutator.GenericParameters.MutatedOrOriginal(source.GenericParameters);
             this.UnderlyingType = mutator.UnderlyingType.MutatedOrOriginal(source.UnderlyingType);
             this.Members = mutator.Members.MutatedOrOriginal(source.Members);
             this.Generator = mutator.Generator.MutatedOrOriginal(source.Generator);
@@ -81,10 +83,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public bool IsNullable { get; }
         public bool IsAwaitable { get; }
         public bool IsGenericType { get; }
-        public bool IsGenericTypeDefinition { get; }
+        public bool IsGenericDefinition { get; }
+        public bool IsGenericParameter { get; }
         public TypeMember GenericTypeDefinition { get; }
-        public ImmutableList<TypeMember> GenericTypeArguments { get; }
-        public ImmutableList<TypeMember> GenericTypeParameters { get; }
+        public ImmutableList<TypeMember> GenericArguments { get; }
+        public ImmutableList<TypeMember> GenericParameters { get; }
         public TypeMember UnderlyingType { get; }
         public ImmutableList<AbstractMember> Members { get; }
         public TypeGeneratorInfo Generator { get; }
@@ -138,7 +141,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             var mutator = new TypeMemberMutator(new TypeMemberMutatorBuilder {
                 IsGenericType = true,
                 GenericTypeDefinition = this,
-                GenericTypeArguments = typeArguments.ToList()
+                GenericArguments = typeArguments.ToList()
             });
 
             return new TypeMember(this, mutator);
@@ -151,12 +154,12 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 return this.Name;
             }
 
-            if (IsGenericTypeDefinition)
+            if (IsGenericDefinition)
             {
                 return (
                     this.Name + 
                     openBracket + 
-                    string.Join(commaSeparator, GenericTypeParameters.Select(t => t.Name)) +
+                    string.Join(commaSeparator, GenericParameters.Select(t => t.Name)) +
                     closeBracket);
             }
             else
@@ -164,20 +167,20 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 return (
                     this.Name +
                     openBracket + 
-                    string.Join(commaSeparator, GenericTypeArguments.Select(t => t.MakeGenericName(openBracket, closeBracket, commaSeparator))) +
+                    string.Join(commaSeparator, GenericArguments.Select(t => t.MakeGenericName(openBracket, closeBracket, commaSeparator))) +
                     closeBracket);
             }
         }
 
         public string MakeNameWithGenericArity(char aritySeparator)
         {
-            if (IsGenericTypeDefinition)
+            if (IsGenericDefinition)
             {
-                return (this.Name + aritySeparator + GenericTypeParameters.Count);
+                return (this.Name + aritySeparator + GenericParameters.Count);
             }
             else if (IsGenericType)
             {
-                return (this.Name + aritySeparator + GenericTypeArguments.Count);
+                return (this.Name + aritySeparator + GenericArguments.Count);
             }
             else
             {
