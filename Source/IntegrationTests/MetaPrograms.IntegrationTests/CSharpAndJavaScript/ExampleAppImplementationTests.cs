@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using Example.AspNetAdapter;
 using Example.WebBrowserAdapter;
@@ -15,12 +16,32 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
     public class ExampleAppImplementationTests
     {
         [Test]
+        public void CanCompileExampleProject()
+        {
+            // arrange
+            var loader = new BuildalyzerWorkspaceLoader();
+            var workspace = loader.LoadProjectWorkspace(new[] {
+                GetExampleProjectFilePath("Example.App"),
+                GetExampleProjectFilePath("Example.WebUIModel"),
+                GetExampleProjectFilePath("Example.WebBrowserAdapter"),
+                GetExampleProjectFilePath("Example.AspNetAdapter"),
+            });
+                    ;
+
+            //act & assert
+            workspace.CompileCodeOrThrow();
+        }
+
+        [Test]
         public void CanGenerateImplementations()
         {
             // act
 
             var reader = new RoslynCodeModelReader(new BuildalyzerWorkspaceLoader());
-            reader.AddProject(Path.Combine(ExamplesRootDirectory, "Example.App", "Example.App.csproj"));
+            reader.AddProject(GetExampleProjectFilePath("Example.App"));
+            reader.AddProject(GetExampleProjectFilePath("Example.WebUIModel"));
+            reader.AddProject(GetExampleProjectFilePath("Example.WebBrowserAdapter"));
+            reader.AddProject(GetExampleProjectFilePath("Example.AspNetAdapter"));
             reader.Read();
             
             var uiMetadata = new WebUIMetadata(reader.CodeModel);
@@ -30,18 +51,26 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             
             var backEndAdapter = new AspNetAdapter(outputStreamFactory: filePath => new MemoryStream());
             var backEndOutputs = backEndAdapter.GenerateImplementations(uiMetadata);
-            
+
             // assert
 
-            frontEndOutputs.Select(kvp => kvp.Key).ShouldBe(new[] { "index.html", "index.js" }, ignoreOrder: true);
-            backEndOutputs.Select(kvp => kvp.Key).ShouldBe(new[] { "IndexController.cs" });
+            AssertOutputs(frontEndOutputs, "index.html", "index.js", "tinyfx.js");
+            AssertOutputs(backEndOutputs, "IndexController.cs", "InvalidModelAutoResponderAttribute.cs");
+        }
+
+        private void AssertOutputs(ImmutableDictionary<string, Stream> outputs, params string[] expectedFileNames)
+        {
+            outputs.Select(kvp => kvp.Key).ShouldBe(expectedFileNames, ignoreOrder: true);
 
             var expectedOutputsDirectory = Path.Combine(ExamplesRootDirectory, "ExpectedOutput");
-
-            frontEndOutputs["index.html"].ShouldMatchTextFile(Path.Combine(expectedOutputsDirectory, "index.html"));
-            frontEndOutputs["index.js"].ShouldMatchTextFile(Path.Combine(expectedOutputsDirectory, "index.js"));
-            backEndOutputs["IndexController.cs"].ShouldMatchTextFile(Path.Combine(expectedOutputsDirectory, "IndexController.cs"));
+            foreach (var fileName in expectedFileNames)
+            {
+                outputs[fileName].ShouldMatchTextFile(Path.Combine(expectedOutputsDirectory, fileName));
+            }
         }
+
+        private string GetExampleProjectFilePath(string projectName) =>
+            Path.Combine(ExamplesRootDirectory, projectName, projectName + ".csproj");
 
         private string ExamplesRootDirectory
         {

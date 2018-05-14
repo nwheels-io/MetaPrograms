@@ -12,8 +12,9 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     public class RoslynCodeModelReader
     {
         private readonly IWorkspaceLoader _workspaceLoader;
-        private readonly List<Workspace> _projectWorkspaces = new List<Workspace>();
+        private readonly List<string> _projectFilePaths = new List<string>();
         private readonly CodeModelBuilder _modelBuilder = new CodeModelBuilder();
+        private Workspace _workspace = null;
         
         public RoslynCodeModelReader(IWorkspaceLoader workspaceLoader)
         {
@@ -22,16 +23,16 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void AddProject(string projectFilePath)
         {
-            var workspace = _workspaceLoader.LoadProjectWorkspace(projectFilePath);
-            _projectWorkspaces.Add(workspace);
+            _projectFilePaths.Add(projectFilePath);
         }
 
         public void Read()
         {
-            foreach (var workspace in _projectWorkspaces)
+            _workspace = _workspaceLoader.LoadProjectWorkspace(_projectFilePaths);
+
+            foreach (var project in _workspace.CurrentSolution.Projects)
             {
-                var project = workspace.CurrentSolution.Projects.Single();
-                var projectReader = new ProjectReader(_modelBuilder, workspace, project);
+                var projectReader = new ProjectReader(_modelBuilder, _workspace, project);
                 projectReader.Read();
             }
 

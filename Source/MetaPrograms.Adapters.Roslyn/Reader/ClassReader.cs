@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis;
@@ -28,7 +29,18 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _clrType = Type.GetType(_fullyQualifiedMetadataName, throwOnError: false);
         }
 
-        public void Read()
+        public ClassReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, INamedTypeSymbol symbol)
+        {
+            _modelBuilder = modelBuilder;
+            _memberBuilder = new TypeMemberBuilder();
+            _semanticModel = semanticModel;
+            _symbol = symbol;
+            _syntax = symbol.DeclaringSyntaxReferences.OfType<ClassDeclarationSyntax>().FirstOrDefault();
+            _fullyQualifiedMetadataName = _symbol.GetFullyQualifiedMetadataName();
+            _clrType = Type.GetType(_fullyQualifiedMetadataName, throwOnError: false);
+        }
+
+        public TypeMember Read()
         {
             ReadName();
             RegisterIncompleteTypeMember();
@@ -37,7 +49,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             ReadBaseTypes();
             ReadMembers();
             
-            RegisterCompleteTypeMember();
+            return RegisterCompleteTypeMember();
         }
 
         private void RegisterIncompleteTypeMember()
@@ -47,11 +59,13 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _modelBuilder.RegisterMember(incompleteMember, isTopLevel: false);
         }
 
-        private void RegisterCompleteTypeMember()
+        private TypeMember RegisterCompleteTypeMember()
         {
             _memberBuilder.Status = MemberStatus.Compiled;
             var completeMember = CreateTypeMemberWithBindings();
             _modelBuilder.RegisterMember(completeMember, isTopLevel: _symbol.ContainingSymbol is INamespaceSymbol);
+
+            return completeMember;
         }
 
         private void ReadName()
@@ -64,17 +78,27 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         private void ReadGenerics()
         {
             _memberBuilder.IsGenericType = _symbol.IsGenericType;
-            //_memberBuilder.IsGenericTypeDefinition = _symbol.
+            _memberBuilder.IsGenericDefinition = _symbol.IsDefinition;
             
             if (_symbol.IsGenericType)
             {
-                
+                _memberBuilder.GenericTypeParameters.AddRange(
+                    _symbol.TypeParameters.Select(
+                        p => _modelBuilder.IncludeType(p, _semanticModel)));
             }
         }
 
         private void ReadBaseTypes()
         {
-            throw new NotImplementedException();
+            _memberBuilder.BaseType = (
+                _symbol.BaseType == null || _symbol.BaseType.SpecialType == SpecialType.System_Object
+                    ? null
+                    : _modelBuilder.IncludeType(_symbol.BaseType, _semanticModel));
+
+            foreach (var interfaceSymbol in _symbol.Interfaces)
+            {
+                _memberBuilder.Interfaces.Add(_modelBuilder.IncludeType(interfaceSymbol, _semanticModel));
+            }
         }
 
         private void ReadMembers()

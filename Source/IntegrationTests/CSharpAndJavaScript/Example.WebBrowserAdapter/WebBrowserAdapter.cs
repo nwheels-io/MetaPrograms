@@ -9,7 +9,7 @@ namespace Example.WebBrowserAdapter
         public WebBrowserAdapter(Func<string, Stream> outputStreamFactory)
         {
         }
-
+            
         public ImmutableDictionary<string, Stream> GenerateImplementations(WebUIModel.Metadata.WebUIMetadata metadata) =>
             ImmutableDictionary<string, Stream>.Empty;
     }

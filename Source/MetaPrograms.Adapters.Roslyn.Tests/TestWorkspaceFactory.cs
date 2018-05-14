@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using MetaPrograms.Adapters.Roslyn.Reader;
 
 namespace MetaPrograms.Adapters.Roslyn.Tests
 {
@@ -13,25 +14,38 @@ namespace MetaPrograms.Adapters.Roslyn.Tests
         private static readonly IReadOnlyList<string> TrustedAssemblyPaths = 
             AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES").ToString().Split(';');
 
-        public static AdhocWorkspace CreatreDefaultWithCode(string csharpCode, out Project project)
+        public static AdhocWorkspace CreateWithCode(string csharpCode, out Project project)
+        {
+            return CreateWithCode(csharpCode, new string[0], out project);
+        }
+
+        public static AdhocWorkspace CreateWithCode(string csharpCode, string[] references, out Project project)
         {
             var sourceText = SourceText.From(csharpCode);
                 
             var workspace = new AdhocWorkspace();
             var projectId = ProjectId.CreateNewId();
             var documentInfo = DocumentInfo.Create(
-                DocumentId.CreateNewId(projectId, "MyClass.cs"),
-                "MyClass.cs",
+                DocumentId.CreateNewId(projectId, "Source.cs"),
+                name: "Source.cs",
                 loader: TextLoader.From(TextAndVersion.Create(sourceText, VersionStamp.Create())));
 
+            var allReferencedAssemblyPaths = GetSystemAssemblyPaths().Concat(references);
+            
             var projectInfo = ProjectInfo
-                .Create(projectId, VersionStamp.Create(), "MyTest", "MyTest", LanguageNames.CSharp)
+                .Create(projectId, VersionStamp.Create(), "Test", "Test", LanguageNames.CSharp)
                 .WithCompilationOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-                .WithMetadataReferences(GetSystemAssemblyPaths().Select(path => MetadataReference.CreateFromFile(path)))
-                .WithDocuments(new[] {documentInfo});
+                .WithMetadataReferences(allReferencedAssemblyPaths.Select(path => MetadataReference.CreateFromFile(path)))
+                .WithDocuments(new[] { documentInfo });
             
             project = workspace.AddProject(projectInfo);
             return workspace;
+        }
+
+        public static Compilation CompileCodeOrThrow(string csharpCode, params string[] references)
+        {
+            var workspace = CreateWithCode(csharpCode, references, out Project project);
+            return workspace.CompileCodeOrThrow();
         }
         
         private static string[] GetSystemAssemblyPaths(params string[] additionalAssemblyNames)
