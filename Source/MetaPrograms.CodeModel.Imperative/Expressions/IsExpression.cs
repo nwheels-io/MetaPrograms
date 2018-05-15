@@ -5,7 +5,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class IsExpression : AbstractExpression
     {
         public IsExpression(
-            TypeMember type, 
+            MemberRef<TypeMember> type, 
             AbstractExpression expression, 
             LocalVariable patternMatchVariable) 
             : base(type)
@@ -16,7 +16,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public IsExpression(
             IsExpression source,
-            Mutator<TypeMember>? type = null,
+            Mutator<MemberRef<TypeMember>>? type = null,
             Mutator<AbstractExpression>? expression = null,
             Mutator<LocalVariable>? patternMatchVariable = null) 
             : base(source, type)

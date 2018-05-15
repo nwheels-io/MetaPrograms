@@ -6,15 +6,15 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class PropertyMember : AbstractMember
     {
         public PropertyMember(
-            string name, 
-            TypeMember declaringType, 
+            string name,
+            MemberRef<TypeMember> declaringType, 
             MemberStatus status, 
             MemberVisibility visibility, 
             MemberModifier modifier, 
-            ImmutableList<AttributeDescription> attributes, 
-            TypeMember propertyType, 
-            MethodMember getter, 
-            MethodMember setter) 
+            ImmutableList<AttributeDescription> attributes,
+            MemberRef<TypeMember> propertyType,
+            MemberRef<TypeMember> getter,
+            MemberRef<TypeMember> setter) 
             : base(name, declaringType, status, visibility, modifier, attributes)
         {
             PropertyType = propertyType;
@@ -24,11 +24,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public PropertyMember(
             PropertyMember source,
-            Mutator<TypeMember>? propertyType,
-            Mutator<MethodMember>? getter,
-            Mutator<MethodMember>? setter, 
+            Mutator<MemberRef<TypeMember>>? propertyType,
+            Mutator<MemberRef<TypeMember>>? getter,
+            Mutator<MemberRef<TypeMember>>? setter, 
             Mutator<string>? name = null, 
-            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
@@ -40,25 +40,20 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Setter = setter.MutatedOrOriginal(source.Setter);
         }
 
+        public MemberRef<PropertyMember> GetRef() => new MemberRef<PropertyMember>(SelfReference);
+
         public override void AcceptVisitor(MemberVisitor visitor)
         {
             base.AcceptVisitor(visitor);
 
             visitor.VisitProperty(this);
 
-            if (this.Getter != null)
-            {
-                this.Getter.AcceptVisitor(visitor);
-            }
-
-            if (this.Setter != null)
-            {
-                this.Setter.AcceptVisitor(visitor);
-            }
+            this.Getter.Get()?.AcceptVisitor(visitor);
+            this.Setter.Get()?.AcceptVisitor(visitor);
         }
 
-        public TypeMember PropertyType { get; }
-        public MethodMember Getter { get; }
-        public MethodMember Setter { get; }
+        public MemberRef<TypeMember> PropertyType { get; }
+        public MemberRef<TypeMember> Getter { get; }
+        public MemberRef<TypeMember> Setter { get; }
     }
 }

@@ -8,8 +8,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class ConstructorMember : MethodMemberBase
     {
         public ConstructorMember(
-            string name, 
-            TypeMember declaringType, 
+            string name,
+            MemberRef<TypeMember> declaringType, 
             MemberStatus status, 
             MemberVisibility visibility, 
             MemberModifier modifier, 
@@ -17,19 +17,17 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             MethodSignature signature, 
             BlockStatement body, 
             MethodCallExpression callThisConstructor, 
-            MethodCallExpression callBaseConstructor, 
-            ConstructorInfo clrBinding) 
+            MethodCallExpression callBaseConstructor) 
             : base(name, declaringType, status, visibility, modifier, attributes, signature, body)
         {
             CallThisConstructor = callThisConstructor;
             CallBaseConstructor = callBaseConstructor;
-            ClrBinding = clrBinding;
         }
 
         public ConstructorMember(
             ConstructorMember source,
             Mutator<string>? name = null, 
-            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
@@ -37,14 +35,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<MethodSignature>? signature = null, 
             Mutator<BlockStatement>? body = null,
             Mutator<MethodCallExpression>? callThisConstructor = null,
-            Mutator<MethodCallExpression>? callBaseConstructor = null,
-            Mutator<ConstructorInfo>? clrBinding = null) 
+            Mutator<MethodCallExpression>? callBaseConstructor = null) 
             : base(source, name, declaringType, status, visibility, modifier, attributes, signature, body)
         {
             CallThisConstructor = callThisConstructor.MutatedOrOriginal(source.CallThisConstructor);
             CallBaseConstructor = callBaseConstructor.MutatedOrOriginal(source.CallBaseConstructor);
-            ClrBinding = clrBinding.MutatedOrOriginal(source.ClrBinding);
         }
+
+        public new MemberRef<ConstructorMember> GetRef() => new MemberRef<ConstructorMember>(SelfReference);
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {
@@ -54,6 +52,5 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public MethodCallExpression CallThisConstructor { get; }
         public MethodCallExpression CallBaseConstructor { get; }
-        public ConstructorInfo ClrBinding { get; }
     }
 }

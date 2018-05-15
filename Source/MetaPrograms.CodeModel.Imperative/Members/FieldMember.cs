@@ -7,13 +7,13 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class FieldMember : AbstractMember
     {
         public FieldMember(
-            string name, 
-            TypeMember declaringType, 
+            string name,
+            MemberRef<TypeMember> declaringType, 
             MemberStatus status, 
             MemberVisibility visibility, 
             MemberModifier modifier, 
-            ImmutableList<AttributeDescription> attributes, 
-            TypeMember type, 
+            ImmutableList<AttributeDescription> attributes,
+            MemberRef<TypeMember> type, 
             bool isReadOnly, 
             AbstractExpression initializer) 
             : base(name, declaringType, status, visibility, modifier, attributes)
@@ -25,12 +25,12 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public FieldMember(
             FieldMember source,
-            Mutator<TypeMember>? type,
+            Mutator<MemberRef<TypeMember>>? type,
             Mutator<FieldInfo>? clrBinding,
             Mutator<bool>? isReadOnly,
             Mutator<AbstractExpression>? initializer, 
             Mutator<string>? name = null, 
-            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
@@ -42,7 +42,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Initializer = initializer.MutatedOrOriginal(source.Initializer);
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
+        public MemberRef<FieldMember> GetRef() => new MemberRef<FieldMember>(SelfReference);
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {
@@ -50,9 +50,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             visitor.VisitField(this);
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public TypeMember Type { get; }
+        public MemberRef<TypeMember> Type { get; }
         public bool IsReadOnly { get; }
         public AbstractExpression Initializer { get; }
     }

@@ -5,9 +5,9 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class MemberExpression : AbstractExpression
     {
         public MemberExpression(
-            TypeMember type, 
-            AbstractExpression target, 
-            AbstractMember member) : base(type)
+            MemberRef<TypeMember> type, 
+            AbstractExpression target,
+            MemberRef<AbstractMember> member) : base(type)
         {
             Target = target;
             Member = member;
@@ -15,9 +15,9 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public MemberExpression(
             MemberExpression source,
-            Mutator<TypeMember>? type = null,
+            Mutator<MemberRef<TypeMember>>? type = null,
             Mutator<AbstractExpression>? target = null,
-            Mutator<AbstractMember>? member = null) 
+            Mutator<MemberRef<AbstractMember>>? member = null) 
             : base(source, type)
         {
             Target = target.MutatedOrOriginal(source.Target);
@@ -35,6 +35,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         }
 
         public AbstractExpression Target { get; }
-        public AbstractMember Member { get; }
+        public MemberRef<AbstractMember> Member { get; }
     }
 }

@@ -8,7 +8,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class IndexerExpression : AbstractExpression
     {
         public IndexerExpression(
-            TypeMember type, 
+        MemberRef<TypeMember> type, 
             AbstractExpression target,
             ImmutableList<AbstractExpression> indexArguments) 
             : base(type)
@@ -19,7 +19,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public IndexerExpression(
             IndexerExpression source, 
-            Mutator<TypeMember>? type = null,
+            Mutator<MemberRef<TypeMember>>? type = null,
             Mutator<AbstractExpression>? target = null,
             Mutator<ImmutableList<AbstractExpression>>? indexArguments = null) 
             : base(source, type)

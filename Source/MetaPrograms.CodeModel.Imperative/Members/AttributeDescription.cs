@@ -8,7 +8,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class AttributeDescription
     {
         public AttributeDescription(
-            TypeMember attributeType, 
+            MemberRef<TypeMember> attributeType, 
             ImmutableList<AbstractExpression> constructorArguments, 
             ImmutableList<PropertyValue> propertyValues)
         {
@@ -19,7 +19,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public AttributeDescription(
             AttributeDescription source,
-            Mutator<TypeMember>? attributeType,
+            Mutator<MemberRef<TypeMember>>? attributeType,
             Mutator<ImmutableList<AbstractExpression>>? constructorArguments,
             Mutator<ImmutableList<PropertyValue>>? propertyValues)
         {
@@ -30,10 +30,10 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public override string ToString()
         {
-            return (AttributeType?.Name ?? base.ToString());
+            return (AttributeType.Get()?.Name ?? base.ToString());
         }
 
-        public TypeMember AttributeType { get; }
+        public MemberRef<TypeMember> AttributeType { get; }
         public ImmutableList<AbstractExpression> ConstructorArguments { get; }
         public ImmutableList<PropertyValue> PropertyValues { get; }
     }

@@ -5,7 +5,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class UnaryExpression : AbstractExpression
     {
         public UnaryExpression(
-            TypeMember type, 
+            MemberRef<TypeMember> type, 
             UnaryOperator @operator, 
             AbstractExpression operand) 
             : base(type)
@@ -18,7 +18,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             UnaryExpression source,
             Mutator<AbstractExpression>? operand = null,
             Mutator<UnaryOperator>? @operator = null, 
-            Mutator<TypeMember>? type = null) 
+            Mutator<MemberRef<TypeMember>>? type = null) 
             : base(source, type)
         {
             Operator = @operator.MutatedOrOriginal(source.Operator);

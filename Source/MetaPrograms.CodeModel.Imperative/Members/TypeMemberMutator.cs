@@ -39,15 +39,15 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         }
 
         public Mutator<string>? Name { get; set; }
-        public Mutator<TypeMember>? DeclaringType { get; set; }
+        public Mutator<MemberRef<TypeMember>>? DeclaringType { get; set; }
         public Mutator<MemberStatus>? Status { get; set; }
         public Mutator<MemberVisibility>? Visibility { get; set; }
         public Mutator<MemberModifier>? Modifier { get; set; }
         public Mutator<ImmutableList<AttributeDescription>>? Attributes { get; set; }
         public Mutator<string>? AssemblyName { get; set; }
         public Mutator<string>? Namespace { get; set; }
-        public Mutator<TypeMember>? BaseType { get; set; }
-        public Mutator<ImmutableHashSet<TypeMember>>? Interfaces { get; set; }
+        public Mutator<MemberRef<TypeMember>>? BaseType { get; set; }
+        public Mutator<ImmutableHashSet<MemberRef<TypeMember>>>? Interfaces { get; set; }
         public Mutator<TypeMemberKind>? TypeKind { get; set; }
         public Mutator<bool>? IsAbstract { get; set; }
         public Mutator<bool>? IsValueType { get; set; }
@@ -58,11 +58,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public Mutator<bool>? IsGenericType { get; set; }
         public Mutator<bool>? IsGenericDefinition { get; set; }
         public Mutator<bool>? IsGenericParameter { get; set; }
-        public Mutator<TypeMember>? GenericTypeDefinition { get; set; }
-        public Mutator<ImmutableList<TypeMember>>? GenericArguments { get; set; }
-        public Mutator<ImmutableList<TypeMember>>? GenericParameters { get; set; }
-        public Mutator<TypeMember>? UnderlyingType { get; set; }
-        public Mutator<ImmutableList<AbstractMember>>? Members { get; set; }
+        public Mutator<MemberRef<TypeMember>>? GenericTypeDefinition { get; set; }
+        public Mutator<ImmutableList<MemberRef<TypeMember>>>? GenericArguments { get; set; }
+        public Mutator<ImmutableList<MemberRef<TypeMember>>>? GenericParameters { get; set; }
+        public Mutator<MemberRef<TypeMember>>? UnderlyingType { get; set; }
+        public Mutator<ImmutableList<MemberRef<AbstractMember>>>? Members { get; set; }
         public Mutator<TypeGeneratorInfo>? Generator { get; set; }
     }
 }

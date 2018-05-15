@@ -8,8 +8,8 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class NewArrayExpression : AbstractExpression
     {
         public NewArrayExpression(
-            TypeMember type, 
-            TypeMember elementType, 
+            MemberRef<TypeMember> type,
+            MemberRef<TypeMember> elementType, 
             ImmutableList<AbstractExpression> dimensionLengths, 
             ImmutableList<ImmutableList<AbstractExpression>> dimensionInitializerValues) 
             : base(type)
@@ -21,8 +21,8 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public NewArrayExpression(
             NewArrayExpression source,
-            Mutator<TypeMember>? type = null,
-            Mutator<TypeMember>? elementType = null,
+            Mutator<MemberRef<TypeMember>>? type = null,
+            Mutator<MemberRef<TypeMember>>? elementType = null,
             Mutator<ImmutableList<AbstractExpression>>? dimensionLengths = null,
             Mutator<ImmutableList<ImmutableList<AbstractExpression>>>? dimensionInitializerValues = null) 
             : base(source, type)
@@ -36,9 +36,9 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         {
             visitor.VisitNewArrayExpression(this);
 
-            if (ElementType != null)
+            if (ElementType.Get() != null)
             {
-                visitor.VisitReferenceToTypeMember(ElementType);
+                visitor.VisitReferenceToTypeMember(ElementType.Get());
             }
 
             if (DimensionLengths != null)
@@ -84,7 +84,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public TypeMember ElementType { get; }
+        public MemberRef<TypeMember> ElementType { get; }
         public ImmutableList<AbstractExpression> DimensionLengths { get; }
         public ImmutableList<ImmutableList<AbstractExpression>> DimensionInitializerValues { get; }
     }

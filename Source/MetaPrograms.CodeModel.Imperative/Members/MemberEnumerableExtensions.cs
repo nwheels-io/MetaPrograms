@@ -19,8 +19,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return selector;
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
         public static IEnumerable<TMember> SelectPublicInstance<TMember>(this TypeMember type, Func<TMember, bool> where = null)
             where TMember : AbstractMember
         {
@@ -34,29 +32,21 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return selector;
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
         public static HavingSelector<TMember> Having<TMember>(this IEnumerable<TMember> source)
             where TMember : AbstractMember
         {
             return new HavingSelector<TMember>(source);
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
         public class HavingSelector<TMember> 
             where TMember : AbstractMember
         {
             private readonly IEnumerable<TMember> _source;
 
-            //-------------------------------------------------------------------------------------------------------------------------------------------------
-
             public HavingSelector(IEnumerable<TMember> source)
             {
                 _source = source;
             }
-
-            //-------------------------------------------------------------------------------------------------------------------------------------------------
 
             public IEnumerable<TMember> Attribute(TypeMember attributeType)
             {

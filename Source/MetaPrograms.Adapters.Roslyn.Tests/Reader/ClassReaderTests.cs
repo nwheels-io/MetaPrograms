@@ -3,6 +3,7 @@ using System.Linq;
 using MetaPrograms.Adapters.Roslyn.Reader;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
+using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using Shouldly;
 
@@ -55,8 +56,8 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             
             // assert
 
-            type.BaseType.ShouldNotBeNull();
-            type.BaseType.FullName.ShouldBe("MyApp.MyBase");
+            type.BaseType.Get().ShouldNotBeNull();
+            type.BaseType.Get().FullName.ShouldBe("MyApp.MyBase");
         }
         
         [Test]
@@ -81,7 +82,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             // assert
 
             type.Interfaces.Count.ShouldBe(2);
-            type.Interfaces.Select(t => t.FullName).ShouldBe(new[] { "MyApp.IService1", "MyApp.IService2" }, ignoreOrder: true);
+            type.Interfaces.Select(t => t.Get().FullName).ShouldBe(new[] { "MyApp.IService1", "MyApp.IService2" }, ignoreOrder: true);
         }
 
         [Test]

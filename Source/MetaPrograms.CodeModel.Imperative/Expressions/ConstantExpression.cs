@@ -5,7 +5,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class ConstantExpression : AbstractExpression
     {
         public ConstantExpression(
-            TypeMember type, 
+            MemberRef<TypeMember> type, 
             object value) 
             : base(type)
         {
@@ -14,7 +14,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public ConstantExpression(
             ConstantExpression source,
-            Mutator<TypeMember>? type = null,
+            Mutator<MemberRef<TypeMember>>? type = null,
             Mutator<object>? value = null) 
             : base(source, type)
         {

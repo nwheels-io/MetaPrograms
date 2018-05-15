@@ -8,7 +8,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class RealTypeMember : TypeMember
     {
         public RealTypeMember(TypeMemberBuilder builder)
-            : base(builder)
+            : base(builder, selfReference: builder.GetMemberRefState())
         {
             this.AssemblyName = builder.AssemblyName;
             this.Namespace = builder.Namespace;
@@ -30,6 +30,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.UnderlyingType = builder.UnderlyingType;
             this.Members = builder.Members.ToImmutableList();
             this.Generator = builder.Generator;
+            this.Bindings.UnionWith(builder.Bindings);
+
+            SelfReference.ReassignOnce(this);
         }
 
         public RealTypeMember(TypeMember source, TypeMemberMutator mutator)
@@ -59,8 +62,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public override string AssemblyName { get; }
         public override string Namespace { get; }
-        public override TypeMember BaseType { get; }
-        public override ImmutableHashSet<TypeMember> Interfaces { get; }
+        public override MemberRef<TypeMember> BaseType { get; }
+        public override ImmutableHashSet<MemberRef<TypeMember>> Interfaces { get; }
         public override TypeMemberKind TypeKind { get; }
         public override bool IsAbstract { get; }
         public override bool IsValueType { get; }
@@ -71,11 +74,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public override bool IsGenericType { get; }
         public override bool IsGenericDefinition { get; }
         public override bool IsGenericParameter { get; }
-        public override TypeMember GenericTypeDefinition { get; }
-        public override ImmutableList<TypeMember> GenericArguments { get; }
-        public override ImmutableList<TypeMember> GenericParameters { get; }
-        public override TypeMember UnderlyingType { get; }
-        public override ImmutableList<AbstractMember> Members { get; }
+        public override MemberRef<TypeMember> GenericTypeDefinition { get; }
+        public override ImmutableList<MemberRef<TypeMember>> GenericArguments { get; }
+        public override ImmutableList<MemberRef<TypeMember>> GenericParameters { get; }
+        public override MemberRef<TypeMember> UnderlyingType { get; }
+        public override ImmutableList<MemberRef<AbstractMember>> Members { get; }
         public override TypeGeneratorInfo Generator { get; }
 
         public override bool Equals(TypeMember other)
@@ -109,11 +112,10 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         {
             //TODO: validate type arguments
 
-            var mutator = new TypeMemberMutator(new TypeMemberMutatorBuilder
-            {
+            var mutator = new TypeMemberMutator(new TypeMemberMutatorBuilder {
                 IsGenericType = true,
-                GenericTypeDefinition = this,
-                GenericArguments = typeArguments.ToList()
+                GenericTypeDefinition = GetRef(),
+                GenericArguments = typeArguments.Select(t => t.GetRef()).ToList()
             });
 
             return new RealTypeMember(this, mutator);
@@ -141,11 +143,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
             foreach (var member in this.Members)
             {
-                member.AcceptVisitor(visitor);
+                member.Get().AcceptVisitor(visitor);
             }
         }
-
-        protected internal override bool IsProxy => false;
-        protected internal override TypeMember RealType => this;
     }
 }

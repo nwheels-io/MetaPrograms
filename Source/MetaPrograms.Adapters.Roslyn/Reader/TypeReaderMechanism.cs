@@ -18,6 +18,16 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             FullyQualifiedMetadataName = Symbol.GetFullyQualifiedMetadataName();
             ClrType = Type.GetType(FullyQualifiedMetadataName, throwOnError: false);
             MemberBuilder.Status = MemberStatus.Incomplete;
+            MemberRef = MemberBuilder.GetTemporaryProxy().GetRef();
+
+            MemberBuilder.Bindings.Add(Symbol);
+            MemberBuilder.Bindings.Add(FullyQualifiedMetadataName);
+
+            if (ClrType != null)
+            {
+                MemberBuilder.Bindings.Add(ClrType);
+            }
+
         }
 
         public CodeModelBuilder ModelBuilder { get; }
@@ -26,29 +36,18 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         public string FullyQualifiedMetadataName { get; }
         public Type ClrType { get; }
         public bool IsTopLevelType => (Symbol.ContainingSymbol is INamespaceSymbol);
-        public ProxyTypeMember ProxyType { get; private set; }
-        public RealTypeMember RealType { get; private set; }
+        public MemberRef<TypeMember> MemberRef { get; }
+        public RealTypeMember FinalType { get; private set; }
 
-        public void RegisterProxyType()
+        public void RegisterTemporaryProxy()
         {
-            this.ProxyType = new ProxyTypeMember(MemberBuilder);
-            ModelBuilder.RegisterMember(ProxyType);
+            ModelBuilder.RegisterMember(MemberRef.AsRef<AbstractMember>(), IsTopLevelType);
         }
 
-        public void RegisterRealType()
+        public void RegisterFinalType()
         {
             MemberBuilder.Status = MemberStatus.Compiled;
-            this.RealType = new RealTypeMember(MemberBuilder);
-
-            if (ProxyType != null)
-            {
-                ProxyType.ReAssignBackingTypeOnce(RealType);
-            }
-
-            if (IsTopLevelType)
-            {
-                ModelBuilder.RegisterTopLevelMember(RealType);
-            }
+            FinalType = new RealTypeMember(MemberBuilder);
         }
 
         public void ReadName()
@@ -74,7 +73,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             MemberBuilder.BaseType = (
                 Symbol.BaseType == null || Symbol.BaseType.SpecialType == SpecialType.System_Object
-                    ? null
+                    ? MemberRef<TypeMember>.Null
                     : ModelBuilder.GetMember<TypeMember, ISymbol>(Symbol.BaseType));
         }
 
@@ -96,22 +95,22 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             //throw new NotImplementedException();
         }
 
-        public TypeMember CreateTypeMemberWithBindings(bool shouldCreateProxy)
-        {
-            var type = (
-                shouldCreateProxy 
-                ? new ProxyTypeMember(MemberBuilder) as TypeMember 
-                : new RealTypeMember(MemberBuilder) as TypeMember);
+        //public TypeMember CreateTypeMemberWithBindings(bool shouldCreateProxy)
+        //{
+        //    var type = (
+        //        shouldCreateProxy 
+        //        ? new ProxyTypeMember(MemberBuilder) as TypeMember 
+        //        : new RealTypeMember(MemberBuilder) as TypeMember);
             
-            type.Bindings.Add(Symbol);
-            type.Bindings.Add(FullyQualifiedMetadataName);
+        //    type.Bindings.Add(Symbol);
+        //    type.Bindings.Add(FullyQualifiedMetadataName);
 
-            if (ClrType != null)
-            {
-                type.Bindings.Add(ClrType);
-            }
+        //    if (ClrType != null)
+        //    {
+        //        type.Bindings.Add(ClrType);
+        //    }
 
-            return type;
-        }
+        //    return type;
+        //}
     }
 }

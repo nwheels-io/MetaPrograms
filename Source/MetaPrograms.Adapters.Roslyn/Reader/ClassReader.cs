@@ -20,7 +20,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void RegisterProxy()
         {
-            _mechanism.RegisterProxyType();
+            _mechanism.RegisterTemporaryProxy();
         }
 
         public void ReadName()
@@ -57,9 +57,9 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void RegisterReal()
         {
-            _mechanism.RegisterRealType();
+            _mechanism.RegisterFinalType();
         }
 
-        public TypeMember TypeMember => _mechanism.RealType;
+        public TypeMember TypeMember => _mechanism.FinalType;
     }
 }

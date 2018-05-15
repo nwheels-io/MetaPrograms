@@ -4,14 +4,14 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class ThisExpression : AbstractExpression
     {
-        public ThisExpression(TypeMember type) 
+        public ThisExpression(MemberRef<TypeMember> type) 
             : base(type)
         {
         }
 
         public ThisExpression(
             ThisExpression source, 
-            Mutator<TypeMember>? type = null) 
+            Mutator<MemberRef<TypeMember>>? type = null) 
             : base(source, type)
         {
         }
@@ -20,6 +20,5 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         {
             visitor.VisitThisExpression(this);
         }
-
     }
 }

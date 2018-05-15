@@ -10,7 +10,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     {
         protected MethodMemberBase(
             string name, 
-            TypeMember declaringType, 
+            MemberRef<TypeMember> declaringType, 
             MemberStatus status, 
             MemberVisibility visibility, 
             MemberModifier modifier, 
@@ -26,7 +26,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         protected MethodMemberBase(
             MethodMemberBase source, 
             Mutator<string>? name = null, 
-            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
@@ -38,6 +38,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Signature = signature.MutatedOrOriginal(source.Signature);
             Body = body.MutatedOrOriginal(source.Body);
         }
+
+        public MemberRef<MethodMemberBase> GetRef() => new MemberRef<MethodMemberBase>(SelfReference);
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {

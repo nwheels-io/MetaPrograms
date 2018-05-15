@@ -7,7 +7,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class AnonymousDelegateExpression : AbstractExpression
     {
         public AnonymousDelegateExpression(MethodSignature signature, BlockStatement body)
-            : base(signature.ReturnValue?.Type)
+            : base(signature.IsVoid ? TypeMember.Void : signature.ReturnValue.Type)
         {
             this.Body = body;
         }

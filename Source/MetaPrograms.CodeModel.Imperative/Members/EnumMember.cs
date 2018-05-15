@@ -5,8 +5,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class EnumMember : AbstractMember
     {
         public EnumMember(
-            string name, 
-            TypeMember declaringType, 
+            string name,
+            MemberRef<TypeMember> declaringType, 
             MemberStatus status, 
             MemberVisibility visibility, 
             MemberModifier modifier, 
@@ -20,7 +20,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public EnumMember(
             EnumMember source, 
             Mutator<string>? name = null, 
-            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
@@ -30,6 +30,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         {
             Value = value.MutatedOrOriginal(source.Value);
         }
+
+        public MemberRef<EnumMember> GetRef() => new MemberRef<EnumMember>(SelfReference);
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {

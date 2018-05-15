@@ -1,83 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace MetaPrograms.CodeModel.Imperative
 {
     public class CodeModelBuilder
     {
-        private readonly Dictionary<object, AbstractMember> _memberByBinding = new Dictionary<object, AbstractMember>();
-        private readonly HashSet<AbstractMember> _topLevelMembers = new HashSet<AbstractMember>();
+        private readonly Dictionary<object, MemberRef<AbstractMember>> _memberByBinding = new Dictionary<object, MemberRef<AbstractMember>>();
+        private readonly HashSet<MemberRef<AbstractMember>> _topLevelMembers = new HashSet<MemberRef<AbstractMember>>();
         
-        public void BindMember<TBinding>(AbstractMember member, TBinding binding)
-            where TBinding : class
-        {
-            member.Bindings.Add(binding);
-            _memberByBinding[binding] = member;
-        }
+        //public void BindMember<TBinding>(MemberRef<AbstractMember> member, TBinding binding)
+        //    where TBinding : class
+        //{
+        //    member.Bindings.Add(binding);
+        //    _memberByBinding[binding] = member;
+        //}
 
-        public void RegisterMember(AbstractMember member)
+        public void RegisterMember(MemberRef<AbstractMember> member, bool isTopLevel)
         {
-            foreach (var binding in member.Bindings)
+            foreach (var binding in member.Get().Bindings)
             {
                 _memberByBinding[binding] = member;
             }
-        }
 
-        public void RegisterTopLevelMember(AbstractMember member)
-        {
-            _topLevelMembers.Add(member);
-        }
-
-        public bool TryGetMember<TMember, TBinding>(TBinding binding, out TMember member)
-            where TMember : AbstractMember
-            where TBinding : class
-        {
-            if (_memberByBinding.TryGetValue(binding, out AbstractMember abstractMember))
+            if (isTopLevel)
             {
-                member = (TMember)abstractMember;
-                return true;
+                _topLevelMembers.Add(member);
             }
-
-            member = default;
-            return false;
         }
 
-        public TMember GetMember<TMember, TBinding>(TBinding binding)
+        //public bool TryGetMember<TMember, TBinding>(TBinding binding, out TMember member)
+        //    where TMember : AbstractMember
+        //    where TBinding : class
+        //{
+        //    if (_memberByBinding.TryGetValue(binding, out AbstractMember abstractMember))
+        //    {
+        //        member = (TMember)abstractMember;
+        //        return true;
+        //    }
+
+        //    member = default;
+        //    return false;
+        //}
+
+        public MemberRef<TMember> GetMember<TMember, TBinding>(TBinding binding)
             where TMember : AbstractMember
             where TBinding : class
         {
-            if (_memberByBinding.TryGetValue(binding, out AbstractMember existingMember))
+            if (_memberByBinding.TryGetValue(binding, out MemberRef<AbstractMember> existingMember))
             {
-                return (TMember)existingMember;
+                return existingMember.AsRef<TMember>();
             }
 
             throw new KeyNotFoundException(
                 $"{typeof(TMember).Name} with binding '{typeof(TBinding).Name}={binding}' could not be found.");
         }
 
-        public TMember GetOrAddMember<TMember, TBinding>(TBinding binding, Func<TMember> memberFactory)
-            where TMember : AbstractMember
-            where TBinding : class
-        {
-            if (_memberByBinding.TryGetValue(binding, out AbstractMember existingMember))
-            {
-                return (TMember)existingMember;
-            }
+        //public TMember GetOrAddMember<TMember, TBinding>(TBinding binding, Func<TMember> memberFactory)
+        //    where TMember : AbstractMember
+        //    where TBinding : class
+        //{
+        //    if (_memberByBinding.TryGetValue(binding, out AbstractMember existingMember))
+        //    {
+        //        return (TMember)existingMember;
+        //    }
 
-            var newMember = memberFactory();
-            BindMember(newMember, binding);
+        //    var newMember = memberFactory();
+        //    BindMember(newMember, binding);
 
-            return newMember;
-        }
+        //    return newMember;
+        //}
 
-        public IEnumerable<AbstractMember> GetRgisteredMembers() => new HashSet<AbstractMember>(_memberByBinding.Values);
+        public IEnumerable<MemberRef<AbstractMember>> GetRgisteredMembers() => new HashSet<MemberRef<AbstractMember>>(_memberByBinding.Values);
 
-        public IEnumerable<AbstractMember> GetTopLevelMembers() => _topLevelMembers;
+        public IEnumerable<MemberRef<AbstractMember>> GetTopLevelMembers() => _topLevelMembers;
         
         public ImmutableCodeModel GetCodeModel()
         {
-            return new ImmutableCodeModel(_topLevelMembers);
+            return new ImmutableCodeModel(_topLevelMembers.Select(m => m.Get()));
         }
     }
 }

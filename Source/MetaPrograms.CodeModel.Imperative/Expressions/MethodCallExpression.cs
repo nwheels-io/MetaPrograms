@@ -7,9 +7,9 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class MethodCallExpression : AbstractExpression
     {
         public MethodCallExpression(
-            TypeMember type, 
-            AbstractExpression target, 
-            MethodMember method, 
+            MemberRef<TypeMember> type, 
+            AbstractExpression target,
+            MemberRef<MethodMember> method, 
             ImmutableList<Argument> arguments, 
             bool isAsyncAwait) : base(type)
         {
@@ -22,8 +22,8 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         public MethodCallExpression(
             MethodCallExpression source,
             Mutator<AbstractExpression>? target = null,
-            Mutator<TypeMember>? type = null,
-            Mutator<MethodMember>? method = null,
+            Mutator<MemberRef<TypeMember>>? type = null,
+            Mutator<MemberRef<MethodMember>>? method = null,
             Mutator<ImmutableList<Argument>>? arguments = null,
             Mutator<bool>? isAsyncAwait = null) 
             : base(source, type)
@@ -50,7 +50,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         }
 
         public AbstractExpression Target { get; }
-        public MethodMember Method { get; }
+        public MemberRef<MethodMember> Method { get; }
         public ImmutableList<Argument> Arguments { get; }
         public bool IsAsyncAwait { get; }
     }

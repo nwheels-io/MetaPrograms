@@ -5,7 +5,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class CastExpression : AbstractExpression
     {
         public CastExpression(
-            TypeMember type, 
+            MemberRef<TypeMember> type, 
             AbstractExpression expression) 
             : base(type)
         {
@@ -15,7 +15,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         public CastExpression(
             CastExpression source,
             Mutator<AbstractExpression>? expression = null, 
-            Mutator<TypeMember>? type = null) 
+            Mutator<MemberRef<TypeMember>>? type = null) 
             : base(source, type)
         {
             Expression = expression.MutatedOrOriginal(source.Expression);
@@ -25,9 +25,9 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         {
             visitor.VisitCastExpression(this);
 
-            if (this.Type != null)
+            if (this.Type.Get() != null)
             {
-                visitor.VisitReferenceToTypeMember(this.Type);
+                visitor.VisitReferenceToTypeMember(this.Type.Get());
             }
 
             if (Expression != null)

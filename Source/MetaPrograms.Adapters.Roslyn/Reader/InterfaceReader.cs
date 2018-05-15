@@ -22,14 +22,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _mechanism.MemberBuilder.TypeKind = TypeMemberKind.Interface;
             
             _mechanism.ReadName();
-            _mechanism.RegisterProxyType();
+            _mechanism.RegisterTemporaryProxy();
 
             _mechanism.ReadGenerics();
             _mechanism.ReadBaseInterfaces();
             _mechanism.ReadMemberDeclarations();
             
-            _mechanism.RegisterRealType();
-            return _mechanism.RealType;
+            _mechanism.RegisterFinalType();
+            return _mechanism.FinalType;
         }
 
         public TypeReaderMechanism Mechanism => _mechanism;

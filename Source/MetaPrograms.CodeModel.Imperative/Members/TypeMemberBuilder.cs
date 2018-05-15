@@ -8,25 +8,31 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class TypeMemberBuilder
     {
+        private readonly TypeMemberProxy _temporaryProxy;
+        private readonly MemberRefState _memberRefState;
+
         public TypeMemberBuilder()
         {
             this.Attributes = new List<AttributeDescription>();
-            this.Interfaces = new HashSet<TypeMember>();
-            this.GenericArguments = new List<TypeMember>();
-            this.GenericParameters = new List<TypeMember>();
-            this.Members = new List<AbstractMember>();
+            this.Interfaces = new HashSet<MemberRef<TypeMember>>();
+            this.GenericArguments = new List<MemberRef<TypeMember>>();
+            this.GenericParameters = new List<MemberRef<TypeMember>>();
+            this.Members = new List<MemberRef<AbstractMember>>();
+
+            _temporaryProxy = new TypeMemberProxy(this);
+            _memberRefState = _temporaryProxy.GetSelfReference();
         }
 
         public string Name { get; set; }
-        public TypeMember DeclaringType { get; set; }
+        public MemberRef<TypeMember> DeclaringType { get; set; }
         public MemberStatus Status { get; set; }
         public MemberVisibility Visibility { get; set; }
         public MemberModifier Modifier { get; set; }
         public List<AttributeDescription> Attributes { get; }
         public string AssemblyName { get; set; }
         public string Namespace { get; set; }
-        public TypeMember BaseType { get; set; }
-        public HashSet<TypeMember> Interfaces { get; }
+        public MemberRef<TypeMember> BaseType { get; set; }
+        public HashSet<MemberRef<TypeMember>> Interfaces { get; }
         public TypeMemberKind TypeKind { get; set; }
         public bool IsAbstract { get; set; }
         public bool IsValueType { get; set; }
@@ -37,26 +43,30 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public bool IsGenericType { get; set; }
         public bool IsGenericDefinition { get; set; }
         public bool IsGenericParameter { get; set; }
-        public TypeMember GenericDefinition { get; set; }
-        public List<TypeMember> GenericArguments { get; }
-        public List<TypeMember> GenericParameters { get; }
-        public TypeMember UnderlyingType { get; set; }
-        public List<AbstractMember> Members { get; }
+        public MemberRef<TypeMember> GenericDefinition { get; set; }
+        public List<MemberRef<TypeMember>> GenericArguments { get; }
+        public List<MemberRef<TypeMember>> GenericParameters { get; }
+        public MemberRef<TypeMember> UnderlyingType { get; set; }
+        public List<MemberRef<AbstractMember>> Members { get; }
         public TypeGeneratorInfo Generator { get; set; }
 
-        public TypeMember GetTemporaryType()
-        {
-            return new TemporaryTypeMember(this);
-        }
+        public BindingCollection Bindings => _temporaryProxy.Bindings;
+        public TypeMember GetTemporaryProxy() => _temporaryProxy;
+        public MemberRefState GetMemberRefState() => _memberRefState;
 
-        private class TemporaryTypeMember : TypeMember
+        private class TypeMemberProxy : TypeMember
         {
             private readonly TypeMemberBuilder _builder;
 
-            public TemporaryTypeMember(TypeMemberBuilder builder)
+            public TypeMemberProxy(TypeMemberBuilder builder)
                 : base(builder)
             {
                 _builder = builder;
+            }
+
+            public MemberRefState GetSelfReference()
+            {
+                return SelfReference;
             }
 
             public override bool Equals(TypeMember other)
@@ -73,9 +83,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
             public override string Namespace => _builder.Namespace;
 
-            public override TypeMember BaseType => _builder.BaseType;
+            public override MemberRef<TypeMember> BaseType => _builder.BaseType;
 
-            public override ImmutableHashSet<TypeMember> Interfaces => _builder.Interfaces.ToImmutableHashSet();
+            public override ImmutableHashSet<MemberRef<TypeMember>> Interfaces => _builder.Interfaces.ToImmutableHashSet();
 
             public override TypeMemberKind TypeKind => _builder.TypeKind;
 
@@ -97,21 +107,21 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
             public override bool IsGenericParameter => _builder.IsGenericParameter;
 
-            public override TypeMember GenericTypeDefinition => _builder.GenericDefinition;
+            public override MemberRef<TypeMember> GenericTypeDefinition => _builder.GenericDefinition;
 
-            public override ImmutableList<TypeMember> GenericArguments => _builder.GenericArguments.ToImmutableList();
+            public override ImmutableList<MemberRef<TypeMember>> GenericArguments => _builder.GenericArguments.ToImmutableList();
 
-            public override ImmutableList<TypeMember> GenericParameters => _builder.GenericParameters.ToImmutableList();
+            public override ImmutableList<MemberRef<TypeMember>> GenericParameters => _builder.GenericParameters.ToImmutableList();
 
-            public override TypeMember UnderlyingType => _builder.UnderlyingType;
+            public override MemberRef<TypeMember> UnderlyingType => _builder.UnderlyingType;
 
-            public override ImmutableList<AbstractMember> Members => _builder.Members.ToImmutableList();
+            public override ImmutableList<MemberRef<AbstractMember>> Members => _builder.Members.ToImmutableList();
 
             public override TypeGeneratorInfo Generator => _builder.Generator;
 
             public override string Name => _builder.Name;
 
-            public override TypeMember DeclaringType => _builder.DeclaringType;
+            public override MemberRef<TypeMember> DeclaringType => _builder.DeclaringType;
 
             public override MemberStatus Status => _builder.Status;
 
@@ -120,11 +130,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             public override MemberModifier Modifier => _builder.Modifier;
 
             public override ImmutableList<AttributeDescription> Attributes => _builder.Attributes.ToImmutableList();
-
-            protected internal override bool IsProxy => throw new NotSupportedException("TemporaryTypeMember does not support IsProxy");
-
-            protected internal override TypeMember RealType => throw new NotSupportedException("TemporaryTypeMember does not support RealType");
-
         }
     }
 }

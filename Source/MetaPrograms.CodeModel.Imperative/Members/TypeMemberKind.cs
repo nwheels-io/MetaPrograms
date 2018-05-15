@@ -6,6 +6,7 @@
         Struct,
         Enum,
         Interface,
-        GenericParameter
+        GenericParameter,
+        Void
     }
 }

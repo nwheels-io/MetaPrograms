@@ -7,14 +7,15 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public abstract class TypeMember : AbstractMember
     {
-        protected TypeMember(TypeMemberBuilder builder)
+        protected TypeMember(TypeMemberBuilder builder, MemberRefState selfReference = null)
             : base(
                 builder.Name, 
                 builder.DeclaringType, 
                 builder.Status, 
                 builder.Visibility, 
                 builder.Modifier, 
-                builder.Attributes.ToImmutableList())
+                builder.Attributes.ToImmutableList(),
+                selfReference)
         {
         }
 
@@ -32,8 +33,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public abstract string AssemblyName { get; }
         public abstract string Namespace { get; }
-        public abstract TypeMember BaseType { get; }
-        public abstract ImmutableHashSet<TypeMember> Interfaces { get; }
+        public abstract MemberRef<TypeMember> BaseType { get; }
+        public abstract ImmutableHashSet<MemberRef<TypeMember>> Interfaces { get; }
         public abstract TypeMemberKind TypeKind { get; }
         public abstract bool IsAbstract { get; }
         public abstract bool IsValueType { get; }
@@ -44,12 +45,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public abstract bool IsGenericType { get; }
         public abstract bool IsGenericDefinition { get; }
         public abstract bool IsGenericParameter { get; }
-        public abstract TypeMember GenericTypeDefinition { get; }
-        public abstract ImmutableList<TypeMember> GenericArguments { get; }
-        public abstract ImmutableList<TypeMember> GenericParameters { get; }
-        public abstract TypeMember UnderlyingType { get; }
-        public abstract ImmutableList<AbstractMember> Members { get; }
+        public abstract MemberRef<TypeMember> GenericTypeDefinition { get; }
+        public abstract ImmutableList<MemberRef<TypeMember>> GenericArguments { get; }
+        public abstract ImmutableList<MemberRef<TypeMember>> GenericParameters { get; }
+        public abstract MemberRef<TypeMember> UnderlyingType { get; }
+        public abstract ImmutableList<MemberRef<AbstractMember>> Members { get; }
         public abstract TypeGeneratorInfo Generator { get; }
+
+        public MemberRef<TypeMember> GetRef() => new MemberRef<TypeMember>(SelfReference);
 
         public abstract bool Equals(TypeMember other);
 
@@ -87,7 +90,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 return (
                     this.Name + 
                     openBracket + 
-                    string.Join(commaSeparator, GenericParameters.Select(t => t.Name)) +
+                    string.Join(commaSeparator, GenericParameters.Select(t => t.Get().Name)) +
                     closeBracket);
             }
             else
@@ -95,7 +98,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 return (
                     this.Name +
                     openBracket + 
-                    string.Join(commaSeparator, GenericArguments.Select(t => t.MakeGenericName(openBracket, closeBracket, commaSeparator))) +
+                    string.Join(commaSeparator, GenericArguments.Select(t => t.Get().MakeGenericName(openBracket, closeBracket, commaSeparator))) +
                     closeBracket);
             }
         }
@@ -120,9 +123,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         {
             get
             {
-                if (DeclaringType != null)
+                if (DeclaringType.IsNotNull)
                 {
-                    return DeclaringType.FullName + "." + Name;
+                    return DeclaringType.Get().FullName + "." + Name;
                 }
 
                 if (!string.IsNullOrEmpty(Namespace))
@@ -134,8 +137,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
-        protected internal abstract bool IsProxy { get; }
-        protected internal abstract TypeMember RealType { get; }
+        public static readonly MemberRef<TypeMember> Void = 
+            new RealTypeMember(
+                new TypeMemberBuilder() {
+                    Status = MemberStatus.Compiled,
+                    TypeKind = TypeMemberKind.Void,
+                    Name = "void"
+                }
+            ).GetRef();
 
         public static bool operator == (TypeMember member1, TypeMember member2)
         {

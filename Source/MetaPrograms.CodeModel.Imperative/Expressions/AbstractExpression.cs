@@ -5,14 +5,14 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public abstract class AbstractExpression
     {
-        protected AbstractExpression(TypeMember type)
+        protected AbstractExpression(MemberRef<TypeMember> type)
         {
             Type = type;
         }
 
         protected AbstractExpression(
             AbstractExpression expression, 
-            Mutator<TypeMember>? type = null)
+            Mutator<MemberRef<TypeMember>>? type = null)
         {
             Type = type.MutatedOrOriginal(expression.Type);
         }
@@ -20,6 +20,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         public abstract void AcceptVisitor(StatementVisitor visitor);
 
         public BindingCollection Bindings { get; } = new BindingCollection();
-        public TypeMember Type { get; }
+        public MemberRef<TypeMember> Type { get; }
     }
 }

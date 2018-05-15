@@ -58,7 +58,7 @@ namespace MetaPrograms.CodeModel.Imperative
             base.VisitTypeMember(type);
             AddReferencedType(type);
 
-            if (type.BaseType != null)
+            if (type.BaseType.IsNotNull)
             {
                 AddReferencedType(type.BaseType);
             }

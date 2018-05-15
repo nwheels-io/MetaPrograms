@@ -7,8 +7,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     {
         public MethodParameter(
             string name, 
-            int position, 
-            TypeMember type, 
+            int position,
+            MemberRef<TypeMember> type, 
             MethodParameterModifier modifier, 
             ImmutableList<AttributeDescription> attributes)
         {
@@ -23,7 +23,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             MethodParameter source,
             Mutator<string>? name = null,
             Mutator<int>? position = null,
-            Mutator<TypeMember>? type = null,
+            Mutator<MemberRef<TypeMember>>? type = null,
             Mutator<MethodParameterModifier>? modifier = null,
             Mutator<ImmutableList<AttributeDescription>>? attributes = null)
         {
@@ -36,7 +36,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public string Name { get; }
         public int Position { get; }
-        public TypeMember Type { get; }
+        public MemberRef<TypeMember> Type { get; }
         public MethodParameterModifier Modifier { get; }
         public ImmutableList<AttributeDescription> Attributes { get; }
 

@@ -28,8 +28,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         }
 
         public bool IsVoid => (ReturnValue == null);
-
         public bool IsAsync { get; }
+        public MemberRef<TypeMember> ReturnType => (IsVoid ? TypeMember.Void : ReturnValue.Type);
+
         public MethodParameter ReturnValue { get; }
         public ImmutableList<MethodParameter> Parameters { get; }
     }

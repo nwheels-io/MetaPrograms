@@ -6,13 +6,13 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class EventMember : AbstractMember
     {
         public EventMember(
-            string name, 
-            TypeMember declaringType, 
+            string name,
+            MemberRef<TypeMember> declaringType, 
             MemberStatus status, 
             MemberVisibility visibility, 
             MemberModifier modifier, 
-            ImmutableList<AttributeDescription> attributes, 
-            TypeMember delegateType, 
+            ImmutableList<AttributeDescription> attributes,
+            MemberRef<TypeMember> delegateType, 
             MethodMember adder, 
             MethodMember remover) 
             : base(name, declaringType, status, visibility, modifier, attributes)
@@ -25,12 +25,12 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public EventMember(
             EventMember source, 
             Mutator<string>? name = null, 
-            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
             Mutator<ImmutableList<AttributeDescription>>? attributes = null,
-            Mutator<TypeMember>? delegateType = null,
+            Mutator<MemberRef<TypeMember>>? delegateType = null,
             Mutator<MethodMember>? adder = null,
             Mutator<MethodMember>? remover = null) 
             : base(source, name, declaringType, status, visibility, modifier, attributes)
@@ -39,6 +39,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Adder = adder.MutatedOrOriginal(source.Adder);
             Remover = remover.MutatedOrOriginal(source.Remover);
         }
+
+        public MemberRef<EventMember> GetRef() => new MemberRef<EventMember>(SelfReference);
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {
@@ -57,7 +59,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
-        public TypeMember DelegateType { get; }
+        public MemberRef<TypeMember> DelegateType { get; }
         public MethodMember Adder { get; }
         public MethodMember Remover { get; }
     }

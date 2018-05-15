@@ -4,14 +4,14 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class BaseExpression : AbstractExpression
     {
-        public BaseExpression(TypeMember type) 
+        public BaseExpression(MemberRef<TypeMember> type) 
             : base(type)
         {
         }
 
         public BaseExpression(
             BaseExpression expression, 
-            Mutator<TypeMember>? type = null) 
+            Mutator<MemberRef<TypeMember>>? type = null) 
             : base(expression, type)
         {
         }

@@ -6,7 +6,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class BinaryExpression : AbstractExpression
     {
         public BinaryExpression(
-            TypeMember type, 
+            MemberRef<TypeMember> type, 
             AbstractExpression left, 
             BinaryOperator @operator, 
             AbstractExpression right) 
@@ -19,7 +19,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public BinaryExpression(
             BinaryExpression expression,
-            Mutator<TypeMember>? type = null,
+            Mutator<MemberRef<TypeMember>>? type = null,
             Mutator<AbstractExpression>? left = null,
             Mutator<BinaryOperator>? @operator = null,
             Mutator<AbstractExpression>? right = null) 

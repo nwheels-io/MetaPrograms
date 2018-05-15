@@ -9,13 +9,16 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public abstract class AbstractMember
     {
         protected AbstractMember(
-            string name, 
-            TypeMember declaringType, 
-            MemberStatus status, 
-            MemberVisibility visibility, 
-            MemberModifier modifier, 
-            ImmutableList<AttributeDescription> attributes)
+            string name,
+            MemberRef<TypeMember> declaringType,
+            MemberStatus status,
+            MemberVisibility visibility,
+            MemberModifier modifier,
+            ImmutableList<AttributeDescription> attributes,
+            MemberRefState selfReference = null)
         {
+            this.SelfReference = selfReference ?? new MemberRefState(this);
+
             Name = name;
             DeclaringType = declaringType;
             Status = status;
@@ -27,7 +30,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         protected AbstractMember(
             AbstractMember source,
             Mutator<string>? name = null,
-            Mutator<TypeMember>? declaringType = null,
+            Mutator<MemberRef<TypeMember>>? declaringType = null,
             Mutator<MemberStatus>? status = null,
             Mutator<MemberVisibility>? visibility = null,
             Mutator<MemberModifier>? modifier = null,
@@ -74,10 +77,12 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public virtual BindingCollection Bindings { get; } = new BindingCollection();
 
         public virtual string Name { get; }
-        public virtual TypeMember DeclaringType { get; }
+        public virtual MemberRef<TypeMember> DeclaringType { get; }
         public virtual MemberStatus Status { get; }
         public virtual MemberVisibility Visibility { get; }
         public virtual MemberModifier Modifier { get; }
         public virtual ImmutableList<AttributeDescription> Attributes { get; }
+
+        protected MemberRefState SelfReference { get; }
     }
 }

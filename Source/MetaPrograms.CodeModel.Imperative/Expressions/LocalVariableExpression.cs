@@ -5,7 +5,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class LocalVariableExpression : AbstractExpression
     {
         public LocalVariableExpression(
-            TypeMember type, 
+            MemberRef<TypeMember> type, 
             LocalVariable variable) 
             : base(type)
         {
@@ -15,7 +15,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         public LocalVariableExpression(
             LocalVariableExpression source,
             Mutator<LocalVariable>? variable = null, 
-            Mutator<TypeMember>? type = null) 
+            Mutator<MemberRef<TypeMember>>? type = null) 
             : base(source, type)
         {
             Variable = variable.MutatedOrOriginal(source.Variable);

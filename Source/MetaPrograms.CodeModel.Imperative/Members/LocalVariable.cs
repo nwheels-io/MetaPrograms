@@ -2,13 +2,13 @@
 {
     public class LocalVariable
     {
-        public LocalVariable(string name, TypeMember type)
+        public LocalVariable(string name, MemberRef<TypeMember> type)
         {
             Name = name;
             Type = type;
         }
 
         public string Name { get; }
-        public TypeMember Type { get; }
+        public MemberRef<TypeMember> Type { get; }
     }
 }

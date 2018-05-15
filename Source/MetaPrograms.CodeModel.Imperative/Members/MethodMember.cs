@@ -7,8 +7,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class MethodMember : MethodMemberBase
     {
         public MethodMember(
-            string name, 
-            TypeMember declaringType, 
+            string name,
+            MemberRef<TypeMember> declaringType, 
             MemberStatus status, 
             MemberVisibility visibility, 
             MemberModifier modifier, 
@@ -22,7 +22,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public MethodMember(
             MethodMember source, 
             Mutator<string>? name = null, 
-            Mutator<TypeMember>? declaringType = null, 
+            Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
@@ -32,6 +32,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             : base(source, name, declaringType, status, visibility, modifier, attributes, signature, body)
         {
         }
+
+        public new MemberRef<MethodMember> GetRef() => new MemberRef<MethodMember>(SelfReference);
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {

@@ -25,6 +25,11 @@ namespace MetaPrograms.CodeModel.Imperative
             _bindings.Add(binding);
         }
 
+        public void UnionWith<TBinding>(IEnumerable<TBinding> bindings) where TBinding : class
+        {
+            _bindings.UnionWith(bindings);
+        }
+
         public int Count => _bindings.Count;
     }
 }
