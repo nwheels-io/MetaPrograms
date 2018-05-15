@@ -24,9 +24,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.IsGenericType = builder.IsGenericType;
             this.IsGenericDefinition = builder.IsGenericDefinition;
             this.IsGenericParameter = builder.IsGenericParameter;
-            this.GenericTypeDefinition = builder.GenericTypeDefinition;
-            this.GenericArguments = builder.GenericTypeArguments.ToImmutableList();
-            this.GenericParameters = builder.GenericTypeParameters.ToImmutableList();
+            this.GenericTypeDefinition = builder.GenericDefinition;
+            this.GenericArguments = builder.GenericArguments.ToImmutableList();
+            this.GenericParameters = builder.GenericParameters.ToImmutableList();
             this.UnderlyingType = builder.UnderlyingType;
             this.Members = builder.Members.ToImmutableList();
             this.Generator = builder.Generator;

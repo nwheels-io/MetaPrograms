@@ -19,6 +19,11 @@ namespace MetaPrograms.Adapters.Roslyn.Tests
             return CreateWithCode(csharpCode, new string[0], out project);
         }
 
+        public static AdhocWorkspace CreateWithCode(string csharpCode, string[] references)
+        {
+            return CreateWithCode(csharpCode, references, out Project project);
+        }
+
         public static AdhocWorkspace CreateWithCode(string csharpCode, string[] references, out Project project)
         {
             var sourceText = SourceText.From(csharpCode);

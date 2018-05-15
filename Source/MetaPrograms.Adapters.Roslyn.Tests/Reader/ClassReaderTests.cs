@@ -26,13 +26,13 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             // act
 
-            var typeMember = reader.Read();
-            
+            var type = reader.ReadAll();
+
             // assert
-            
-            typeMember.Name.ShouldBe("MyClass");
-            typeMember.Namespace.ShouldBe("MyApp.MyTest");
-            typeMember.FullName.ShouldBe("MyApp.MyTest.MyClass");
+
+            type.Name.ShouldBe("MyClass");
+            type.Namespace.ShouldBe("MyApp.MyTest");
+            type.FullName.ShouldBe("MyApp.MyTest.MyClass");
         }
         
         [Test]
@@ -51,12 +51,12 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             // act
 
-            var concrete = reader.Read();
+            var type = reader.ReadAll();
             
             // assert
 
-            concrete.BaseType.ShouldNotBeNull();
-            concrete.BaseType.FullName.ShouldBe("MyApp.MyBase");
+            type.BaseType.ShouldNotBeNull();
+            type.BaseType.FullName.ShouldBe("MyApp.MyBase");
         }
         
         [Test]
@@ -76,12 +76,12 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             // act
 
-            var concrete = reader.Read();
+            var type = reader.ReadAll();
             
             // assert
 
-            concrete.Interfaces.Count.ShouldBe(2);
-            concrete.Interfaces.Select(t => t.FullName).ShouldBe(new[] { "MyApp.IService1", "MyApp.IService2" }, ignoreOrder: true);
+            type.Interfaces.Count.ShouldBe(2);
+            type.Interfaces.Select(t => t.FullName).ShouldBe(new[] { "MyApp.IService1", "MyApp.IService2" }, ignoreOrder: true);
         }
 
         [Test]
@@ -104,15 +104,15 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             // act
 
-            var concrete = reader.Read();
+            var type = reader.ReadAll();
             
             // assert
             
-            concrete.Members.OfType<ConstructorMember>().Select(m => m.Name).ShouldBe(new[] { "MyClass" });
-            concrete.Members.OfType<FieldMember>().Select(m => m.Name).ShouldBe(new[] { "f1" });
-            concrete.Members.OfType<MethodMember>().Select(m => m.Name).ShouldBe(new[] { "M1" });
-            concrete.Members.OfType<PropertyMember>().Select(m => m.Name).ShouldBe(new[] { "P1" });
-            concrete.Members.OfType<EventMember>().Select(m => m.Name).ShouldBe(new[] { "E1" });
+            type.Members.OfType<ConstructorMember>().Select(m => m.Name).ShouldBe(new[] { "MyClass" });
+            type.Members.OfType<FieldMember>().Select(m => m.Name).ShouldBe(new[] { "f1" });
+            type.Members.OfType<MethodMember>().Select(m => m.Name).ShouldBe(new[] { "M1" });
+            type.Members.OfType<PropertyMember>().Select(m => m.Name).ShouldBe(new[] { "P1" });
+            type.Members.OfType<EventMember>().Select(m => m.Name).ShouldBe(new[] { "E1" });
         }
         
         private (ClassReader, CodeModelBuilder) GetClassReaderFromCode(string csharpCode, string className)
@@ -126,11 +126,8 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             var typeSymbol = compilation.GetTypeByMetadataName(className);
             typeSymbol.ShouldNotBeNull($"Type symbol '{className}' could not be found in compilation.");
 
-            var syntaxTree = typeSymbol.DeclaringSyntaxReferences.First().SyntaxTree;
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            
             var modelBuilder = new CodeModelBuilder();
-            var reader = new ClassReader(new TypeReaderMechanism(modelBuilder, semanticModel, typeSymbol));
+            var reader = new ClassReader(new TypeReaderMechanism(modelBuilder, typeSymbol));
 
             return (reader, modelBuilder);
         }

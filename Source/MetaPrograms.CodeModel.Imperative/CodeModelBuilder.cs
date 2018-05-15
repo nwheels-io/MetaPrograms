@@ -53,7 +53,7 @@ namespace MetaPrograms.CodeModel.Imperative
             }
 
             throw new KeyNotFoundException(
-                $"${typeof(TMember).Name} with binding '${typeof(TBinding).Name}=${binding}' could not be found.");
+                $"{typeof(TMember).Name} with binding '{typeof(TBinding).Name}={binding}' could not be found.");
         }
 
         public TMember GetOrAddMember<TMember, TBinding>(TBinding binding, Func<TMember> memberFactory)

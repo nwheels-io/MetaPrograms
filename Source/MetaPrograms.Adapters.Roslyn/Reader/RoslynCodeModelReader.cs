@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using MetaPrograms.CodeModel.Imperative;
@@ -11,24 +12,18 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class RoslynCodeModelReader
     {
-        private readonly List<IPhasedTypeReader> _phasedTypeReaders;
+        private readonly List<IPhasedTypeReader> _phasedTypeReaders = new List<IPhasedTypeReader>();
 
         public RoslynCodeModelReader(Workspace workspace)
         {
             this.Workspace = workspace;
+            this.ModelBuilder = new CodeModelBuilder();
         }
 
         public void Read()
         {
             DiscoverAllTypes();
-
-            //foreach (var project in _workspace.CurrentSolution.Projects)
-            //{
-            //    var projectReader = new ProjectReader(_modelBuilder, _workspace, project);
-            //    projectReader.Read();
-            //}
-
-            //CodeModel = _modelBuilder.GetCodeModel();
+            ReadAllTypes();
         }
 
         public ImmutableCodeModel GetCodeModel() => ModelBuilder.GetCodeModel();
@@ -38,7 +33,42 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         private void DiscoverAllTypes()
         {
-            throw new System.NotImplementedException();
+            foreach (var project in Workspace.CurrentSolution.Projects)
+            {
+                var compilation = CompileProjectOrThrow(project).WithReferences();
+                var visitor = new TypeDiscoverySymbolVisitor(ModelBuilder, _phasedTypeReaders);
+                compilation.GlobalNamespace.Accept(visitor);
+            }
+        }
+
+        private void ReadAllTypes()
+        {
+            _phasedTypeReaders.RunAllPhases();
+        }
+
+        private Compilation CompileProjectOrThrow(Project project)
+        {
+            var compilation = project.GetCompilationAsync().Result;
+            var warningsAndErrors = compilation
+                .GetDiagnostics()
+                .Where(d => d.Severity >= DiagnosticSeverity.Warning)
+                .ToArray();
+
+            if (warningsAndErrors.Length > 0)
+            {
+                throw new Exception(GetDiagnosticsText(warningsAndErrors));
+            }
+
+            return compilation;
+        }
+
+        private string GetDiagnosticsText(Diagnostic[] warningsAndErrors)
+        {
+            var endl = Environment.NewLine;
+            var messages = string.Join(endl, warningsAndErrors.Select(x => x.ToString()));
+            var text = $"Project failed to compile.{endl}{messages}";
+
+            return text;
         }
     }
 }

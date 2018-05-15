@@ -26,7 +26,6 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
                 GetExampleProjectFilePath("Example.WebBrowserAdapter"),
                 GetExampleProjectFilePath("Example.AspNetAdapter"),
             });
-                    ;
 
             //act & assert
             workspace.CompileCodeOrThrow();
@@ -35,16 +34,21 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
         [Test]
         public void CanGenerateImplementations()
         {
-            // act
+            // arrange
+            var loader = new BuildalyzerWorkspaceLoader();
+            var workspace = loader.LoadWorkspace(new[] {
+                GetExampleProjectFilePath("Example.App"),
+                GetExampleProjectFilePath("Example.WebUIModel"),
+                GetExampleProjectFilePath("Example.WebBrowserAdapter"),
+                GetExampleProjectFilePath("Example.AspNetAdapter"),
+            });
 
-            var reader = new RoslynCodeModelReader(new BuildalyzerWorkspaceLoader());
-            reader.AddProject(GetExampleProjectFilePath("Example.App"));
-            reader.AddProject(GetExampleProjectFilePath("Example.WebUIModel"));
-            reader.AddProject(GetExampleProjectFilePath("Example.WebBrowserAdapter"));
-            reader.AddProject(GetExampleProjectFilePath("Example.AspNetAdapter"));
+            // act
+            var reader = new RoslynCodeModelReader(workspace);
             reader.Read();
+            var codeModel = reader.GetCodeModel();
             
-            var uiMetadata = new WebUIMetadata(reader.CodeModel);
+            var uiMetadata = new WebUIMetadata(codeModel);
             
             var frontEndAdapter = new WebBrowserAdapter(outputStreamFactory: filePath => new MemoryStream());
             var frontEndOutputs = frontEndAdapter.GenerateImplementations(uiMetadata);

@@ -10,26 +10,18 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class TypeReaderMechanism
     {
-        public TypeReaderMechanism(CodeModelBuilder modelBuilder, SemanticModel semanticModel, TypeDeclarationSyntax syntax)
-            : this(modelBuilder, semanticModel, semanticModel.GetDeclaredSymbol(syntax))
-        {
-            Syntax = syntax;
-        }
-
-        public TypeReaderMechanism(CodeModelBuilder modelBuilder, SemanticModel semanticModel, INamedTypeSymbol symbol)
+        public TypeReaderMechanism(CodeModelBuilder modelBuilder, INamedTypeSymbol symbol)
         {
             ModelBuilder = modelBuilder;
             MemberBuilder = new TypeMemberBuilder();
-            SemanticModel = semanticModel;
             Symbol = symbol;
             FullyQualifiedMetadataName = Symbol.GetFullyQualifiedMetadataName();
             ClrType = Type.GetType(FullyQualifiedMetadataName, throwOnError: false);
+            MemberBuilder.Status = MemberStatus.Incomplete;
         }
 
         public CodeModelBuilder ModelBuilder { get; }
         public TypeMemberBuilder MemberBuilder { get; }
-        public SemanticModel SemanticModel { get; }
-        public TypeDeclarationSyntax Syntax { get; }
         public INamedTypeSymbol Symbol { get; }
         public string FullyQualifiedMetadataName { get; }
         public Type ClrType { get; }
@@ -39,19 +31,18 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void RegisterProxyType()
         {
-            MemberBuilder.Status = MemberStatus.Incomplete;
-            this.ProxyType = (ProxyTypeMember)CreateTypeMemberWithBindings(shouldCreateProxy: true);
+            this.ProxyType = new ProxyTypeMember(MemberBuilder);
             ModelBuilder.RegisterMember(ProxyType);
         }
 
         public void RegisterRealType()
         {
             MemberBuilder.Status = MemberStatus.Compiled;
-            this.RealType = (RealTypeMember)CreateTypeMemberWithBindings(shouldCreateProxy: false);
+            this.RealType = new RealTypeMember(MemberBuilder);
 
             if (ProxyType != null)
             {
-                ProxyType.AssignRealTypeOnce(RealType);
+                ProxyType.ReAssignBackingTypeOnce(RealType);
             }
 
             if (IsTopLevelType)
@@ -73,9 +64,9 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             
             if (Symbol.IsGenericType)
             {
-                MemberBuilder.GenericTypeParameters.AddRange(
+                MemberBuilder.GenericParameters.AddRange(
                     Symbol.TypeParameters.Select(
-                        p => ModelBuilder.IncludeType(p, SemanticModel)));
+                        p => ModelBuilder.GetMember<TypeMember, ISymbol>(p)));
             }
         }
 
@@ -84,14 +75,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             MemberBuilder.BaseType = (
                 Symbol.BaseType == null || Symbol.BaseType.SpecialType == SpecialType.System_Object
                     ? null
-                    : ModelBuilder.IncludeType(Symbol.BaseType, SemanticModel));
+                    : ModelBuilder.GetMember<TypeMember, ISymbol>(Symbol.BaseType));
         }
 
         public void ReadBaseInterfaces()
         {
             foreach (var interfaceSymbol in Symbol.Interfaces)
             {
-                MemberBuilder.Interfaces.Add(ModelBuilder.IncludeType(interfaceSymbol, SemanticModel));
+                MemberBuilder.Interfaces.Add(ModelBuilder.GetMember<TypeMember, ISymbol>(interfaceSymbol));
             }
         }
         

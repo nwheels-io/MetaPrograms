@@ -5,28 +5,32 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class ProxyTypeMember : TypeMember
     {
-        private TypeMember _realType = null;
+        private TypeMember _backingType;
+        private bool _backingTypeReAssigned;
 
         public ProxyTypeMember(TypeMemberBuilder builder)
             : base(builder)
         {
+            _backingType = builder.GetTemporaryType();
+            _backingTypeReAssigned = false;
         }
 
-        public void AssignRealTypeOnce(TypeMember type)
+        public void ReAssignBackingTypeOnce(TypeMember type)
         {
-            if (_realType != null)
+            if (_backingTypeReAssigned)
             {
-                throw new InvalidOperationException("This proxy was already assigned a real type member.");
+                throw new InvalidOperationException("Backing type was already reassigned on this proxy.");
             }
 
-            _realType = type;
+            _backingTypeReAssigned = true;
+            _backingType = type;
         }
 
         public override bool Equals(TypeMember other)
         {
             if (other != null)
             {
-                return (other.RealType == this._realType);
+                return (other.RealType == this._backingType);
             }
 
             return false;
@@ -34,78 +38,65 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public override TypeMember MakeGenericType(params TypeMember[] typeArguments)
         {
-            return GetRealTypeOrThrow().MakeGenericType(typeArguments);
+            return _backingType.MakeGenericType(typeArguments);
         }
 
-        public override string AssemblyName => GetRealTypeOrThrow().AssemblyName;
+        public override string AssemblyName => _backingType.AssemblyName;
 
-        public override string Namespace => GetRealTypeOrThrow().Namespace;
+        public override string Namespace => _backingType.Namespace;
 
-        public override TypeMember BaseType => GetRealTypeOrThrow().BaseType;
+        public override TypeMember BaseType => _backingType.BaseType;
 
-        public override ImmutableHashSet<TypeMember> Interfaces => GetRealTypeOrThrow().Interfaces;
+        public override ImmutableHashSet<TypeMember> Interfaces => _backingType.Interfaces;
 
-        public override TypeMemberKind TypeKind => GetRealTypeOrThrow().TypeKind;
+        public override TypeMemberKind TypeKind => _backingType.TypeKind;
 
-        public override bool IsAbstract => GetRealTypeOrThrow().IsAbstract;
+        public override bool IsAbstract => _backingType.IsAbstract;
 
-        public override bool IsValueType => GetRealTypeOrThrow().IsValueType;
+        public override bool IsValueType => _backingType.IsValueType;
 
-        public override bool IsCollection => GetRealTypeOrThrow().IsCollection;
+        public override bool IsCollection => _backingType.IsCollection;
 
-        public override bool IsArray => GetRealTypeOrThrow().IsArray;
+        public override bool IsArray => _backingType.IsArray;
 
-        public override bool IsNullable => GetRealTypeOrThrow().IsNullable;
+        public override bool IsNullable => _backingType.IsNullable;
 
-        public override bool IsAwaitable => GetRealTypeOrThrow().IsAwaitable;
+        public override bool IsAwaitable => _backingType.IsAwaitable;
 
-        public override bool IsGenericType => GetRealTypeOrThrow().IsGenericType;
+        public override bool IsGenericType => _backingType.IsGenericType;
 
-        public override bool IsGenericDefinition => GetRealTypeOrThrow().IsGenericDefinition;
+        public override bool IsGenericDefinition => _backingType.IsGenericDefinition;
 
-        public override bool IsGenericParameter => GetRealTypeOrThrow().IsGenericParameter;
+        public override bool IsGenericParameter => _backingType.IsGenericParameter;
 
-        public override TypeMember GenericTypeDefinition => GetRealTypeOrThrow().GenericTypeDefinition;
+        public override TypeMember GenericTypeDefinition => _backingType.GenericTypeDefinition;
 
-        public override ImmutableList<TypeMember> GenericArguments => GetRealTypeOrThrow().GenericArguments;
+        public override ImmutableList<TypeMember> GenericArguments => _backingType.GenericArguments;
 
-        public override ImmutableList<TypeMember> GenericParameters => GetRealTypeOrThrow().GenericParameters;
+        public override ImmutableList<TypeMember> GenericParameters => _backingType.GenericParameters;
 
-        public override TypeMember UnderlyingType => GetRealTypeOrThrow().UnderlyingType;
+        public override TypeMember UnderlyingType => _backingType.UnderlyingType;
 
-        public override ImmutableList<AbstractMember> Members => GetRealTypeOrThrow().Members;
+        public override ImmutableList<AbstractMember> Members => _backingType.Members;
 
-        public override TypeGeneratorInfo Generator => GetRealTypeOrThrow().Generator;
+        public override TypeGeneratorInfo Generator => _backingType.Generator;
 
-        public override BindingCollection Bindings => GetRealTypeOrThrow().Bindings;
+        public override BindingCollection Bindings => _backingType.Bindings;
 
-        public override string Name => GetRealTypeOrThrow().Name;
+        public override string Name => _backingType.Name;
 
-        public override TypeMember DeclaringType => GetRealTypeOrThrow().DeclaringType;
+        public override TypeMember DeclaringType => _backingType.DeclaringType;
 
-        public override MemberStatus Status => GetRealTypeOrThrow().Status;
+        public override MemberStatus Status => _backingType.Status;
 
-        public override MemberVisibility Visibility => GetRealTypeOrThrow().Visibility;
+        public override MemberVisibility Visibility => _backingType.Visibility;
 
-        public override MemberModifier Modifier => GetRealTypeOrThrow().Modifier;
+        public override MemberModifier Modifier => _backingType.Modifier;
 
-        public override ImmutableList<AttributeDescription> Attributes => GetRealTypeOrThrow().Attributes;
+        public override ImmutableList<AttributeDescription> Attributes => _backingType.Attributes;
 
         protected internal override bool IsProxy => true;
 
-        protected internal override TypeMember RealType => _realType;
-
-        private TypeMember GetRealTypeOrThrow()
-        {
-            if (_realType != null)
-            {
-                return _realType;
-            }
-            
-            throw new InvalidOperationException(
-                "This proxy was not assigned a real instance. " +
-                "Requested operation can only be performed on a real instance. " +
-                "Call this operation after project reading is done: this is when all proxies are guaranteed to have real instances.");
-        }
+        protected internal override TypeMember RealType => _backingType;
     }
 }

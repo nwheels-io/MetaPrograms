@@ -8,37 +8,58 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
-    public class ClassReader
+    public class ClassReader : IPhasedTypeReader
     {
-        private readonly TypeReaderMechanism _typeReaderMechanism;
+        private readonly TypeReaderMechanism _mechanism;
 
-        public ClassReader(TypeReaderMechanism typeReaderMechanism)
+        public ClassReader(TypeReaderMechanism mechanism)
         {
-            _typeReaderMechanism = typeReaderMechanism;
+            _mechanism = mechanism;
+            _mechanism.MemberBuilder.TypeKind = TypeMemberKind.Class;
         }
 
-        public ClassReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, ClassDeclarationSyntax syntax)
-            : this(new TypeReaderMechanism(modelBuilder, semanticModel, syntax))
+        public void RegisterProxy()
         {
+            _mechanism.RegisterProxyType();
         }
 
-        public TypeMember Read()
+        public void ReadName()
         {
-            _typeReaderMechanism.MemberBuilder.TypeKind = TypeMemberKind.Class;
-            
-            _typeReaderMechanism.ReadName();
-            _typeReaderMechanism.RegisterProxyType();
-
-            _typeReaderMechanism.ReadGenerics();
-            _typeReaderMechanism.ReadBaseType();
-            _typeReaderMechanism.ReadBaseInterfaces();
-            _typeReaderMechanism.ReadMemberDeclarations();
-            _typeReaderMechanism.ReadMemberImplementations();
-            
-            _typeReaderMechanism.RegisterRealType();
-            return _typeReaderMechanism.RealType;
+            _mechanism.ReadName();
         }
 
-        public TypeReaderMechanism TypeReaderMechanism => _typeReaderMechanism;
+        public void ReadGenerics()
+        {
+            _mechanism.ReadGenerics();
+        }
+
+        public void ReadAncestors()
+        {
+            _mechanism.ReadBaseType();
+            _mechanism.ReadBaseInterfaces();
+        }
+
+        public void ReadMemberDeclarations()
+        {
+            _mechanism.ReadMemberDeclarations();
+        }
+
+        public void ReadAttributes()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void ReadMemberImplementations()
+        {
+            //throw new NotImplementedException();
+
+        }
+
+        public void RegisterReal()
+        {
+            _mechanism.RegisterRealType();
+        }
+
+        public TypeMember TypeMember => _mechanism.RealType;
     }
 }

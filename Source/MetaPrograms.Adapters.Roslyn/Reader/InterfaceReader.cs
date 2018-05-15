@@ -8,35 +8,72 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
-    public class InterfaceReader
+    public class InterfaceReader : IPhasedTypeReader
     {
-        private readonly TypeReaderMechanism _typeReaderMechanism;
+        private readonly TypeReaderMechanism _mechanism;
 
-        public InterfaceReader(TypeReaderMechanism typeReaderMechanism)
+        public InterfaceReader(TypeReaderMechanism mechanism)
         {
-            _typeReaderMechanism = typeReaderMechanism;
-        }
-
-        public InterfaceReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, InterfaceDeclarationSyntax syntax)
-            : this(new TypeReaderMechanism(modelBuilder, semanticModel, syntax))
-        {
+            _mechanism = mechanism;
         }
 
         public TypeMember Read()
         {
-            _typeReaderMechanism.MemberBuilder.TypeKind = TypeMemberKind.Interface;
+            _mechanism.MemberBuilder.TypeKind = TypeMemberKind.Interface;
             
-            _typeReaderMechanism.ReadName();
-            _typeReaderMechanism.RegisterProxyType();
+            _mechanism.ReadName();
+            _mechanism.RegisterProxyType();
 
-            _typeReaderMechanism.ReadGenerics();
-            _typeReaderMechanism.ReadBaseInterfaces();
-            _typeReaderMechanism.ReadMemberDeclarations();
+            _mechanism.ReadGenerics();
+            _mechanism.ReadBaseInterfaces();
+            _mechanism.ReadMemberDeclarations();
             
-            _typeReaderMechanism.RegisterRealType();
-            return _typeReaderMechanism.RealType;
+            _mechanism.RegisterRealType();
+            return _mechanism.RealType;
         }
 
-        public TypeReaderMechanism TypeReaderMechanism => _typeReaderMechanism;
+        public TypeReaderMechanism Mechanism => _mechanism;
+
+        public void ReadName()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RegisterProxy()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadGenerics()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadAncestors()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadMemberDeclarations()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadAttributes()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadMemberImplementations()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RegisterReal()
+        {
+            throw new NotImplementedException();
+        }
+
+        public TypeMember TypeMember { get; }
     }
 }
