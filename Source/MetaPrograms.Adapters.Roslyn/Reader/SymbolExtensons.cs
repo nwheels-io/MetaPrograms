@@ -13,7 +13,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             
             for (
                 var namespaceSymbol = symbol.ContainingNamespace;
-                namespaceSymbol != null;
+                namespaceSymbol != null && !namespaceSymbol.IsGlobalNamespace;
                 namespaceSymbol = namespaceSymbol.ContainingNamespace)
             {
                 namespaceHierarchy.Add(namespaceSymbol.Name);

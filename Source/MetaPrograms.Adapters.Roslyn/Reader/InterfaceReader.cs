@@ -8,32 +8,30 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
-    public class ClassReader
+    public class InterfaceReader
     {
         private readonly TypeReader _typeReader;
 
-        public ClassReader(TypeReader typeReader)
+        public InterfaceReader(TypeReader typeReader)
         {
             _typeReader = typeReader;
         }
 
-        public ClassReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, ClassDeclarationSyntax syntax)
+        public InterfaceReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, InterfaceDeclarationSyntax syntax)
             : this(new TypeReader(modelBuilder, semanticModel, syntax))
         {
         }
 
         public TypeMember Read()
         {
-            _typeReader.MemberBuilder.TypeKind = TypeMemberKind.Class;
+            _typeReader.MemberBuilder.TypeKind = TypeMemberKind.Interface;
             
             _typeReader.ReadName();
             _typeReader.RegisterIncompleteTypeMember();
 
             _typeReader.ReadGenerics();
-            _typeReader.ReadBaseType();
             _typeReader.ReadBaseInterfaces();
             _typeReader.ReadMemberDeclarations();
-            _typeReader.ReadMemberImplementations();
             
             return _typeReader.RegisterCompleteTypeMember();
         }

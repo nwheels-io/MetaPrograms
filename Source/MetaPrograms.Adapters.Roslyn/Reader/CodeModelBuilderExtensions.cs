@@ -17,11 +17,18 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             switch (symbol.TypeKind)
             {
                 case TypeKind.Class:
-                    return new ClassReader(modelBuilder, semanticModel, (INamedTypeSymbol)symbol).Read();
+                    return new ClassReader(CreateTypeReader()).Read();
+                case TypeKind.Interface:
+                    return new InterfaceReader(CreateTypeReader()).Read();
                 case TypeKind.TypeParameter:
                     return new TypeParameterReader(modelBuilder, semanticModel, (ITypeParameterSymbol)symbol).Read();
                 default:
                     throw new NotImplementedException(symbol.TypeKind.ToString());
+            }
+
+            TypeReader CreateTypeReader()
+            {
+                return new TypeReader(modelBuilder, semanticModel, (INamedTypeSymbol)symbol);
             }
         }
     }

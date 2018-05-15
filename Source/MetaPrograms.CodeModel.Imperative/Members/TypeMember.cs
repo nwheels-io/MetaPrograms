@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
-    public class TypeMember : AbstractMember, IEquatable<TypeMember>
+    public class TypeMember : AbstractMember
     {
         public TypeMember(TypeMemberBuilder builder)
             : base(
@@ -71,26 +70,28 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.Generator = mutator.Generator.MutatedOrOriginal(source.Generator);
         }
 
-        public string AssemblyName { get; }
-        public string Namespace { get; }
-        public TypeMember BaseType { get; }
-        public ImmutableHashSet<TypeMember> Interfaces { get; }
-        public TypeMemberKind TypeKind { get; }
-        public bool IsAbstract { get; }
-        public bool IsValueType { get; }
-        public bool IsCollection { get; }
-        public bool IsArray { get; }
-        public bool IsNullable { get; }
-        public bool IsAwaitable { get; }
-        public bool IsGenericType { get; }
-        public bool IsGenericDefinition { get; }
-        public bool IsGenericParameter { get; }
-        public TypeMember GenericTypeDefinition { get; }
-        public ImmutableList<TypeMember> GenericArguments { get; }
-        public ImmutableList<TypeMember> GenericParameters { get; }
-        public TypeMember UnderlyingType { get; }
-        public ImmutableList<AbstractMember> Members { get; }
-        public TypeGeneratorInfo Generator { get; }
+        public virtual bool IsProxy => false;
+        public virtual TypeMember RealType => this;
+        public virtual string AssemblyName { get; }
+        public virtual string Namespace { get; }
+        public virtual TypeMember BaseType { get; }
+        public virtual ImmutableHashSet<TypeMember> Interfaces { get; }
+        public virtual TypeMemberKind TypeKind { get; }
+        public virtual bool IsAbstract { get; }
+        public virtual bool IsValueType { get; }
+        public virtual bool IsCollection { get; }
+        public virtual bool IsArray { get; }
+        public virtual bool IsNullable { get; }
+        public virtual bool IsAwaitable { get; }
+        public virtual bool IsGenericType { get; }
+        public virtual bool IsGenericDefinition { get; }
+        public virtual bool IsGenericParameter { get; }
+        public virtual TypeMember GenericTypeDefinition { get; }
+        public virtual ImmutableList<TypeMember> GenericArguments { get; }
+        public virtual ImmutableList<TypeMember> GenericParameters { get; }
+        public virtual TypeMember UnderlyingType { get; }
+        public virtual ImmutableList<AbstractMember> Members { get; }
+        public virtual TypeGeneratorInfo Generator { get; }
 
         public bool Equals(TypeMember other)
         {
@@ -214,7 +215,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
-        public string FullName
+        public virtual string FullName
         {
             get
             {

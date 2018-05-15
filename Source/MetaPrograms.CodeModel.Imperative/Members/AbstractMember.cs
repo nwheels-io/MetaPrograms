@@ -71,13 +71,13 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return $"{this.GetType().Name.TrimSuffix("Member")} {this.Name}";
         }
 
-        public BindingCollection Bindings { get; } = new BindingCollection();
+        public virtual BindingCollection Bindings { get; } = new BindingCollection();
 
-        public string Name { get; }
-        public TypeMember DeclaringType { get; }
-        public MemberStatus Status { get; }
-        public MemberVisibility Visibility { get; }
-        public MemberModifier Modifier { get; }
-        public ImmutableList<AttributeDescription> Attributes { get; }
+        public virtual string Name { get; }
+        public virtual TypeMember DeclaringType { get; }
+        public virtual MemberStatus Status { get; }
+        public virtual MemberVisibility Visibility { get; }
+        public virtual MemberModifier Modifier { get; }
+        public virtual ImmutableList<AttributeDescription> Attributes { get; }
     }
 }
