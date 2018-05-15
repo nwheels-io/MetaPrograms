@@ -130,7 +130,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             
             var modelBuilder = new CodeModelBuilder();
-            var reader = new ClassReader(new TypeReader(modelBuilder, semanticModel, typeSymbol));
+            var reader = new ClassReader(new TypeReaderMechanism(modelBuilder, semanticModel, typeSymbol));
 
             return (reader, modelBuilder);
         }

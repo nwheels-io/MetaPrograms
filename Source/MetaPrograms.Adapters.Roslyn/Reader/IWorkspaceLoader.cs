@@ -5,6 +5,6 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public interface IWorkspaceLoader
     {
-        Workspace LoadProjectWorkspace(IEnumerable<string> projectFilePaths);
+        Workspace LoadWorkspace(IEnumerable<string> projectFilePaths);
     }
 }

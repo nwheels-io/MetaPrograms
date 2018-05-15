@@ -20,7 +20,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
         {
             // arrange
             var loader = new BuildalyzerWorkspaceLoader();
-            var workspace = loader.LoadProjectWorkspace(new[] {
+            var workspace = loader.LoadWorkspace(new[] {
                 GetExampleProjectFilePath("Example.App"),
                 GetExampleProjectFilePath("Example.WebUIModel"),
                 GetExampleProjectFilePath("Example.WebBrowserAdapter"),

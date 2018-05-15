@@ -11,35 +11,35 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class RoslynCodeModelReader
     {
-        private readonly IWorkspaceLoader _workspaceLoader;
-        private readonly List<string> _projectFilePaths = new List<string>();
-        private readonly CodeModelBuilder _modelBuilder = new CodeModelBuilder();
-        private Workspace _workspace = null;
-        
-        public RoslynCodeModelReader(IWorkspaceLoader workspaceLoader)
-        {
-            _workspaceLoader = workspaceLoader;
-        }
+        private readonly List<IPhasedTypeReader> _phasedTypeReaders;
 
-        public void AddProject(string projectFilePath)
+        public RoslynCodeModelReader(Workspace workspace)
         {
-            _projectFilePaths.Add(projectFilePath);
+            this.Workspace = workspace;
         }
 
         public void Read()
         {
-            _workspace = _workspaceLoader.LoadProjectWorkspace(_projectFilePaths);
+            DiscoverAllTypes();
 
-            foreach (var project in _workspace.CurrentSolution.Projects)
-            {
-                var projectReader = new ProjectReader(_modelBuilder, _workspace, project);
-                projectReader.Read();
-            }
+            //foreach (var project in _workspace.CurrentSolution.Projects)
+            //{
+            //    var projectReader = new ProjectReader(_modelBuilder, _workspace, project);
+            //    projectReader.Read();
+            //}
 
-            CodeModel = _modelBuilder.GetCodeModel();
+            //CodeModel = _modelBuilder.GetCodeModel();
         }
 
-        public ImmutableCodeModel CodeModel { get; private set; }
+        public ImmutableCodeModel GetCodeModel() => ModelBuilder.GetCodeModel();
+
+        public Workspace Workspace { get; }
+        public CodeModelBuilder ModelBuilder { get; }
+
+        private void DiscoverAllTypes()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
 

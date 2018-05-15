@@ -16,17 +16,17 @@ namespace MetaPrograms.CodeModel.Imperative
             _memberByBinding[binding] = member;
         }
 
-        public void RegisterMember(AbstractMember member, bool isTopLevel = false)
+        public void RegisterMember(AbstractMember member)
         {
             foreach (var binding in member.Bindings)
             {
                 _memberByBinding[binding] = member;
             }
-            
-            if (isTopLevel)
-            {
-                _topLevelMembers.Add(member);
-            }
+        }
+
+        public void RegisterTopLevelMember(AbstractMember member)
+        {
+            _topLevelMembers.Add(member);
         }
 
         public bool TryGetMember<TMember, TBinding>(TBinding binding, out TMember member)

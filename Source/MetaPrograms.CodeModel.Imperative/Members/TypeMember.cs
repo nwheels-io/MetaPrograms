@@ -5,9 +5,9 @@ using System.Reflection;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
-    public class TypeMember : AbstractMember
+    public abstract class TypeMember : AbstractMember
     {
-        public TypeMember(TypeMemberBuilder builder)
+        protected TypeMember(TypeMemberBuilder builder)
             : base(
                 builder.Name, 
                 builder.DeclaringType, 
@@ -16,98 +16,42 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 builder.Modifier, 
                 builder.Attributes.ToImmutableList())
         {
-            this.AssemblyName = builder.AssemblyName;
-            this.Namespace = builder.Namespace;
-            this.BaseType = builder.BaseType;
-            this.Interfaces = builder.Interfaces.ToImmutableHashSet();
-            this.TypeKind = builder.TypeKind;
-            this.IsAbstract = builder.IsAbstract;
-            this.IsValueType = builder.IsValueType;
-            this.IsCollection = builder.IsCollection;
-            this.IsArray = builder.IsArray;
-            this.IsNullable = builder.IsNullable;
-            this.IsAwaitable = builder.IsAwaitable;
-            this.IsGenericType = builder.IsGenericType;
-            this.IsGenericDefinition = builder.IsGenericDefinition;
-            this.IsGenericParameter = builder.IsGenericParameter;
-            this.GenericTypeDefinition = builder.GenericTypeDefinition;
-            this.GenericArguments = builder.GenericTypeArguments.ToImmutableList();
-            this.GenericParameters = builder.GenericTypeParameters.ToImmutableList();
-            this.UnderlyingType = builder.UnderlyingType;
-            this.Members = builder.Members.ToImmutableList();
-            this.Generator = builder.Generator;
         }
 
-        public TypeMember(TypeMember source, TypeMemberMutator mutator)
+        protected TypeMember(TypeMember source, TypeMemberMutator mutator)
             : base(
-                source, 
-                name: mutator.Name, 
-                declaringType: mutator.DeclaringType, 
-                status: mutator.Status, 
-                visibility: mutator.Visibility, 
-                modifier: mutator.Modifier, 
+                source,
+                name: mutator.Name,
+                declaringType: mutator.DeclaringType,
+                status: mutator.Status,
+                visibility: mutator.Visibility,
+                modifier: mutator.Modifier,
                 attributes: mutator.Attributes)
         {
-            this.AssemblyName = mutator.AssemblyName.MutatedOrOriginal(source.AssemblyName);
-            this.Namespace = mutator.Namespace.MutatedOrOriginal(source.AssemblyName);
-            this.BaseType = mutator.BaseType.MutatedOrOriginal(source.BaseType);
-            this.Interfaces = mutator.Interfaces.MutatedOrOriginal(source.Interfaces);
-            this.TypeKind = mutator.TypeKind.MutatedOrOriginal(source.TypeKind);
-            this.IsAbstract = mutator.IsAbstract.MutatedOrOriginal(source.IsAbstract);
-            this.IsValueType = mutator.IsValueType.MutatedOrOriginal(source.IsValueType);
-            this.IsCollection = mutator.IsCollection.MutatedOrOriginal(source.IsCollection);
-            this.IsArray = mutator.IsArray.MutatedOrOriginal(source.IsArray);
-            this.IsNullable = mutator.IsNullable.MutatedOrOriginal(source.IsNullable);
-            this.IsAwaitable = mutator.IsAwaitable.MutatedOrOriginal(source.IsAwaitable);
-            this.IsGenericType = mutator.IsGenericType.MutatedOrOriginal(source.IsGenericType);
-            this.IsGenericDefinition = mutator.IsGenericDefinition.MutatedOrOriginal(source.IsGenericDefinition);
-            this.IsGenericParameter = mutator.IsGenericParameter.MutatedOrOriginal(source.IsGenericParameter);
-            this.GenericTypeDefinition = mutator.GenericTypeDefinition.MutatedOrOriginal(source.GenericTypeDefinition);
-            this.GenericArguments = mutator.GenericArguments.MutatedOrOriginal(source.GenericArguments);
-            this.GenericParameters = mutator.GenericParameters.MutatedOrOriginal(source.GenericParameters);
-            this.UnderlyingType = mutator.UnderlyingType.MutatedOrOriginal(source.UnderlyingType);
-            this.Members = mutator.Members.MutatedOrOriginal(source.Members);
-            this.Generator = mutator.Generator.MutatedOrOriginal(source.Generator);
         }
 
-        public virtual bool IsProxy => false;
-        public virtual TypeMember RealType => this;
-        public virtual string AssemblyName { get; }
-        public virtual string Namespace { get; }
-        public virtual TypeMember BaseType { get; }
-        public virtual ImmutableHashSet<TypeMember> Interfaces { get; }
-        public virtual TypeMemberKind TypeKind { get; }
-        public virtual bool IsAbstract { get; }
-        public virtual bool IsValueType { get; }
-        public virtual bool IsCollection { get; }
-        public virtual bool IsArray { get; }
-        public virtual bool IsNullable { get; }
-        public virtual bool IsAwaitable { get; }
-        public virtual bool IsGenericType { get; }
-        public virtual bool IsGenericDefinition { get; }
-        public virtual bool IsGenericParameter { get; }
-        public virtual TypeMember GenericTypeDefinition { get; }
-        public virtual ImmutableList<TypeMember> GenericArguments { get; }
-        public virtual ImmutableList<TypeMember> GenericParameters { get; }
-        public virtual TypeMember UnderlyingType { get; }
-        public virtual ImmutableList<AbstractMember> Members { get; }
-        public virtual TypeGeneratorInfo Generator { get; }
+        public abstract string AssemblyName { get; }
+        public abstract string Namespace { get; }
+        public abstract TypeMember BaseType { get; }
+        public abstract ImmutableHashSet<TypeMember> Interfaces { get; }
+        public abstract TypeMemberKind TypeKind { get; }
+        public abstract bool IsAbstract { get; }
+        public abstract bool IsValueType { get; }
+        public abstract bool IsCollection { get; }
+        public abstract bool IsArray { get; }
+        public abstract bool IsNullable { get; }
+        public abstract bool IsAwaitable { get; }
+        public abstract bool IsGenericType { get; }
+        public abstract bool IsGenericDefinition { get; }
+        public abstract bool IsGenericParameter { get; }
+        public abstract TypeMember GenericTypeDefinition { get; }
+        public abstract ImmutableList<TypeMember> GenericArguments { get; }
+        public abstract ImmutableList<TypeMember> GenericParameters { get; }
+        public abstract TypeMember UnderlyingType { get; }
+        public abstract ImmutableList<AbstractMember> Members { get; }
+        public abstract TypeGeneratorInfo Generator { get; }
 
-        public bool Equals(TypeMember other)
-        {
-            if (ReferenceEquals(other, null))
-            {
-                return false;
-            }
-
-            //TODO: compare by bindings
-            //if (this.ClrBinding != null)
-            //{
-            //    return (this.ClrBinding == other.ClrBinding);
-            //}
-
-            return ReferenceEquals(this, other);
-        }
+        public abstract bool Equals(TypeMember other);
 
         public override bool Equals(object obj)
         {
@@ -121,13 +65,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public override int GetHashCode()
         {
-            //TODO: calculate from bindings
-            //if (ClrBinding != null)
-            //{
-            //    return 127 ^ ClrBinding.GetHashCode();
-            //}
-
-            return 17 ^ base.GetHashCode();
+            return base.GetHashCode();
         }
 
         public override string ToString()
@@ -135,18 +73,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return $"{this.TypeKind} {this.Name}";
         }
 
-        public TypeMember MakeGenericType(params TypeMember[] typeArguments)
-        {
-            //TODO: validate type arguments
-
-            var mutator = new TypeMemberMutator(new TypeMemberMutatorBuilder {
-                IsGenericType = true,
-                GenericTypeDefinition = this,
-                GenericArguments = typeArguments.ToList()
-            });
-
-            return new TypeMember(this, mutator);
-        }
+        public abstract TypeMember MakeGenericType(params TypeMember[] typeArguments);
 
         public string MakeGenericName(string openBracket, string closeBracket, string commaSeparator)
         {
@@ -189,33 +116,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
-        public override void AcceptVisitor(MemberVisitor visitor)
-        {
-            base.AcceptVisitor(visitor);
-
-            switch (this.TypeKind)
-            {
-                case TypeMemberKind.Class:
-                    visitor.VisitClassType(this);
-                    break;
-                case TypeMemberKind.Struct:
-                    visitor.VisitStructType(this);
-                    break;
-                case TypeMemberKind.Interface:
-                    visitor.VisitInterfaceType(this);
-                    break;
-                case TypeMemberKind.Enum:
-                    visitor.VisitEnumType(this);
-                    break;
-            }
-
-            foreach (var member in this.Members)
-            {
-                member.AcceptVisitor(visitor);
-            }
-        }
-
-        public virtual string FullName
+        public string FullName
         {
             get
             {
@@ -233,6 +134,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
+        protected internal abstract bool IsProxy { get; }
+        protected internal abstract TypeMember RealType { get; }
 
         public static bool operator == (TypeMember member1, TypeMember member2)
         {

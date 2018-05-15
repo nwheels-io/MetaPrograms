@@ -10,32 +10,33 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class InterfaceReader
     {
-        private readonly TypeReader _typeReader;
+        private readonly TypeReaderMechanism _typeReaderMechanism;
 
-        public InterfaceReader(TypeReader typeReader)
+        public InterfaceReader(TypeReaderMechanism typeReaderMechanism)
         {
-            _typeReader = typeReader;
+            _typeReaderMechanism = typeReaderMechanism;
         }
 
         public InterfaceReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, InterfaceDeclarationSyntax syntax)
-            : this(new TypeReader(modelBuilder, semanticModel, syntax))
+            : this(new TypeReaderMechanism(modelBuilder, semanticModel, syntax))
         {
         }
 
         public TypeMember Read()
         {
-            _typeReader.MemberBuilder.TypeKind = TypeMemberKind.Interface;
+            _typeReaderMechanism.MemberBuilder.TypeKind = TypeMemberKind.Interface;
             
-            _typeReader.ReadName();
-            _typeReader.RegisterIncompleteTypeMember();
+            _typeReaderMechanism.ReadName();
+            _typeReaderMechanism.RegisterProxyType();
 
-            _typeReader.ReadGenerics();
-            _typeReader.ReadBaseInterfaces();
-            _typeReader.ReadMemberDeclarations();
+            _typeReaderMechanism.ReadGenerics();
+            _typeReaderMechanism.ReadBaseInterfaces();
+            _typeReaderMechanism.ReadMemberDeclarations();
             
-            return _typeReader.RegisterCompleteTypeMember();
+            _typeReaderMechanism.RegisterRealType();
+            return _typeReaderMechanism.RealType;
         }
 
-        public TypeReader TypeReader => _typeReader;
+        public TypeReaderMechanism TypeReaderMechanism => _typeReaderMechanism;
     }
 }

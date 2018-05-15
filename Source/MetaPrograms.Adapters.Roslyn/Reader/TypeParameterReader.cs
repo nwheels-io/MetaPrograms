@@ -27,7 +27,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             memberBuilder.Name = _symbol.Name;
             memberBuilder.IsGenericParameter = true;
 
-            return new TypeMember(memberBuilder);
+            return new RealTypeMember(memberBuilder);
         }
     }
 }

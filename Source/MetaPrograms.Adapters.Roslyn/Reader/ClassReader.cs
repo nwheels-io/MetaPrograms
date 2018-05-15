@@ -10,34 +10,35 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class ClassReader
     {
-        private readonly TypeReader _typeReader;
+        private readonly TypeReaderMechanism _typeReaderMechanism;
 
-        public ClassReader(TypeReader typeReader)
+        public ClassReader(TypeReaderMechanism typeReaderMechanism)
         {
-            _typeReader = typeReader;
+            _typeReaderMechanism = typeReaderMechanism;
         }
 
         public ClassReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, ClassDeclarationSyntax syntax)
-            : this(new TypeReader(modelBuilder, semanticModel, syntax))
+            : this(new TypeReaderMechanism(modelBuilder, semanticModel, syntax))
         {
         }
 
         public TypeMember Read()
         {
-            _typeReader.MemberBuilder.TypeKind = TypeMemberKind.Class;
+            _typeReaderMechanism.MemberBuilder.TypeKind = TypeMemberKind.Class;
             
-            _typeReader.ReadName();
-            _typeReader.RegisterIncompleteTypeMember();
+            _typeReaderMechanism.ReadName();
+            _typeReaderMechanism.RegisterProxyType();
 
-            _typeReader.ReadGenerics();
-            _typeReader.ReadBaseType();
-            _typeReader.ReadBaseInterfaces();
-            _typeReader.ReadMemberDeclarations();
-            _typeReader.ReadMemberImplementations();
+            _typeReaderMechanism.ReadGenerics();
+            _typeReaderMechanism.ReadBaseType();
+            _typeReaderMechanism.ReadBaseInterfaces();
+            _typeReaderMechanism.ReadMemberDeclarations();
+            _typeReaderMechanism.ReadMemberImplementations();
             
-            return _typeReader.RegisterCompleteTypeMember();
+            _typeReaderMechanism.RegisterRealType();
+            return _typeReaderMechanism.RealType;
         }
 
-        public TypeReader TypeReader => _typeReader;
+        public TypeReaderMechanism TypeReaderMechanism => _typeReaderMechanism;
     }
 }

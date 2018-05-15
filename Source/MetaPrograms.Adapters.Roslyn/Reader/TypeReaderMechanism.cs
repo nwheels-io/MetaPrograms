@@ -8,15 +8,15 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
-    public class TypeReader
+    public class TypeReaderMechanism
     {
-        public TypeReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, TypeDeclarationSyntax syntax)
+        public TypeReaderMechanism(CodeModelBuilder modelBuilder, SemanticModel semanticModel, TypeDeclarationSyntax syntax)
             : this(modelBuilder, semanticModel, semanticModel.GetDeclaredSymbol(syntax))
         {
             Syntax = syntax;
         }
 
-        public TypeReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, INamedTypeSymbol symbol)
+        public TypeReaderMechanism(CodeModelBuilder modelBuilder, SemanticModel semanticModel, INamedTypeSymbol symbol)
         {
             ModelBuilder = modelBuilder;
             MemberBuilder = new TypeMemberBuilder();
@@ -34,21 +34,30 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         public string FullyQualifiedMetadataName { get; }
         public Type ClrType { get; }
         public bool IsTopLevelType => (Symbol.ContainingSymbol is INamespaceSymbol);
-        
-        public void RegisterIncompleteTypeMember()
+        public ProxyTypeMember ProxyType { get; private set; }
+        public RealTypeMember RealType { get; private set; }
+
+        public void RegisterProxyType()
         {
             MemberBuilder.Status = MemberStatus.Incomplete;
-            var incompleteMember = CreateTypeMemberWithBindings();
-            ModelBuilder.RegisterMember(incompleteMember, isTopLevel: false);
+            this.ProxyType = (ProxyTypeMember)CreateTypeMemberWithBindings(shouldCreateProxy: true);
+            ModelBuilder.RegisterMember(ProxyType);
         }
 
-        public TypeMember RegisterCompleteTypeMember()
+        public void RegisterRealType()
         {
             MemberBuilder.Status = MemberStatus.Compiled;
-            var completeMember = CreateTypeMemberWithBindings();
-            ModelBuilder.RegisterMember(completeMember, IsTopLevelType);
+            this.RealType = (RealTypeMember)CreateTypeMemberWithBindings(shouldCreateProxy: false);
 
-            return completeMember;
+            if (ProxyType != null)
+            {
+                ProxyType.AssignRealTypeOnce(RealType);
+            }
+
+            if (IsTopLevelType)
+            {
+                ModelBuilder.RegisterTopLevelMember(RealType);
+            }
         }
 
         public void ReadName()
@@ -96,9 +105,12 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             //throw new NotImplementedException();
         }
 
-        public TypeMember CreateTypeMemberWithBindings()
+        public TypeMember CreateTypeMemberWithBindings(bool shouldCreateProxy)
         {
-            var type = new TypeMember(MemberBuilder);
+            var type = (
+                shouldCreateProxy 
+                ? new ProxyTypeMember(MemberBuilder) as TypeMember 
+                : new RealTypeMember(MemberBuilder) as TypeMember);
             
             type.Bindings.Add(Symbol);
             type.Bindings.Add(FullyQualifiedMetadataName);

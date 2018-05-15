@@ -9,7 +9,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     {
         private readonly AnalyzerManager _analyzerManager = new AnalyzerManager();
 
-        public Workspace LoadProjectWorkspace(IEnumerable<string> projectFilePaths)
+        public Workspace LoadWorkspace(IEnumerable<string> projectFilePaths)
         {
             var workspace = new AdhocWorkspace();
 
