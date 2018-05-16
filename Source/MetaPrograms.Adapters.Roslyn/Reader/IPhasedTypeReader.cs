@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using MetaPrograms.CodeModel.Imperative.Members;
+using Microsoft.CodeAnalysis;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
@@ -15,6 +16,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         void ReadAttributes();
         void ReadMemberImplementations();
         void RegisterReal();
+        INamedTypeSymbol TypeSymbol { get; }
         TypeMember TypeMember { get; }
     }
 }

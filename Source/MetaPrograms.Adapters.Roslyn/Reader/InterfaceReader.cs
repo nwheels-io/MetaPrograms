@@ -17,23 +17,6 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _mechanism = mechanism;
         }
 
-        public TypeMember Read()
-        {
-            _mechanism.MemberBuilder.TypeKind = TypeMemberKind.Interface;
-            
-            _mechanism.ReadName();
-            _mechanism.RegisterTemporaryProxy();
-
-            _mechanism.ReadGenerics();
-            _mechanism.ReadBaseInterfaces();
-            _mechanism.ReadMemberDeclarations();
-            
-            _mechanism.RegisterFinalType();
-            return _mechanism.FinalType;
-        }
-
-        public TypeReaderMechanism Mechanism => _mechanism;
-
         public void ReadName()
         {
             throw new NotImplementedException();
@@ -41,7 +24,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void RegisterProxy()
         {
-            throw new NotImplementedException();
+            _mechanism.RegisterTemporaryProxy();
         }
 
         public void ReadGenerics()
@@ -74,6 +57,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             throw new NotImplementedException();
         }
 
-        public TypeMember TypeMember { get; }
+        public INamedTypeSymbol TypeSymbol => _mechanism.Symbol;
+        public TypeMember TypeMember => _mechanism.CurrentMember;
     }
 }

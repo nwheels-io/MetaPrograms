@@ -60,6 +60,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _mechanism.RegisterFinalType();
         }
 
-        public TypeMember TypeMember => _mechanism.FinalType;
+        public INamedTypeSymbol TypeSymbol => _mechanism.Symbol;
+        public TypeMember TypeMember => _mechanism.CurrentMember;
     }
 }

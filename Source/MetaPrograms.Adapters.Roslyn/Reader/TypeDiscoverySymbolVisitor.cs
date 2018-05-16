@@ -12,7 +12,8 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     {
         private readonly CodeModelBuilder _modelBuilder;
         private readonly List<IPhasedTypeReader> _results;
-        private readonly HashSet<INamedTypeSymbol> _doneSymbols = new HashSet<INamedTypeSymbol>();
+        private readonly HashSet<INamedTypeSymbol> _includedSymbols = new HashSet<INamedTypeSymbol>();
+        private int _typeDescendLevel = 0;
 
         public TypeDiscoverySymbolVisitor(CodeModelBuilder modelBuilder, List<IPhasedTypeReader> results)
         {
@@ -20,22 +21,66 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _results = results;
         }
 
+        public override void VisitNamespace(INamespaceSymbol symbol)
+        {
+            foreach (var memberSymbol in symbol.GetMembers())
+            {
+                memberSymbol.Accept(this);
+            }
+        }
+
         public override void VisitNamedType(INamedTypeSymbol symbol)
         {
-            if (!_doneSymbols.Add(symbol))
+            if (symbol != null && ShouldIncludeType(symbol) && _includedSymbols.Add(symbol))
             {
-                return;
+                EnterType();
+
+                try
+                {
+                    RegisterTypeReader(symbol);
+
+                    VisitNamedType(symbol.BaseType);
+
+                    foreach (var interfaceSymbol in symbol.Interfaces)
+                    {
+                        VisitNamedType(interfaceSymbol);
+                    }
+
+                    foreach (var typeArgumentSymbol in symbol.TypeArguments)
+                    {
+                        typeArgumentSymbol.Accept(this);
+                    }
+
+                    foreach (var nestedTypeSymbol in symbol.GetTypeMembers())
+                    {
+                        nestedTypeSymbol.Accept(this);
+                    }
+
+                    base.VisitNamedType(symbol);
+                }
+                finally
+                {
+                    ExitType();
+                }
+            }
+        }
+
+        private bool ShouldIncludeType(INamedTypeSymbol symbol)
+        {
+            if (symbol.SpecialType == SpecialType.System_Object)
+            {
+                return false;
             }
 
-            RegisterTypeReader(symbol);
-            base.VisitNamedType(symbol);
+            var hasSourceCode = (symbol.DeclaringSyntaxReferences.Length > 0);
+            var referencedByIncludedType = (_typeDescendLevel > 0);
+
+            return (hasSourceCode || referencedByIncludedType);
         }
 
         private void RegisterTypeReader(INamedTypeSymbol symbol)
         {
             var syntax = symbol.DeclaringSyntaxReferences.OfType<BaseTypeDeclarationSyntax>().FirstOrDefault();
-            
-
             var readerMechanism = new TypeReaderMechanism(_modelBuilder, symbol);
 
             switch (symbol.TypeKind)
@@ -47,8 +92,18 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                     _results.Add(new InterfaceReader(readerMechanism));
                     break;
                 default:
-                    throw new NotImplementedException(symbol.TypeKind.ToString());
+                    throw new NotImplementedException($"{symbol.TypeKind} '{symbol.Name}'");
             }
+        }
+
+        private void EnterType()
+        {
+            _typeDescendLevel++;
+        }
+
+        private void ExitType()
+        {
+            _typeDescendLevel--;
         }
     }
 }

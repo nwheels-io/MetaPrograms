@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MetaPrograms.Adapters.Roslyn.Reader;
 using MetaPrograms.CodeModel.Imperative;
@@ -27,9 +28,11 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             // act
 
-            var type = reader.ReadAll();
+            reader.ReadName();
 
             // assert
+
+            var type = reader.TypeMember;
 
             type.Name.ShouldBe("MyClass");
             type.Namespace.ShouldBe("MyApp.MyTest");
@@ -52,12 +55,13 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             // act
 
-            var type = reader.ReadAll();
-            
+            reader.ReadAncestors();
+
             // assert
 
+            var type = reader.TypeMember;
             type.BaseType.Get().ShouldNotBeNull();
-            type.BaseType.Get().FullName.ShouldBe("MyApp.MyBase");
+            GetSymbolName(type.BaseType).ShouldBe("MyBase");
         }
         
         [Test]
@@ -77,15 +81,16 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             // act
 
-            var type = reader.ReadAll();
-            
+            reader.ReadAncestors();
+
             // assert
 
+            var type = reader.TypeMember;
             type.Interfaces.Count.ShouldBe(2);
-            type.Interfaces.Select(t => t.Get().FullName).ShouldBe(new[] { "MyApp.IService1", "MyApp.IService2" }, ignoreOrder: true);
+            type.Interfaces.Select(GetSymbolName).ShouldBe(new[] { "IService1", "IService2" }, ignoreOrder: true);
         }
 
-        [Test]
+        [Test, Ignore("Not implemented")]
         public void CanReadMethodDeclarations()
         {
             // arrange
@@ -109,13 +114,19 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             
             // assert
             
-            type.Members.OfType<ConstructorMember>().Select(m => m.Name).ShouldBe(new[] { "MyClass" });
-            type.Members.OfType<FieldMember>().Select(m => m.Name).ShouldBe(new[] { "f1" });
-            type.Members.OfType<MethodMember>().Select(m => m.Name).ShouldBe(new[] { "M1" });
-            type.Members.OfType<PropertyMember>().Select(m => m.Name).ShouldBe(new[] { "P1" });
-            type.Members.OfType<EventMember>().Select(m => m.Name).ShouldBe(new[] { "E1" });
+            type.Members.OfType<MemberRef<ConstructorMember>>().Select(GetSymbolName).ShouldBe(new[] { "MyClass" });
+            type.Members.OfType<MemberRef<FieldMember>>().Select(GetSymbolName).ShouldBe(new[] { "f1" });
+            type.Members.OfType<MemberRef<MethodMember>>().Select(GetSymbolName).ShouldBe(new[] { "M1" });
+            type.Members.OfType<MemberRef<PropertyMember>>().Select(GetSymbolName).ShouldBe(new[] { "P1" });
+            type.Members.OfType<MemberRef<EventMember>>().Select(GetSymbolName).ShouldBe(new[] { "E1" });
         }
-        
+
+        private string GetSymbolName<T>(MemberRef<T> member) 
+            where T : AbstractMember
+        {
+            return member.Get().Bindings.OfType<ISymbol>().Single().Name;
+        }
+
         private (ClassReader, CodeModelBuilder) GetClassReaderFromCode(string csharpCode, string className)
         {
             var compilation = TestWorkspaceFactory.CompileCodeOrThrow(
@@ -128,8 +139,15 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             typeSymbol.ShouldNotBeNull($"Type symbol '{className}' could not be found in compilation.");
 
             var modelBuilder = new CodeModelBuilder();
-            var reader = new ClassReader(new TypeReaderMechanism(modelBuilder, typeSymbol));
+            var allReaders = new List<IPhasedTypeReader>();
+            var discoveryVisitor = new TypeDiscoverySymbolVisitor(modelBuilder, allReaders);
 
+            compilation.GlobalNamespace.Accept(discoveryVisitor);
+
+            var reader = allReaders.OfType<ClassReader>().FirstOrDefault(r => r.TypeSymbol.Equals(typeSymbol));
+            reader.ShouldNotBeNull($"ClassReader for '{className}' was not registered.");
+
+            allReaders.ForEach(r => r.RegisterProxy());
             return (reader, modelBuilder);
         }
     }

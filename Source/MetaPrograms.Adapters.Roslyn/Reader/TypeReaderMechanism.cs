@@ -37,7 +37,8 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         public Type ClrType { get; }
         public bool IsTopLevelType => (Symbol.ContainingSymbol is INamespaceSymbol);
         public MemberRef<TypeMember> MemberRef { get; }
-        public RealTypeMember FinalType { get; private set; }
+        public RealTypeMember FinalMember { get; private set; }
+        public TypeMember CurrentMember => MemberRef.Get();
 
         public void RegisterTemporaryProxy()
         {
@@ -47,7 +48,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         public void RegisterFinalType()
         {
             MemberBuilder.Status = MemberStatus.Compiled;
-            FinalType = new RealTypeMember(MemberBuilder);
+            FinalMember = new RealTypeMember(MemberBuilder);
         }
 
         public void ReadName()
