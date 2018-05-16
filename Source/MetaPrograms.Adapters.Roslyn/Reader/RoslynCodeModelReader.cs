@@ -36,7 +36,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             foreach (var project in Workspace.CurrentSolution.Projects)
             {
                 var compilation = CompileProjectOrThrow(project).WithReferences();
-                var visitor = new TypeDiscoverySymbolVisitor(ModelBuilder, _phasedTypeReaders);
+                var visitor = new TypeDiscoverySymbolVisitor(compilation, ModelBuilder, _phasedTypeReaders);
                 compilation.GlobalNamespace.Accept(visitor);
             }
         }

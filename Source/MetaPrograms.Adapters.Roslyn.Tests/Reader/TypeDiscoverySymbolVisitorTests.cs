@@ -29,7 +29,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             // act
 
-            var visitor = new TypeDiscoverySymbolVisitor(modelBuilder, discoveredTypeReaders);
+            var visitor = new TypeDiscoverySymbolVisitor(compilation, modelBuilder, discoveredTypeReaders);
             compilation.GlobalNamespace.Accept(visitor);
 
             // assert
@@ -45,10 +45,10 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
                 class C2 { }
             ");
 
-            SelectReaderSymbolPairsFrom(typeReaders).ShouldBe(new[] {
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
                 "ClassReader:C1",
                 "ClassReader:C2"
-            }, ignoreOrder: true);
+            });
         }
 
         [Test]
@@ -66,17 +66,17 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
                 }
             ");
 
-            SelectReaderSymbolPairsFrom(typeReaders).ShouldBe(new[] {
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
                 "ClassReader:C1",
                 "ClassReader:C2",
                 "ClassReader:C3"
-            }, ignoreOrder: true);
+            });
         }
 
         [Test]
         public void NestedClasses()
         {
-            var results = VisitCode(@"
+            var typeReaders = VisitCode(@"
                 class C1 { 
                     class C2 {     
                         class C3 { }
@@ -84,72 +84,222 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
                 }
             ");
 
-            SelectReaderSymbolPairsFrom(results).ShouldBe(new[] {
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
                 "ClassReader:C1",
                 "ClassReader:C2",
                 "ClassReader:C3"
-            }, ignoreOrder: true);
+            });
         }
 
         [Test]
         public void IncludeBaseClass()
         {
-            var results = VisitCode(@"
+            var typeReaders = VisitCode(@"
                 using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
                 class C1 : ClassOne { }
             ");
 
-            SelectReaderSymbolPairsFrom(results).ShouldBe(new[] {
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
                 "ClassReader:C1",
                 "ClassReader:ClassOne"
-            }, ignoreOrder: true);
+            });
         }
 
         [Test]
         public void IncludeImplementedInterfaces()
         {
-            var results = VisitCode(@"
+            var typeReaders = VisitCode(@"
                 using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
                 class C1 : IInterfaceOne, IInterfaceTwo { }
             ");
 
-            SelectReaderSymbolPairsFrom(results).ShouldBe(new[] {
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
                 "ClassReader:C1",
                 "InterfaceReader:IInterfaceOne",
                 "InterfaceReader:IInterfaceTwo",
-            }, ignoreOrder: true);
+            });
         }
 
         [Test]
         public void IncludeGenericArguments()
         {
-            var results = VisitCode(@"
+            var typeReaders = VisitCode(@"
                 using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
                 class C1 : GenericClassTwo<IInterfaceOne, IInterfaceTwo> {  }
             ");
 
-            SelectReaderSymbolPairsFrom(results).ShouldBe(new[] {
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
                 "ClassReader:C1",
                 "ClassReader:GenericClassTwo",
                 "InterfaceReader:IInterfaceOne",
                 "InterfaceReader:IInterfaceTwo",
+            });
+        }
+
+        [Test]
+        public void IncludeTypesOfFields()
+        {
+            var typeReaders = VisitCode(@"
+                #pragma warning disable CS0169 // unused fields
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    IInterfaceOne f1; 
+                    IInterfaceTwo f2; 
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:C1",
+                "InterfaceReader:IInterfaceOne",
+                "InterfaceReader:IInterfaceTwo",
+            });
+        }
+
+        [Test]
+        public void IncludeTypesOfProperties()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    IInterfaceOne P1 { get; set; } 
+                    IInterfaceTwo P2 { get; set; } 
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:C1",
+                "InterfaceReader:IInterfaceOne",
+                "InterfaceReader:IInterfaceTwo",
+            });
+        }
+
+        [Test]
+        public void IncludeTypesInMethodSignatures()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    ClassOne F(GenericClassTwo<ClassThree, ClassFour> p) {
+                        return null;
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:C1",
+                "ClassReader:ClassOne",
+                "ClassReader:GenericClassTwo",
+                "ClassReader:ClassThree",
+                "ClassReader:ClassFour",
+            });
+        }
+
+        [Test]
+        public void IncludeTypesOfLocalVariables()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    void F() {
+                        var c = new ClassOne();
+                        while (true) {
+                            var z = new ClassThree();
+                        }
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:C1",
+                "ClassReader:ClassOne",
+                "ClassReader:ClassThree",
+            });
+        }
+
+        [Test]
+        public void IncludeSystemObjectType()
+        {
+            var typeReaders = VisitCode(@"
+                class C1 { 
+                    void F(object value) { }
+                }
+            ");
+
+            SelectReaderSymbolPairsFrom(typeReaders).ShouldBe(new[] {
+                "ClassReader:C1",
+                "ClassReader:Object",
+                "StructReader:Int32",
+                "StructReader:Boolean",
+                "ClassReader:String",
+                "ClassReader:Type",
             }, ignoreOrder: true);
+        }
+
+        [Test]
+        public void IncludeStandardLanguageTypes()
+        {
+            var typeReaders = VisitCode(@"
+                class C1 { 
+                    int F(string s) {
+                        return 123;                    
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:C1",
+                "StructReader:Int32",
+                "ClassReader:String"
+            });
+        }
+
+        [Test]
+        public void IncludeTypesFromLanguageConstructs()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    void F(object value) {
+                        if (value is ClassOne one) {
+                            for (int i = 0; i < 10 ; i++) { }
+                        }
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:ClassOne",
+                "StructReader:Int32",
+                "ClassReader:Object"
+            });
         }
 
         private IEnumerable<IPhasedTypeReader> VisitCode(string csharpCode)
         {
             var compilation = CompileCode(csharpCode);
             var results = new List<IPhasedTypeReader>();
-            var visitor = new TypeDiscoverySymbolVisitor(new CodeModelBuilder(), results);
+            var visitor = new TypeDiscoverySymbolVisitor(compilation, new CodeModelBuilder(), results);
 
             compilation.GlobalNamespace.Accept(visitor);
 
             return results;
         }
 
-        private IEnumerable<string> SelectReaderSymbolPairsFrom(IEnumerable<IPhasedTypeReader> results)
+        private void AssertReaderSymbolPairs(IEnumerable<IPhasedTypeReader> results, string[] shouldContain)
         {
-            return results.Select(reader => $"{reader.GetType().Name}:{reader.TypeSymbol.Name}");
+            var pairs = SelectReaderSymbolPairsFrom(results);
+
+            foreach (var value in shouldContain)
+            {
+                pairs.ShouldContain(value);
+            }
+        }
+
+        private string[] SelectReaderSymbolPairsFrom(IEnumerable<IPhasedTypeReader> results)
+        {
+            return results
+                .Select(reader => $"{reader.GetType().Name}:{reader.TypeSymbol.Name}")
+                .ToArray();
         }
 
         private Compilation CompileCode(string csharpCode)

@@ -9,7 +9,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class TypeMemberBuilder
     {
         private readonly TypeMemberProxy _temporaryProxy;
-        private readonly MemberRefState _memberRefState;
+        private readonly MemberRefState _memberSelfReference;
 
         public TypeMemberBuilder()
         {
@@ -20,7 +20,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.Members = new List<MemberRef<AbstractMember>>();
 
             _temporaryProxy = new TypeMemberProxy(this);
-            _memberRefState = _temporaryProxy.GetSelfReference();
+            _memberSelfReference = _temporaryProxy.GetSelfReference();
         }
 
         public string Name { get; set; }
@@ -52,7 +52,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public BindingCollection Bindings => _temporaryProxy.Bindings;
         public TypeMember GetTemporaryProxy() => _temporaryProxy;
-        public MemberRefState GetMemberRefState() => _memberRefState;
+        public MemberRefState GetMemberSelfReference() => _memberSelfReference;
 
         private class TypeMemberProxy : TypeMember
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
@@ -10,6 +11,9 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class TypeReaderMechanism
     {
+        private readonly List<IPhasedMemberReader> _memberReaders = new List<IPhasedMemberReader>();
+        private readonly Dictionary<ISymbol, IPhasedMemberReader> _memberReaderBySymbol = new Dictionary<ISymbol, IPhasedMemberReader>();
+
         public TypeReaderMechanism(CodeModelBuilder modelBuilder, INamedTypeSymbol symbol)
         {
             ModelBuilder = modelBuilder;
@@ -27,7 +31,6 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             {
                 MemberBuilder.Bindings.Add(ClrType);
             }
-
         }
 
         public CodeModelBuilder ModelBuilder { get; }
@@ -49,6 +52,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             MemberBuilder.Status = MemberStatus.Compiled;
             FinalMember = new RealTypeMember(MemberBuilder);
+            MemberBuilder.GetMemberSelfReference().ReassignOnce(FinalMember);
         }
 
         public void ReadName()
@@ -88,7 +92,16 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         
         public void ReadMemberDeclarations()
         {
-            //throw new NotImplementedException();
+            foreach (var memberSymbol in Symbol.GetMembers().Where(m => !(m is INamedTypeSymbol)))
+            {
+                if (TryCreateMemberReader(memberSymbol, out IPhasedMemberReader memberReader))
+                {
+                    _memberReaderBySymbol.Add(memberSymbol, memberReader);
+                    _memberReaders.Add(memberReader);
+                }
+            }
+
+            _memberReaders.ForEach(m => m.ReadDeclaration());
         }
 
         public void ReadMemberImplementations()
@@ -96,13 +109,29 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             //throw new NotImplementedException();
         }
 
+        private bool TryCreateMemberReader(ISymbol memberSymbol, out IPhasedMemberReader memberReader)
+        {
+            if (memberSymbol is IFieldSymbol field)
+            {
+                memberReader = new FieldReader(field);
+            }
+            else
+            {
+                memberReader = null;
+                return false;
+            }
+
+            return true;
+        }
+
+
         //public TypeMember CreateTypeMemberWithBindings(bool shouldCreateProxy)
         //{
         //    var type = (
         //        shouldCreateProxy 
         //        ? new ProxyTypeMember(MemberBuilder) as TypeMember 
         //        : new RealTypeMember(MemberBuilder) as TypeMember);
-            
+
         //    type.Bindings.Add(Symbol);
         //    type.Bindings.Add(FullyQualifiedMetadataName);
 

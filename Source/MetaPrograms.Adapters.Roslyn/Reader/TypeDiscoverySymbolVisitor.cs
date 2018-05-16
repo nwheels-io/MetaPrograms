@@ -5,18 +5,22 @@ using System.Text;
 using MetaPrograms.CodeModel.Imperative;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class TypeDiscoverySymbolVisitor : SymbolVisitor
     {
+        private readonly Compilation _compilation;
         private readonly CodeModelBuilder _modelBuilder;
         private readonly List<IPhasedTypeReader> _results;
         private readonly HashSet<INamedTypeSymbol> _includedSymbols = new HashSet<INamedTypeSymbol>();
-        private int _typeDescendLevel = 0;
+        private int _codedTypeDescendLevel = 0;
+        private int _anyTypeDescendLevel = 0;
 
-        public TypeDiscoverySymbolVisitor(CodeModelBuilder modelBuilder, List<IPhasedTypeReader> results)
+        public TypeDiscoverySymbolVisitor(Compilation compilation, CodeModelBuilder modelBuilder, List<IPhasedTypeReader> results)
         {
+            _compilation = compilation;
             _modelBuilder = modelBuilder;
             _results = results;
         }
@@ -33,54 +37,78 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             if (symbol != null && ShouldIncludeType(symbol) && _includedSymbols.Add(symbol))
             {
-                EnterType();
+                EnterType(symbol);
 
                 try
                 {
                     RegisterTypeReader(symbol);
 
-                    VisitNamedType(symbol.BaseType);
+                    var allLinkedSymbols = QuerySymbolsLinkedToType(symbol);
 
-                    foreach (var interfaceSymbol in symbol.Interfaces)
+                    foreach (var linkedSymbol in allLinkedSymbols)
                     {
-                        VisitNamedType(interfaceSymbol);
+                        linkedSymbol.Accept(this);
                     }
-
-                    foreach (var typeArgumentSymbol in symbol.TypeArguments)
-                    {
-                        typeArgumentSymbol.Accept(this);
-                    }
-
-                    foreach (var nestedTypeSymbol in symbol.GetTypeMembers())
-                    {
-                        nestedTypeSymbol.Accept(this);
-                    }
-
-                    base.VisitNamedType(symbol);
                 }
                 finally
                 {
-                    ExitType();
+                    ExitType(symbol);
                 }
             }
+        }
+
+        public override void VisitField(IFieldSymbol symbol)
+        {
+            if (symbol.Type is INamedTypeSymbol type)
+            {
+                VisitNamedType(type);
+            }
+        }
+
+        public override void VisitMethod(IMethodSymbol symbol)
+        {
+            var allLinkedSymbols = QuerySymbolsLinkedToMethod(symbol);
+
+            foreach (var linkedSymbol in allLinkedSymbols)
+            {
+                linkedSymbol.Accept(this);
+            }
+
+            if (symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is MethodDeclarationSyntax methodSyntax)
+            {
+                var methodSemantic = _compilation.GetSemanticModel(methodSyntax.SyntaxTree, ignoreAccessibility: true);
+                var bodyOperation = methodSemantic.GetOperation(methodSyntax.Body);
+                var walker = new TypeDiscoveryOperationWalker(type => type.Accept(this));
+                bodyOperation.Accept(walker);
+            }
+        }
+
+        public override void VisitParameter(IParameterSymbol symbol)
+        {
+            symbol.Type.Accept(this);
+        }
+
+        public override void VisitLocal(ILocalSymbol symbol)
+        {
+            symbol.Type.Accept(this);
         }
 
         private bool ShouldIncludeType(INamedTypeSymbol symbol)
         {
-            if (symbol.SpecialType == SpecialType.System_Object)
+            if (//symbol.SpecialType == SpecialType.System_Object || 
+                symbol.SpecialType == SpecialType.System_Void)
+                //|| symbol.ToString() == "System.Type")
             {
                 return false;
             }
 
-            var hasSourceCode = (symbol.DeclaringSyntaxReferences.Length > 0);
-            var referencedByIncludedType = (_typeDescendLevel > 0);
-
-            return (hasSourceCode || referencedByIncludedType);
+            var referencedByIncludedType = (_codedTypeDescendLevel > 0);
+            var externalFarFromCode = (_anyTypeDescendLevel - _codedTypeDescendLevel > 1);
+            return (TypeHasSourceCode(symbol) || (referencedByIncludedType && !externalFarFromCode));
         }
 
         private void RegisterTypeReader(INamedTypeSymbol symbol)
         {
-            var syntax = symbol.DeclaringSyntaxReferences.OfType<BaseTypeDeclarationSyntax>().FirstOrDefault();
             var readerMechanism = new TypeReaderMechanism(_modelBuilder, symbol);
 
             switch (symbol.TypeKind)
@@ -91,19 +119,56 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 case TypeKind.Interface:
                     _results.Add(new InterfaceReader(readerMechanism));
                     break;
+                case TypeKind.Struct:
+                    _results.Add(new StructReader(readerMechanism));
+                    break;
+                case TypeKind.Enum:
+                    Console.WriteLine("Enum...");
+                    break;
+                case TypeKind.Delegate:
+                    Console.WriteLine("Delegate...");
+                    break;
                 default:
                     throw new NotImplementedException($"{symbol.TypeKind} '{symbol.Name}'");
             }
         }
 
-        private void EnterType()
+        private void EnterType(INamedTypeSymbol type)
         {
-            _typeDescendLevel++;
+            _anyTypeDescendLevel++;
+
+            if (TypeHasSourceCode(type))
+            {
+                _codedTypeDescendLevel++;
+            }
         }
 
-        private void ExitType()
+        private void ExitType(INamedTypeSymbol type)
         {
-            _typeDescendLevel--;
+            _anyTypeDescendLevel--;
+
+            if (TypeHasSourceCode(type))
+            {
+                _codedTypeDescendLevel--;
+            }
         }
+
+        private static IEnumerable<ISymbol> QuerySymbolsLinkedToType(INamedTypeSymbol parent)
+        {
+            return new ISymbol[] { parent.BaseType }
+                .Concat(parent.Interfaces)
+                .Concat(parent.TypeArguments)
+                .Concat(parent.GetMembers())
+                .Where(s => s != null);
+        }
+
+        private static IEnumerable<ISymbol> QuerySymbolsLinkedToMethod(IMethodSymbol parent)
+        {
+            return new ISymbol[] { parent.ReturnType }
+                .Concat(parent.Parameters)
+                .Where(s => s != null);
+        }
+
+        private static bool TypeHasSourceCode(INamedTypeSymbol type) => (type.DeclaringSyntaxReferences.Length > 0);
     }
 }

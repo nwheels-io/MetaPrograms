@@ -110,10 +110,11 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             // act
 
-            var type = reader.ReadAll();
-            
+            reader.ReadMemberDeclarations();
+
             // assert
-            
+
+            var type = reader.TypeMember;
             type.Members.OfType<MemberRef<ConstructorMember>>().Select(GetSymbolName).ShouldBe(new[] { "MyClass" });
             type.Members.OfType<MemberRef<FieldMember>>().Select(GetSymbolName).ShouldBe(new[] { "f1" });
             type.Members.OfType<MemberRef<MethodMember>>().Select(GetSymbolName).ShouldBe(new[] { "M1" });
@@ -140,7 +141,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             var modelBuilder = new CodeModelBuilder();
             var allReaders = new List<IPhasedTypeReader>();
-            var discoveryVisitor = new TypeDiscoverySymbolVisitor(modelBuilder, allReaders);
+            var discoveryVisitor = new TypeDiscoverySymbolVisitor(compilation, modelBuilder, allReaders);
 
             compilation.GlobalNamespace.Accept(discoveryVisitor);
 

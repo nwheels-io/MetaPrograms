@@ -8,7 +8,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class RealTypeMember : TypeMember
     {
         public RealTypeMember(TypeMemberBuilder builder)
-            : base(builder, selfReference: builder.GetMemberRefState())
+            : base(builder, selfReference: builder.GetMemberSelfReference())
         {
             this.AssemblyName = builder.AssemblyName;
             this.Namespace = builder.Namespace;
@@ -31,8 +31,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.Members = builder.Members.ToImmutableList();
             this.Generator = builder.Generator;
             this.Bindings.UnionWith(builder.Bindings);
-
-            SelfReference.ReassignOnce(this);
         }
 
         public RealTypeMember(TypeMember source, TypeMemberMutator mutator)
