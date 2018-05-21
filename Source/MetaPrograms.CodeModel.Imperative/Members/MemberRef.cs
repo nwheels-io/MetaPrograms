@@ -60,39 +60,4 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return @ref.Get();
         }
     }
-
-    public class MemberRefState
-    {
-        private AbstractMember _member;
-        private bool _isMutable;
-
-        public MemberRefState(AbstractMember initialMember)
-        {
-            _member = initialMember;
-            _isMutable = true;
-        }
-
-        public T Get<T>()
-            where T : AbstractMember
-        {
-            return (T)_member;
-        }
-
-        public MemberRefState MakeImmutable()
-        {
-            _isMutable = true;
-            return this;
-        }
-
-        public void ReassignOnce(AbstractMember finalMember)
-        {
-            if (!_isMutable)
-            {
-                throw new InvalidOperationException($"This member referecnce is immutable ({_member?.Name ?? "null"})");
-            }
-
-            _isMutable = false;
-            _member = finalMember;
-        }
-    }
 }

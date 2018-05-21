@@ -34,7 +34,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<MemberStatus>? status = null,
             Mutator<MemberVisibility>? visibility = null,
             Mutator<MemberModifier>? modifier = null,
-            Mutator<ImmutableList<AttributeDescription>>? attributes = null)
+            Mutator<ImmutableList<AttributeDescription>>? attributes = null,
+            bool preserveMemberRef = false)
         {
             Name = name.MutatedOrOriginal(source.Name);
             DeclaringType = declaringType.MutatedOrOriginal(source.DeclaringType);
@@ -42,6 +43,16 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Visibility = visibility.MutatedOrOriginal(source.Visibility);
             Modifier = modifier.MutatedOrOriginal(source.Modifier);
             Attributes = attributes.MutatedOrOriginal(source.Attributes);
+            
+            if (preserveMemberRef)
+            {
+                this.SelfReference = source.SelfReference;
+                this.SelfReference.Reassign(this);
+            }
+            else
+            {
+                this.SelfReference = new MemberRefState(this);
+            }
         }
 
         //public bool HasAttribute<TAttribute>()

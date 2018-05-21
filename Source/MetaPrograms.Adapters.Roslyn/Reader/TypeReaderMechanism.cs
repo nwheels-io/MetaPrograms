@@ -52,7 +52,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             MemberBuilder.Status = MemberStatus.Compiled;
             FinalMember = new RealTypeMember(MemberBuilder);
-            MemberBuilder.GetMemberSelfReference().ReassignOnce(FinalMember);
+            MemberBuilder.GetMemberSelfReference().Reassign(FinalMember);
         }
 
         public void ReadName()
@@ -114,6 +114,13 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             if (memberSymbol is IFieldSymbol field)
             {
                 memberReader = new FieldReader(field);
+            }
+            else if (memberSymbol is IMethodSymbol method)
+            {
+                memberReader = (
+                    method.MethodKind == MethodKind.Constructor || method.MethodKind == MethodKind.StaticConstructor  
+                    ? new ConstructorReader(ModelBuilder, method) as IPhasedMemberReader
+                    : new MethodReader(ModelBuilder, method) as IPhasedMemberReader);
             }
             else
             {

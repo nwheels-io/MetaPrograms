@@ -174,6 +174,24 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
         }
 
         [Test]
+        public void IncludeTypesOfEventDelegates()
+        {
+            var typeReaders = VisitCode(@"
+                using System;
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    public void F() { if (E1 != null) { } }
+                    public event Action<ClassOne> E1;
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:ClassOne",
+                "ClassReader:Action",
+            });
+        }
+
+        [Test]
         public void IncludeTypesInMethodSignatures()
         {
             var typeReaders = VisitCode(@"
@@ -261,16 +279,148 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
                 class C1 { 
                     void F(object value) {
                         if (value is ClassOne one) {
-                            for (int i = 0; i < 10 ; i++) { }
+                            using (var disposable = new DisposableFive()) {
+                                for (int i = 0; i < 10 ; i++) { }
+                            }
                         }
                     }
                 }
             ");
 
             AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:Object",
                 "ClassReader:ClassOne",
+                "ClassReader:DisposableFive",
                 "StructReader:Int32",
-                "ClassReader:Object"
+            });
+        }
+
+        [Test]
+        public void IncludeTypeFromNewExpression()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    void F(object value) {
+                        using (new DisposableFive()) {
+                        }
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:DisposableFive",
+            });
+        }
+
+        [Test]
+        public void IncludeTypesFromObjectCreationExpressions()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    void F() {
+                        using (new DisposableFive()) {
+                        }
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:DisposableFive"
+            });
+        }
+
+        [Test]
+        public void IncludeTypesFromArrayElements()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    ClassOne[] F() {
+                        return null;
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:ClassOne",
+            });
+        }
+
+        [Test]
+        public void IncludeTypesFromArrayCreationExpression()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    object F() {
+                        return new ClassOne[0];
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:ClassOne",
+            });
+        }
+
+        [Test]
+        public void IncludeTypesFromArrayInitializer()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    object[] F() {
+                        return new object[] { new ClassThree(), new ClassFour() };
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:ClassThree",
+                "ClassReader:ClassFour"
+            });
+        }
+
+        [Test]
+        public void IncludeTypesFromObjectInitializer()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    ClassOne F() {
+                        return new ClassOne() {     
+                            First = new ClassThree(),
+                            Second = new ClassFour()
+                        };
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:ClassThree",
+                "ClassReader:ClassFour"
+            });
+        }
+
+        [Test]
+        public void IncludeTypesFromStaticMethodInvocations()
+        {
+            var typeReaders = VisitCode(@"
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    void F() {
+                        StaticSix.M1();
+                        StaticSix.M2<ClassThree, ClassFour>();
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:StaticSix",
+                "ClassReader:ClassThree",
+                "ClassReader:ClassFour"
             });
         }
 

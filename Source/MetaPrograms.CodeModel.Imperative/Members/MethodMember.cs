@@ -28,8 +28,10 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<MemberModifier>? modifier = null, 
             Mutator<ImmutableList<AttributeDescription>>? attributes = null, 
             Mutator<MethodSignature>? signature = null, 
-            Mutator<BlockStatement>? body = null) 
-            : base(source, name, declaringType, status, visibility, modifier, attributes, signature, body)
+            Mutator<BlockStatement>? body = null,
+            bool preserveMemberRef = false) 
+            : base(
+                source, name, declaringType, status, visibility, modifier, attributes, signature, body, preserveMemberRef)
         {
         }
 

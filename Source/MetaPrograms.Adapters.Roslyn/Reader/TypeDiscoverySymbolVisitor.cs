@@ -57,6 +57,11 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             }
         }
 
+        public override void VisitArrayType(IArrayTypeSymbol symbol)
+        {
+            symbol.ElementType.Accept(this);
+        }
+
         public override void VisitField(IFieldSymbol symbol)
         {
             if (symbol.Type is INamedTypeSymbol type)
@@ -81,6 +86,11 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 var walker = new TypeDiscoveryOperationWalker(type => type.Accept(this));
                 bodyOperation.Accept(walker);
             }
+        }
+
+        public override void VisitEvent(IEventSymbol symbol)
+        {
+            symbol.Type.Accept(this);
         }
 
         public override void VisitParameter(IParameterSymbol symbol)
@@ -109,6 +119,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         private void RegisterTypeReader(INamedTypeSymbol symbol)
         {
+            var s = symbol.ToDisplayString();
             var readerMechanism = new TypeReaderMechanism(_modelBuilder, symbol);
 
             switch (symbol.TypeKind)
@@ -123,10 +134,10 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                     _results.Add(new StructReader(readerMechanism));
                     break;
                 case TypeKind.Enum:
-                    Console.WriteLine("Enum...");
+                    Console.WriteLine("Enum..."); //TODO: use EnumReader
                     break;
                 case TypeKind.Delegate:
-                    Console.WriteLine("Delegate...");
+                    Console.WriteLine("Delegate..."); //TODO: use DelegateReader
                     break;
                 default:
                     throw new NotImplementedException($"{symbol.TypeKind} '{symbol.Name}'");

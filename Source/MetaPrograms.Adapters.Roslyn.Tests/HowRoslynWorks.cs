@@ -155,6 +155,56 @@ namespace MetaPrograms.Adapters.Roslyn.Tests
             matched.ShouldBeTrue();
         }
 
+        [Test]
+        public void CanGetSymbolQualifiedNameInCSharpFormat()
+        {
+            //Arrange
+
+            var sourceCode = @"
+                namespace NS1.NS2 { 
+                    public class C0 { }
+                    public class C1 {
+                        public class C2 { }         
+                    }
+                    public class C3<T1, T2> { }
+                    public class C4 : C3<C0, C1> { }
+                    public class C5 : C3<int, string> { }
+                }
+            ";
+            
+            var compilation = TestWorkspaceFactory.CompileCodeOrThrow(sourceCode, references: ThisAssemblyLocation);
+            var c0 = compilation.GetTypeByMetadataName("NS1.NS2.C0");
+            var c1 = compilation.GetTypeByMetadataName("NS1.NS2.C1");
+            var c2 = compilation.GetTypeByMetadataName("NS1.NS2.C1+C2");
+            var c4 = compilation.GetTypeByMetadataName("NS1.NS2.C4");
+            var c5 = compilation.GetTypeByMetadataName("NS1.NS2.C5");
+            var c3ofC0C1 = c4.BaseType;
+            var c3ofIntString = c5.BaseType;
+            var c3open = c3ofC0C1.OriginalDefinition;
+
+            var format = new SymbolDisplayFormat(
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
+            
+            //Act
+
+            var displayNames = 
+                new[] { c0, c1, c2, c3open, c3ofC0C1, c3ofIntString, c4 }
+                .Select(type => type.ToDisplayString(format));
+            
+            //Assert
+            
+            displayNames.ShouldBe(new[] {
+                "NS1.NS2.C0",
+                "NS1.NS2.C1",
+                "NS1.NS2.C1.C2",
+                "NS1.NS2.C3<T1, T2>",
+                "NS1.NS2.C3<NS1.NS2.C0, NS1.NS2.C1>",
+                "NS1.NS2.C3<System.Int32, System.String>",
+                "NS1.NS2.C4"
+            });
+        }
+
         private static string[] ThisAssemblyLocation => new[] { typeof(HowRoslynWorks).Assembly.Location };
 
         public class ASimpleClass

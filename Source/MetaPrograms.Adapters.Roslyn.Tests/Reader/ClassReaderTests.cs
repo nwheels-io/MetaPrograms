@@ -90,7 +90,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             type.Interfaces.Select(GetSymbolName).ShouldBe(new[] { "IService1", "IService2" }, ignoreOrder: true);
         }
 
-        [Test, Ignore("Not implemented")]
+        [Test]
         public void CanReadMethodDeclarations()
         {
             // arrange
