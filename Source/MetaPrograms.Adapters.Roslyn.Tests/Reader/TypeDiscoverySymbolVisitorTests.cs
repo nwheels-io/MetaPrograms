@@ -243,14 +243,9 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
                 }
             ");
 
-            SelectReaderSymbolPairsFrom(typeReaders).ShouldBe(new[] {
-                "ClassReader:C1",
-                "ClassReader:Object",
-                "StructReader:Int32",
-                "StructReader:Boolean",
-                "ClassReader:String",
-                "ClassReader:Type",
-            }, ignoreOrder: true);
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:Object"
+            });
         }
 
         [Test]
@@ -421,6 +416,29 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
                 "ClassReader:StaticSix",
                 "ClassReader:ClassThree",
                 "ClassReader:ClassFour"
+            });
+        }
+
+        [Test]
+        public void IncludeTypesFromAttributes()
+        {
+            var typeReaders = VisitCode(@"
+                using System;
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                [Serializable]
+                class C1 { 
+                    [Seventh(1, DayOfWeek.Monday)]
+                    void F([Eighth] int p) { }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:SerializableAttribute",
+                "ClassReader:SeventhAttribute",
+                "ClassReader:EighthAttribute",
+                "EnumReader:DayOfWeek",
+                "EnumReader:EnumNine",
+                "EnumReader:EnumTens"
             });
         }
 

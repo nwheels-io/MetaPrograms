@@ -101,7 +101,18 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 }
             }
 
-            _memberReaders.ForEach(m => m.ReadDeclaration());
+            _memberReaders.ForEach(reader => {
+                reader.ReadDeclaration();
+                reader.Member.Bindings.Add(reader.Symbol);
+                MemberBuilder.Members.Add(reader.Member.GetRefAsAbstract());
+            });
+        }
+
+        public void ReadAttributes()
+        {
+            MemberBuilder.Attributes.AddRange(Symbol
+                .GetAttributes()
+                .Select(attr => AttributeReader.ReadAttribute(ModelBuilder, attr)));
         }
 
         public void ReadMemberImplementations()
@@ -109,18 +120,28 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             //throw new NotImplementedException();
         }
 
+        public void ReadEnumMembers()
+        {
+            var members = Symbol.GetMembers();
+        }
+
         private bool TryCreateMemberReader(ISymbol memberSymbol, out IPhasedMemberReader memberReader)
         {
             if (memberSymbol is IFieldSymbol field)
             {
-                memberReader = new FieldReader(field);
+                memberReader = new FieldReader(ModelBuilder, field);
             }
-            else if (memberSymbol is IMethodSymbol method)
+            else if (memberSymbol is IMethodSymbol method && IsStandaloneMethodMember(method))
             {
-                memberReader = (
-                    method.MethodKind == MethodKind.Constructor || method.MethodKind == MethodKind.StaticConstructor  
-                    ? new ConstructorReader(ModelBuilder, method) as IPhasedMemberReader
-                    : new MethodReader(ModelBuilder, method) as IPhasedMemberReader);
+                memberReader = CreateMethodOrConstructorReader(method);
+            }
+            else if (memberSymbol is IPropertySymbol property)
+            {
+                memberReader = new PropertyReader(ModelBuilder, property);
+            }
+            else if (memberSymbol is IEventSymbol @event)
+            {
+                memberReader = new EventReader(ModelBuilder, @event);
             }
             else
             {
@@ -131,6 +152,22 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             return true;
         }
 
+        private IPhasedMemberReader CreateMethodOrConstructorReader(IMethodSymbol methodSymbol)
+        {
+            return (
+                methodSymbol.MethodKind == MethodKind.Constructor || methodSymbol.MethodKind == MethodKind.StaticConstructor  
+                    ? new ConstructorReader(ModelBuilder, methodSymbol) as IPhasedMemberReader
+                    : new MethodReader(ModelBuilder, methodSymbol) as IPhasedMemberReader);
+        }
+
+        private bool IsStandaloneMethodMember(IMethodSymbol method)
+        {
+            return (
+                method.MethodKind == MethodKind.Ordinary ||
+                method.MethodKind == MethodKind.Destructor ||
+                method.MethodKind == MethodKind.StaticConstructor ||
+                method.MethodKind == MethodKind.Constructor);
+        }
 
         //public TypeMember CreateTypeMemberWithBindings(bool shouldCreateProxy)
         //{

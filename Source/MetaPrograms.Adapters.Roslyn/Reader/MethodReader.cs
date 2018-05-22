@@ -30,7 +30,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 visibility: _symbol.GetMemberVisibility(),
                 modifier: _symbol.GetMemberModifier(),
                 attributes: ImmutableList<AttributeDescription>.Empty,
-                signature: MethodReaderMechanism.ReadSignatume(_modelBuilder, _symbol),
+                signature: MethodReaderMechanism.ReadSignature(_modelBuilder, _symbol),
                 body: null);
         }
 
@@ -46,5 +46,15 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public ISymbol Symbol => _symbol;
         public AbstractMember Member => _member;
+
+        public static MemberRef<MethodMember> GetMemberRef(MethodReader reader)
+        {
+            if (reader?.Member != null)
+            {
+                return reader._member.GetRef();
+            }
+
+            return new MemberRef<MethodMember>(null);
+        }
     }
 }

@@ -25,8 +25,23 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _results = results;
         }
 
+        public void VisitAttributes(ISymbol symbol)
+        {
+            VisitAttributes(symbol.GetAttributes());
+        }
+
+        public void VisitAttributes(IEnumerable<AttributeData> attributes)
+        {
+            foreach (var attribute in attributes)
+            {
+                attribute.AttributeClass.Accept(this);
+            }
+        }
+
         public override void VisitNamespace(INamespaceSymbol symbol)
         {
+            VisitAttributes(symbol);
+
             foreach (var memberSymbol in symbol.GetMembers())
             {
                 memberSymbol.Accept(this);
@@ -42,6 +57,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 try
                 {
                     RegisterTypeReader(symbol);
+                    VisitAttributes(symbol);
 
                     var allLinkedSymbols = QuerySymbolsLinkedToType(symbol);
 
@@ -64,6 +80,8 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public override void VisitField(IFieldSymbol symbol)
         {
+            VisitAttributes(symbol);
+
             if (symbol.Type is INamedTypeSymbol type)
             {
                 VisitNamedType(type);
@@ -72,6 +90,9 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public override void VisitMethod(IMethodSymbol symbol)
         {
+            VisitAttributes(symbol);
+            VisitAttributes(symbol.GetReturnTypeAttributes());
+
             var allLinkedSymbols = QuerySymbolsLinkedToMethod(symbol);
 
             foreach (var linkedSymbol in allLinkedSymbols)
@@ -90,16 +111,19 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public override void VisitEvent(IEventSymbol symbol)
         {
+            VisitAttributes(symbol);
             symbol.Type.Accept(this);
         }
 
         public override void VisitParameter(IParameterSymbol symbol)
         {
+            VisitAttributes(symbol);
             symbol.Type.Accept(this);
         }
 
         public override void VisitLocal(ILocalSymbol symbol)
         {
+            VisitAttributes(symbol);
             symbol.Type.Accept(this);
         }
 
@@ -125,6 +149,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             switch (symbol.TypeKind)
             {
                 case TypeKind.Class:
+                case TypeKind.Delegate:
                     _results.Add(new ClassReader(readerMechanism));
                     break;
                 case TypeKind.Interface:
@@ -134,10 +159,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                     _results.Add(new StructReader(readerMechanism));
                     break;
                 case TypeKind.Enum:
-                    Console.WriteLine("Enum..."); //TODO: use EnumReader
-                    break;
-                case TypeKind.Delegate:
-                    Console.WriteLine("Delegate..."); //TODO: use DelegateReader
+                    _results.Add(new EnumReader(readerMechanism));
                     break;
                 default:
                     throw new NotImplementedException($"{symbol.TypeKind} '{symbol.Name}'");

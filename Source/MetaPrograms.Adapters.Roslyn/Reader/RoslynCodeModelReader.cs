@@ -35,7 +35,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             foreach (var project in Workspace.CurrentSolution.Projects)
             {
-                var compilation = CompileProjectOrThrow(project).WithReferences();
+                var compilation = CompileProjectOrThrow(project);
                 var visitor = new TypeDiscoverySymbolVisitor(compilation, ModelBuilder, _phasedTypeReaders);
                 compilation.GlobalNamespace.Accept(visitor);
             }
@@ -49,6 +49,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         private Compilation CompileProjectOrThrow(Project project)
         {
             var compilation = project.GetCompilationAsync().Result;
+            var allDiagnostics = compilation.GetDiagnostics();
             var warningsAndErrors = compilation
                 .GetDiagnostics()
                 .Where(d => d.Severity >= DiagnosticSeverity.Warning)

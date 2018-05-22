@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Schema;
 using Microsoft.CodeAnalysis;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
@@ -12,6 +13,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             var project = workspace.CurrentSolution.Projects.First();
             var compilation = project.GetCompilationAsync().Result;
+            var allDiagnostics = compilation.GetDiagnostics();
             var warningsAndErrors = compilation
                 .GetDiagnostics()
                 .Where(d => d.Severity >= DiagnosticSeverity.Warning)

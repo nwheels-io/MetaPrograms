@@ -29,9 +29,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<ImmutableList<AttributeDescription>>? attributes = null, 
             Mutator<MethodSignature>? signature = null, 
             Mutator<BlockStatement>? body = null,
-            bool preserveMemberRef = false) 
+            bool shouldReplaceSource = false) 
             : base(
-                source, name, declaringType, status, visibility, modifier, attributes, signature, body, preserveMemberRef)
+                source, name, declaringType, status, visibility, modifier, attributes, signature, body, shouldReplaceSource)
         {
         }
 

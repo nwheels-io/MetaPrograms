@@ -35,6 +35,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
         public INamedTypeSymbol TypeC3OfIntString => TypeC5.BaseType;
         public INamedTypeSymbol TypeC3Open => TypeC3OfC0C1.OriginalDefinition;
         public INamedTypeSymbol TypeC6 => Compilation.GetTypeByMetadataName("NS1.NS3.C6");
+        public INamedTypeSymbol GenericClassTwo => Compilation.GetTypeByMetadataName("NS1.NS3.C6");
         public INamedTypeSymbol ClosedGenericTypeFromCompiledExamples => TypeC6.BaseType;
         
         public static string[] ThisAssemblyLocation => new[] { typeof(TypeSymbolsForTest).Assembly.Location };

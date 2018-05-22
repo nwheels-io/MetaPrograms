@@ -33,8 +33,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<ImmutableList<AttributeDescription>>? attributes = null,
             Mutator<MethodSignature>? signature = null,
             Mutator<BlockStatement>? body = null,
-            bool preserveMemberRef = false) 
-            : base(source, name, declaringType, status, visibility, modifier, attributes, preserveMemberRef)
+            bool shouldReplaceSource = false) 
+            : base(source, name, declaringType, status, visibility, modifier, attributes, shouldReplaceSource)
         {
             Signature = signature.MutatedOrOriginal(source.Signature);
             Body = body.MutatedOrOriginal(source.Body);

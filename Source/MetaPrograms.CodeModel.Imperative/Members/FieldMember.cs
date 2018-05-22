@@ -34,8 +34,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
-            Mutator<ImmutableList<AttributeDescription>>? attributes = null) 
-            : base(source, name, declaringType, status, visibility, modifier, attributes)
+            Mutator<ImmutableList<AttributeDescription>>? attributes = null,
+            bool shouldReplaceSource = false) 
+            : base(source, name, declaringType, status, visibility, modifier, attributes, shouldReplaceSource)
         {
             Type = type.MutatedOrOriginal(source.Type);
             IsReadOnly = isReadOnly.MutatedOrOriginal(source.IsReadOnly);

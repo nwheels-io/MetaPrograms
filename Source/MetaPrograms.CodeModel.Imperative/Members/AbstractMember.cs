@@ -35,7 +35,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<MemberVisibility>? visibility = null,
             Mutator<MemberModifier>? modifier = null,
             Mutator<ImmutableList<AttributeDescription>>? attributes = null,
-            bool preserveMemberRef = false)
+            bool shouldReplaceSource = false)
         {
             Name = name.MutatedOrOriginal(source.Name);
             DeclaringType = declaringType.MutatedOrOriginal(source.DeclaringType);
@@ -44,10 +44,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Modifier = modifier.MutatedOrOriginal(source.Modifier);
             Attributes = attributes.MutatedOrOriginal(source.Attributes);
             
-            if (preserveMemberRef)
+            if (shouldReplaceSource)
             {
                 this.SelfReference = source.SelfReference;
                 this.SelfReference.Reassign(this);
+                this.Bindings.UnionWith(source.Bindings);
             }
             else
             {
@@ -85,7 +86,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return $"{this.GetType().Name.TrimSuffix("Member")} {this.Name}";
         }
 
-        public virtual BindingCollection Bindings { get; } = new BindingCollection();
+        public BindingCollection Bindings { get; } = new BindingCollection();
 
         public virtual string Name { get; }
         public virtual MemberRef<TypeMember> DeclaringType { get; }
@@ -93,6 +94,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public virtual MemberVisibility Visibility { get; }
         public virtual MemberModifier Modifier { get; }
         public virtual ImmutableList<AttributeDescription> Attributes { get; }
+
+        public MemberRef<AbstractMember> GetRefAsAbstract() => new MemberRef<AbstractMember>(SelfReference);
 
         protected MemberRefState SelfReference { get; }
     }

@@ -11,7 +11,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public static class MethodReaderMechanism
     {
-        public static MethodSignature ReadSignatume(CodeModelBuilder modelBuilder, IMethodSymbol symbol)
+        public static MethodSignature ReadSignature(CodeModelBuilder modelBuilder, IMethodSymbol symbol)
         {
             var parameters = symbol.Parameters.Select((p, index) => new MethodParameter(
                 name: p.Name,
@@ -38,5 +38,18 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
             return new MethodSignature(symbol.IsAsync, returnValue, parameters.ToImmutableList());
         }
+
+        public static MethodReader CreateAccessorMethodReader(CodeModelBuilder modelBuilder, IMethodSymbol accessorSymbol)
+        {
+            if (accessorSymbol != null)
+            {
+                var reader = new MethodReader(modelBuilder, accessorSymbol);
+                reader.ReadDeclaration();
+                return reader;
+            }
+
+            return null;
+        }
+
     }
 }

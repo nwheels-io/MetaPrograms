@@ -8,13 +8,15 @@ using Microsoft.CodeAnalysis;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
-    public class FieldReader : IPhasedMemberReader
+    public class PropertyReader : IPhasedMemberReader
     {
         private readonly CodeModelBuilder _modelBuilder;
-        private readonly IFieldSymbol _symbol;
-        private FieldMember _member;
+        private readonly IPropertySymbol _symbol;
+        private PropertyMember _member;
+        private MethodReader _getterReader;
+        private MethodReader _setterReader;
 
-        public FieldReader(CodeModelBuilder modelBuilder, IFieldSymbol symbol)
+        public PropertyReader(CodeModelBuilder modelBuilder, IPropertySymbol symbol)
         {
             _modelBuilder = modelBuilder;
             _symbol = symbol;
@@ -23,16 +25,19 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadDeclaration()
         {
-            _member = new FieldMember(
+            _getterReader = MethodReaderMechanism.CreateAccessorMethodReader(_modelBuilder, _symbol.GetMethod);
+            _setterReader = MethodReaderMechanism.CreateAccessorMethodReader(_modelBuilder, _symbol.SetMethod);
+
+            _member = new PropertyMember(
                 name: _symbol.Name,
                 declaringType: _modelBuilder.GetMember<TypeMember>(_symbol.ContainingType),
                 status: MemberStatus.Incomplete,
                 visibility: _symbol.GetMemberVisibility(),
                 modifier: _symbol.GetMemberModifier(),
                 attributes: ImmutableList<AttributeDescription>.Empty,
-                type: _modelBuilder.GetMember<TypeMember>(_symbol.Type),
-                isReadOnly: _symbol.IsReadOnly,
-                initializer: null);
+                propertyType: _modelBuilder.GetMember<TypeMember>(_symbol.Type),
+                getter: MethodReader.GetMemberRef(_getterReader),
+                setter: MethodReader.GetMemberRef(_setterReader));
         }
 
         public void ReadAttributes()

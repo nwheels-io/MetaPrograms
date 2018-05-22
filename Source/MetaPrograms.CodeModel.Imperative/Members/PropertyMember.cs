@@ -13,8 +13,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             MemberModifier modifier, 
             ImmutableList<AttributeDescription> attributes,
             MemberRef<TypeMember> propertyType,
-            MemberRef<TypeMember> getter,
-            MemberRef<TypeMember> setter) 
+            MemberRef<MethodMember> getter,
+            MemberRef<MethodMember> setter) 
             : base(name, declaringType, status, visibility, modifier, attributes)
         {
             PropertyType = propertyType;
@@ -25,8 +25,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public PropertyMember(
             PropertyMember source,
             Mutator<MemberRef<TypeMember>>? propertyType,
-            Mutator<MemberRef<TypeMember>>? getter,
-            Mutator<MemberRef<TypeMember>>? setter, 
+            Mutator<MemberRef<MethodMember>>? getter,
+            Mutator<MemberRef<MethodMember>>? setter, 
             Mutator<string>? name = null, 
             Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
@@ -53,7 +53,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         }
 
         public MemberRef<TypeMember> PropertyType { get; }
-        public MemberRef<TypeMember> Getter { get; }
-        public MemberRef<TypeMember> Setter { get; }
+        public MemberRef<MethodMember> Getter { get; }
+        public MemberRef<MethodMember> Setter { get; }
     }
 }

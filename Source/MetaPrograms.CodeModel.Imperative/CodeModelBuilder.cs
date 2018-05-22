@@ -57,6 +57,12 @@ namespace MetaPrograms.CodeModel.Imperative
                 $"{typeof(TMember).Name} with binding '{typeof(TBinding).Name}={binding}' could not be found.");
         }
 
+        public MemberRef<TMember> GetMember<TMember>(object binding)
+            where TMember : AbstractMember
+        {
+            return GetMember<TMember, object>(binding);
+        }
+
         //public TMember GetOrAddMember<TMember, TBinding>(TBinding binding, Func<TMember> memberFactory)
         //    where TMember : AbstractMember
         //    where TBinding : class

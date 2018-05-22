@@ -35,8 +35,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<MethodSignature>? signature = null, 
             Mutator<BlockStatement>? body = null,
             Mutator<MethodCallExpression>? callThisConstructor = null,
-            Mutator<MethodCallExpression>? callBaseConstructor = null) 
-            : base(source, name, declaringType, status, visibility, modifier, attributes, signature, body)
+            Mutator<MethodCallExpression>? callBaseConstructor = null,
+            bool shouldReplaceSource = false) 
+            : base(source, name, declaringType, status, visibility, modifier, attributes, signature, body, shouldReplaceSource)
         {
             CallThisConstructor = callThisConstructor.MutatedOrOriginal(source.CallThisConstructor);
             CallBaseConstructor = callBaseConstructor.MutatedOrOriginal(source.CallBaseConstructor);

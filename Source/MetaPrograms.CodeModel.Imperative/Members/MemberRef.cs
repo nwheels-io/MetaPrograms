@@ -32,7 +32,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public override int GetHashCode()
         {
-            return _state.GetHashCode();
+            return (_state?.GetHashCode()).GetValueOrDefault(0);
         }
 
         public bool Equals(MemberRef<TMember> other)
@@ -47,6 +47,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 return this.Equals(typedRef);
             }
             return false;
+        }
+
+        public override string ToString()
+        {
+            return (Get()?.ToString() ?? "null");
         }
 
         public bool IsNull => Get() == null;

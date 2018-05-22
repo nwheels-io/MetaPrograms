@@ -30,7 +30,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 visibility: _symbol.GetMemberVisibility(),
                 modifier: _symbol.GetMemberModifier(),
                 attributes: ImmutableList<AttributeDescription>.Empty,
-                signature: MethodReaderMechanism.ReadSignatume(_modelBuilder, _symbol),
+                signature: MethodReaderMechanism.ReadSignature(_modelBuilder, _symbol),
                 body: null,
                 callBaseConstructor: null,
                 callThisConstructor: null);        

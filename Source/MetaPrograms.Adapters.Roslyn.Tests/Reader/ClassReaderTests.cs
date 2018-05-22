@@ -91,7 +91,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
         }
 
         [Test]
-        public void CanReadMethodDeclarations()
+        public void CanReadMemberDeclarations()
         {
             // arrange
             
@@ -115,20 +115,56 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             // assert
 
             var type = reader.TypeMember;
-            type.Members.OfType<MemberRef<ConstructorMember>>().Select(GetSymbolName).ShouldBe(new[] { "MyClass" });
-            type.Members.OfType<MemberRef<FieldMember>>().Select(GetSymbolName).ShouldBe(new[] { "f1" });
-            type.Members.OfType<MemberRef<MethodMember>>().Select(GetSymbolName).ShouldBe(new[] { "M1" });
-            type.Members.OfType<MemberRef<PropertyMember>>().Select(GetSymbolName).ShouldBe(new[] { "P1" });
-            type.Members.OfType<MemberRef<EventMember>>().Select(GetSymbolName).ShouldBe(new[] { "E1" });
+            type.Members.Select(m => m.Get()).OfType<ConstructorMember>().Select(GetSymbolName).ShouldBe(new[] { ".ctor" });
+            type.Members.Select(m => m.Get()).OfType<FieldMember>().Select(GetSymbolName).ShouldBe(new[] { "f1" });
+            type.Members.Select(m => m.Get()).OfType<MethodMember>().Select(GetSymbolName).ShouldBe(new[] { "M1" });
+            type.Members.Select(m => m.Get()).OfType<PropertyMember>().Select(GetSymbolName).ShouldBe(new[] { "P1" });
+            type.Members.Select(m => m.Get()).OfType<EventMember>().Select(GetSymbolName).ShouldBe(new[] { "E1" });
         }
 
-        private string GetSymbolName<T>(MemberRef<T> member) 
-            where T : AbstractMember
+        [Test]
+        public void CanReadTypeAttributes()
         {
-            return member.Get().Bindings.OfType<ISymbol>().Single().Name;
+            // arrange
+
+            var code = @"
+                using System;
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+
+                [Serializable, Seventh(123, DayOfWeek.Tuesday)]
+                class MyClass { }
+            ";
+
+            (ClassReader reader, CodeModelBuilder model) = GetClassReaderFromCode(
+                code, 
+                "MyClass",
+                setupAllReaders: allReaders => allReaders.ForEach(r => r.ReadName()));
+
+            // act
+
+            reader.ReadAttributes();
+
+            // assert
+
+            var type = reader.TypeMember;
+            type.Attributes
+                .Select(a => a.AttributeType.Get().Name)
+                .ShouldBe(new[] { "SerializableAttribute", "SeventhAttribute" }, ignoreOrder: true);
         }
 
-        private (ClassReader, CodeModelBuilder) GetClassReaderFromCode(string csharpCode, string className)
+        private string GetSymbolName(AbstractMember member)
+        {
+            return member.Bindings.OfType<ISymbol>().Single().Name;
+        }
+
+        private string GetSymbolName<T>(MemberRef<T> member)
+            where T : AbstractMember
+            => GetSymbolName(member.Get());
+
+        private (ClassReader, CodeModelBuilder) GetClassReaderFromCode(
+            string csharpCode, 
+            string className, 
+            Action<List<IPhasedTypeReader>> setupAllReaders = null)
         {
             var compilation = TestWorkspaceFactory.CompileCodeOrThrow(
                 csharpCode,
@@ -144,7 +180,8 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             var discoveryVisitor = new TypeDiscoverySymbolVisitor(compilation, modelBuilder, allReaders);
 
             compilation.GlobalNamespace.Accept(discoveryVisitor);
-
+            setupAllReaders?.Invoke(allReaders);
+            
             var reader = allReaders.OfType<ClassReader>().FirstOrDefault(r => r.TypeSymbol.Equals(typeSymbol));
             reader.ShouldNotBeNull($"ClassReader for '{className}' was not registered.");
 

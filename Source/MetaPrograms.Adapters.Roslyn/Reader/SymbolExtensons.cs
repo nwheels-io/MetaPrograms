@@ -44,71 +44,6 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             return result.ToString();
         }
 
-
-        private static void AppendSystemTypeMetadataName(INamedTypeSymbol symbol, StringBuilder output)
-        {
-            if (symbol.TypeKind != TypeKind.Class && symbol.TypeKind != TypeKind.Struct && symbol.TypeKind != TypeKind.Interface && !symbol.IsGenericType)
-            {
-                output.Append(symbol.ToDisplayString(CSharpSymbolDisplayFormat));
-                return;
-            }
-
-            if (symbol.ContainingSymbol is INamedTypeSymbol containingType &&
-                (containingType.TypeKind == TypeKind.Class || containingType.TypeKind == TypeKind.Struct))
-            {
-                AppendSystemTypeMetadataName(containingType, output);
-                output.Append('+');
-            }
-            else if (symbol.ContainingNamespace != null && !symbol.ContainingNamespace.IsGlobalNamespace)
-            {
-                output.Append(symbol.ContainingNamespace.ToDisplayString(CSharpSymbolDisplayFormat));
-                output.Append('.');
-            }
-
-            output.Append(symbol.Name);
-
-            if (symbol.IsGenericType)
-            {
-                output.Append('`');
-                output.Append(symbol.Arity);
-
-                if (symbol.TypeArguments != null)
-                {
-                    output.Append('[');
-                    
-                    for (int i = 0; i < symbol.TypeArguments.Length; i++)
-                    {
-                        if (i > 0)
-                        {
-                            output.Append(',');
-                        }
-
-                        output.Append('[');
-                        
-                        var parameterOrArgument = symbol.TypeArguments[i];
-                        if (parameterOrArgument is INamedTypeSymbol argument)
-                        {
-                            AppendSystemTypeMetadataName(argument, output);
-                        }
-                        else
-                        {
-                            output.Append(parameterOrArgument.ToDisplayString(CSharpSymbolDisplayFormat));
-                        }
-
-                        output.Append(']');
-                    }
-
-                    output.Append(']');
-                }
-            }
-
-            if (symbol.SpecialType == SpecialType.None && symbol.ContainingAssembly != null)
-            {
-                output.Append(',');
-                output.Append(symbol.ContainingAssembly.Name);
-            }
-        }
-        
         public static string GetSystemTypeMetadataName(this INamedTypeSymbol symbol)
         {
             var result = new StringBuilder(capacity: 255);
@@ -191,6 +126,87 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             }
 
             return MethodParameterModifier.None;
+        }
+        
+        private static void AppendSystemTypeMetadataName(INamedTypeSymbol symbol, StringBuilder output, bool isContainingType = false)
+        {
+            if (!ShouldApplySystemTypeNameLogic(symbol))
+            {
+                output.Append(symbol.ToDisplayString(CSharpSymbolDisplayFormat));
+                return;
+            }
+
+            AppendSystemTypeNameQualifiers(symbol, output);
+
+            output.Append(symbol.Name);
+
+            if (symbol.IsGenericType)
+            {
+                AppendSystemTypeNameGenerics(symbol, output);
+            }
+
+            if (!isContainingType)
+            {
+                AppendSystemTypeNameAssembly(symbol, output);
+            }
+        }
+
+        private static bool ShouldApplySystemTypeNameLogic(INamedTypeSymbol symbol)
+        {
+            return (
+                symbol.TypeKind == TypeKind.Class || 
+                symbol.TypeKind == TypeKind.Struct || 
+                symbol.TypeKind == TypeKind.Interface || 
+                symbol.IsGenericType);
+        }
+
+        private static void AppendSystemTypeNameQualifiers(INamedTypeSymbol symbol, StringBuilder output)
+        {
+            if (symbol.ContainingSymbol is INamedTypeSymbol containingType &&
+                (containingType.TypeKind == TypeKind.Class || containingType.TypeKind == TypeKind.Struct))
+            {
+                AppendSystemTypeMetadataName(containingType, output, isContainingType: true);
+                output.Append('+');
+            }
+            else if (symbol.ContainingNamespace != null && !symbol.ContainingNamespace.IsGlobalNamespace)
+            {
+                output.Append(symbol.ContainingNamespace.ToDisplayString(CSharpSymbolDisplayFormat));
+                output.Append('.');
+            }
+        }
+
+        private static void AppendSystemTypeNameGenerics(INamedTypeSymbol symbol, StringBuilder output)
+        {
+            output.Append('`');
+            output.Append(symbol.Arity);
+
+            if (symbol.TypeArguments != null && symbol.TypeArguments.All(t => t is INamedTypeSymbol))
+            {
+                output.Append('[');
+
+                for (int i = 0; i < symbol.TypeArguments.Length; i++)
+                {
+                    if (i > 0)
+                    {
+                        output.Append(',');
+                    }
+
+                    output.Append('[');
+                    AppendSystemTypeMetadataName((INamedTypeSymbol)symbol.TypeArguments[i], output);
+                    output.Append(']');
+                }
+
+                output.Append(']');
+            }
+        }
+
+        private static void AppendSystemTypeNameAssembly(INamedTypeSymbol symbol, StringBuilder output)
+        {
+            if (symbol.SpecialType == SpecialType.None && symbol.ContainingAssembly != null)
+            {
+                output.Append(',');
+                output.Append(symbol.ContainingAssembly.Name);
+            }
         }
     }
 }

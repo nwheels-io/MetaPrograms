@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Text;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
-    public class ClassReader : IPhasedTypeReader
+    public class EnumReader : IPhasedTypeReader
     {
         private readonly TypeReaderMechanism _mechanism;
 
-        public ClassReader(TypeReaderMechanism mechanism)
+        public EnumReader(TypeReaderMechanism mechanism)
         {
             _mechanism = mechanism;
-            _mechanism.MemberBuilder.TypeKind = TypeMemberKind.Class;
+            _mechanism.MemberBuilder.TypeKind = TypeMemberKind.Struct;
         }
 
         public void RegisterProxy()
@@ -30,18 +29,15 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadGenerics()
         {
-            _mechanism.ReadGenerics();
         }
 
         public void ReadAncestors()
         {
-            _mechanism.ReadBaseType();
-            _mechanism.ReadBaseInterfaces();
         }
 
         public void ReadMemberDeclarations()
         {
-            _mechanism.ReadMemberDeclarations();
+            _mechanism.ReadEnumMembers();
         }
 
         public void ReadAttributes()
@@ -51,8 +47,6 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadMemberImplementations()
         {
-            //throw new NotImplementedException();
-
         }
 
         public void RegisterReal()
