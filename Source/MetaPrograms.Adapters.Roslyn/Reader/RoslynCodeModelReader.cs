@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using MetaPrograms.CodeModel.Imperative;
@@ -16,8 +17,10 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public RoslynCodeModelReader(Workspace workspace)
         {
+            var compilations = CompileAllProjects(workspace);
+
             this.Workspace = workspace;
-            this.ModelBuilder = new CodeModelBuilder();
+            this.ModelBuilder = new CodeModelBuilder(compilations);
         }
 
         public void Read()
@@ -29,14 +32,13 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         public ImmutableCodeModel GetCodeModel() => ModelBuilder.GetCodeModel();
 
         public Workspace Workspace { get; }
-        public CodeModelBuilder ModelBuilder { get; }
+        public CodeModelBuilder ModelBuilder { get; private set; }
 
         private void DiscoverAllTypes()
         {
-            foreach (var project in Workspace.CurrentSolution.Projects)
+            foreach (var compilation in ModelBuilder.GetCompilations())
             {
-                var compilation = CompileProjectOrThrow(project);
-                var visitor = new TypeDiscoverySymbolVisitor(compilation, ModelBuilder, _phasedTypeReaders);
+                var visitor = new TypeDiscoverySymbolVisitor(ModelBuilder, _phasedTypeReaders);
                 compilation.GlobalNamespace.Accept(visitor);
             }
         }
@@ -46,10 +48,17 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _phasedTypeReaders.RunAllPhases();
         }
 
-        private Compilation CompileProjectOrThrow(Project project)
+        private static IEnumerable<Compilation> CompileAllProjects(Workspace workspace)
+        {
+            foreach (var project in workspace.CurrentSolution.Projects)
+            {
+                yield return CompileProjectOrThrow(project);
+            }
+        }
+
+        private static Compilation CompileProjectOrThrow(Project project)
         {
             var compilation = project.GetCompilationAsync().Result;
-            var allDiagnostics = compilation.GetDiagnostics();
             var warningsAndErrors = compilation
                 .GetDiagnostics()
                 .Where(d => d.Severity >= DiagnosticSeverity.Warning)
@@ -63,7 +72,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             return compilation;
         }
 
-        private string GetDiagnosticsText(Diagnostic[] warningsAndErrors)
+        private static string GetDiagnosticsText(Diagnostic[] warningsAndErrors)
         {
             var endl = Environment.NewLine;
             var messages = string.Join(endl, warningsAndErrors.Select(x => x.ToString()));

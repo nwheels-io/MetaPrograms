@@ -19,7 +19,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             ModelBuilder = modelBuilder;
             MemberBuilder = new TypeMemberBuilder();
             Symbol = symbol;
-            FullyQualifiedMetadataName = Symbol.GetFullyQualifiedMetadataName();
+            FullyQualifiedMetadataName = Symbol.GetSystemTypeMetadataName();
             ClrType = Type.GetType(FullyQualifiedMetadataName, throwOnError: false);
             MemberBuilder.Status = MemberStatus.Incomplete;
             MemberRef = MemberBuilder.GetTemporaryProxy().GetRef();
@@ -68,9 +68,22 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             
             if (Symbol.IsGenericType)
             {
-                MemberBuilder.GenericParameters.AddRange(
-                    Symbol.TypeParameters.Select(
-                        p => ModelBuilder.GetMember<TypeMember, ISymbol>(p)));
+                MemberBuilder.GenericParameters.AddRange(Symbol.TypeParameters.Select(GetTypeParameterOrArgument));
+                MemberBuilder.GenericArguments.AddRange(Symbol.TypeArguments.Select(GetTypeParameterOrArgument));
+            }
+
+            MemberRef<TypeMember> GetTypeParameterOrArgument(ITypeSymbol symbol)
+            {
+                if (symbol is INamedTypeSymbol argument)
+                {
+                    return ModelBuilder.TryGetMember<TypeMember>(argument);
+                }
+                else if (symbol is ITypeParameterSymbol parameter)
+                {
+                    return TypeParameterReader.Read(parameter).GetRef();
+                }
+
+                return MemberRef<TypeMember>.Null;
             }
         }
 
@@ -79,14 +92,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             MemberBuilder.BaseType = (
                 Symbol.BaseType == null || Symbol.BaseType.SpecialType == SpecialType.System_Object
                     ? MemberRef<TypeMember>.Null
-                    : ModelBuilder.GetMember<TypeMember, ISymbol>(Symbol.BaseType));
+                    : ModelBuilder.TryGetMember<TypeMember>(Symbol.BaseType));
         }
 
         public void ReadBaseInterfaces()
         {
             foreach (var interfaceSymbol in Symbol.Interfaces)
             {
-                MemberBuilder.Interfaces.Add(ModelBuilder.GetMember<TypeMember, ISymbol>(interfaceSymbol));
+                MemberBuilder.Interfaces.Add(ModelBuilder.TryGetMember<TypeMember>(interfaceSymbol));
             }
         }
         

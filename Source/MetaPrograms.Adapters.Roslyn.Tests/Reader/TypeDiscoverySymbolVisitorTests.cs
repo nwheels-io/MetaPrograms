@@ -24,12 +24,12 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
                 }
             ");
 
-            var modelBuilder = new CodeModelBuilder();
+            var modelBuilder = new CodeModelBuilder(compilation);
             var discoveredTypeReaders = new List<IPhasedTypeReader>();
 
             // act
 
-            var visitor = new TypeDiscoverySymbolVisitor(compilation, modelBuilder, discoveredTypeReaders);
+            var visitor = new TypeDiscoverySymbolVisitor(modelBuilder, discoveredTypeReaders);
             compilation.GlobalNamespace.Accept(visitor);
 
             // assert
@@ -231,6 +231,26 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
                 "ClassReader:C1",
                 "ClassReader:ClassOne",
                 "ClassReader:ClassThree",
+            });
+        }
+
+        [Test]
+        public void IncludeTypesOfIncludedTypesGenericArguments()
+        {
+            var typeReaders = VisitCode(@"
+                using System;
+                using MetaPrograms.Adapters.Roslyn.Tests.CompiledExamples;
+                class C1 { 
+                    void F(ClassEleven eleven) {
+                    }
+                }
+            ");
+
+            AssertReaderSymbolPairs(typeReaders, shouldContain: new[] {
+                "ClassReader:C1",
+                "ClassReader:ClassEleven",
+                "ClassReader:Task",
+                "ClassReader:ClassOne"
             });
         }
 
@@ -446,7 +466,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
         {
             var compilation = CompileCode(csharpCode);
             var results = new List<IPhasedTypeReader>();
-            var visitor = new TypeDiscoverySymbolVisitor(compilation, new CodeModelBuilder(), results);
+            var visitor = new TypeDiscoverySymbolVisitor(new CodeModelBuilder(compilation), results);
 
             compilation.GlobalNamespace.Accept(visitor);
 

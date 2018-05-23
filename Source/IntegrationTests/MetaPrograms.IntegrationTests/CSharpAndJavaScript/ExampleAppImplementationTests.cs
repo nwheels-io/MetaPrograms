@@ -19,15 +19,17 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
         public void CanCompileExampleProject()
         {
             // arrange
+            
             var loader = new BuildalyzerWorkspaceLoader();
             var workspace = loader.LoadWorkspace(new[] {
                 GetExampleProjectFilePath("Example.App"),
-                GetExampleProjectFilePath("Example.WebUIModel"),
-                GetExampleProjectFilePath("Example.WebBrowserAdapter"),
-                GetExampleProjectFilePath("Example.AspNetAdapter"),
+            });
+            workspace.AddAssemblyReferences(new[] {
+                typeof(WebUIMetadata).Assembly.Location
             });
 
-            //act & assert
+            // act & assert
+            
             workspace.CompileCodeOrThrow();
         }
 
@@ -35,15 +37,17 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
         public void CanGenerateImplementations()
         {
             // arrange
+            
             var loader = new BuildalyzerWorkspaceLoader();
             var workspace = loader.LoadWorkspace(new[] {
                 GetExampleProjectFilePath("Example.App"),
-                GetExampleProjectFilePath("Example.WebUIModel"),
-                GetExampleProjectFilePath("Example.WebBrowserAdapter"),
-                GetExampleProjectFilePath("Example.AspNetAdapter"),
+            });
+            workspace.AddAssemblyReferences(new[] {
+                typeof(WebUIMetadata).Assembly.Location
             });
 
             // act
+            
             var reader = new RoslynCodeModelReader(workspace);
             reader.Read();
             var codeModel = reader.GetCodeModel();

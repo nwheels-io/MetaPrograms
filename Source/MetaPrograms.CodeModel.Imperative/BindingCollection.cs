@@ -30,6 +30,16 @@ namespace MetaPrograms.CodeModel.Imperative
             _bindings.UnionWith(bindings);
         }
 
+        public T First<T>()
+        {
+            return _bindings.OfType<T>().First();
+        }
+
+        public T FirstOrDefault<T>()
+        {
+            return _bindings.OfType<T>().FirstOrDefault();
+        }
+
         public int Count => _bindings.Count;
     }
 }

@@ -30,12 +30,12 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
             _member = new EventMember(
                 name: _symbol.Name,
-                declaringType: _modelBuilder.GetMember<TypeMember>(_symbol.ContainingType),
+                declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
                 status: MemberStatus.Incomplete,
                 visibility: _symbol.GetMemberVisibility(),
                 modifier: _symbol.GetMemberModifier(),
                 attributes: ImmutableList<AttributeDescription>.Empty,
-                delegateType: _modelBuilder.GetMember<TypeMember>(_symbol.Type),
+                delegateType: _modelBuilder.TryGetMember<TypeMember>(_symbol.Type),
                 adder: MethodReader.GetMemberRef(_adderReader),
                 remover: MethodReader.GetMemberRef(_removerReader));
         }

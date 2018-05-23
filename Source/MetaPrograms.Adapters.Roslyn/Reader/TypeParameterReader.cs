@@ -7,24 +7,13 @@ using Microsoft.CodeAnalysis;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
-    public class TypeParameterReader
+    public static class TypeParameterReader
     {
-        private readonly CodeModelBuilder _modelBuilder;
-        private readonly SemanticModel _semanticModel;
-        private readonly ITypeParameterSymbol _symbol;
-
-        public TypeParameterReader(CodeModelBuilder modelBuilder, SemanticModel semanticModel, ITypeParameterSymbol symbol)
-        {
-            _modelBuilder = modelBuilder;
-            _semanticModel = semanticModel;
-            _symbol = symbol;
-        }
-
-        public TypeMember Read()
+        public static TypeMember Read(ITypeParameterSymbol symbol)
         {
             var memberBuilder  = new TypeMemberBuilder();
 
-            memberBuilder.Name = _symbol.Name;
+            memberBuilder.Name = symbol.Name;
             memberBuilder.IsGenericParameter = true;
 
             return new RealTypeMember(memberBuilder);

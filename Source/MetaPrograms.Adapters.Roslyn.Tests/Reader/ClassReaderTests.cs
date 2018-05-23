@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using MetaPrograms.Adapters.Roslyn.Reader;
 using MetaPrograms.CodeModel.Imperative;
@@ -37,6 +38,39 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             type.Name.ShouldBe("MyClass");
             type.Namespace.ShouldBe("MyApp.MyTest");
             type.FullName.ShouldBe("MyApp.MyTest.MyClass");
+        }
+        
+        [Test]
+        public void CanReadGenerics()
+        {
+            // arrange
+            
+            var code = @"
+                namespace MyApp {
+                    interface IService1 { }
+                    interface IService2 { }
+                    class C0<T1, T2> { }
+                    class C1 : C0<IService1, IService2> { }
+                }
+            ";
+
+            (ClassReader reader, CodeModelBuilder model) = GetClassReaderFromCode(
+                code, 
+                "MyApp.C1",
+                walkSymbols: c1 => c1.BaseType,
+                setupAllReaders: allReaders => allReaders.ForEach(r => r.ReadName()));
+
+            // act
+
+            reader.ReadGenerics();
+
+            // assert
+
+            var c1Base = reader.TypeMember;
+            c1Base.IsGenericType.ShouldBeTrue();
+            c1Base.IsGenericDefinition.ShouldBeFalse();
+            c1Base.GenericParameters.Select(arg => arg.Get().Name).ShouldBe(new[] { "T1", "T2" });
+            c1Base.GenericArguments.Select(arg => arg.Get().Name).ShouldBe(new[] { "IService1", "IService2" });
         }
         
         [Test]
@@ -164,6 +198,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
         private (ClassReader, CodeModelBuilder) GetClassReaderFromCode(
             string csharpCode, 
             string className, 
+            Func<INamedTypeSymbol, INamedTypeSymbol> walkSymbols = null, 
             Action<List<IPhasedTypeReader>> setupAllReaders = null)
         {
             var compilation = TestWorkspaceFactory.CompileCodeOrThrow(
@@ -172,12 +207,13 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
                     this.GetType().Assembly.Location
                 });
 
-            var typeSymbol = compilation.GetTypeByMetadataName(className);
+            var originSymbol = compilation.GetTypeByMetadataName(className);
+            var typeSymbol = walkSymbols?.Invoke(originSymbol) ?? originSymbol; 
             typeSymbol.ShouldNotBeNull($"Type symbol '{className}' could not be found in compilation.");
 
-            var modelBuilder = new CodeModelBuilder();
+            var modelBuilder = new CodeModelBuilder(compilation);
             var allReaders = new List<IPhasedTypeReader>();
-            var discoveryVisitor = new TypeDiscoverySymbolVisitor(compilation, modelBuilder, allReaders);
+            var discoveryVisitor = new TypeDiscoverySymbolVisitor(modelBuilder, allReaders);
 
             compilation.GlobalNamespace.Accept(discoveryVisitor);
             setupAllReaders?.Invoke(allReaders);

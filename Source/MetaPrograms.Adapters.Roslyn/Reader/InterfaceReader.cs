@@ -19,7 +19,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadName()
         {
-            throw new NotImplementedException();
+            _mechanism.ReadName();
         }
 
         public void RegisterProxy()
@@ -29,32 +29,31 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadGenerics()
         {
-            throw new NotImplementedException();
+            _mechanism.ReadGenerics();
         }
 
         public void ReadAncestors()
         {
-            throw new NotImplementedException();
+            _mechanism.ReadBaseInterfaces();
         }
 
         public void ReadMemberDeclarations()
         {
-            throw new NotImplementedException();
+            _mechanism.ReadMemberDeclarations();
         }
 
         public void ReadAttributes()
         {
-            throw new NotImplementedException();
+            _mechanism.ReadAttributes();
         }
 
         public void ReadMemberImplementations()
         {
-            throw new NotImplementedException();
         }
 
         public void RegisterReal()
         {
-            throw new NotImplementedException();
+            _mechanism.RegisterFinalType();
         }
 
         public INamedTypeSymbol TypeSymbol => _mechanism.Symbol;

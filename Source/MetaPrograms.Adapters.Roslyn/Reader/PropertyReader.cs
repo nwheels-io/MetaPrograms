@@ -30,12 +30,12 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
             _member = new PropertyMember(
                 name: _symbol.Name,
-                declaringType: _modelBuilder.GetMember<TypeMember>(_symbol.ContainingType),
+                declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
                 status: MemberStatus.Incomplete,
                 visibility: _symbol.GetMemberVisibility(),
                 modifier: _symbol.GetMemberModifier(),
                 attributes: ImmutableList<AttributeDescription>.Empty,
-                propertyType: _modelBuilder.GetMember<TypeMember>(_symbol.Type),
+                propertyType: _modelBuilder.TryGetMember<TypeMember>(_symbol.Type),
                 getter: MethodReader.GetMemberRef(_getterReader),
                 setter: MethodReader.GetMemberRef(_setterReader));
         }

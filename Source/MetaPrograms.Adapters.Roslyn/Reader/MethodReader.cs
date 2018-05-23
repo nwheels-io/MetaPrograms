@@ -25,7 +25,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             _member = new MethodMember(
                 name: _symbol.Name, 
-                declaringType: _modelBuilder.GetMember<TypeMember, ITypeSymbol>(_symbol.ContainingType),
+                declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
                 status: MemberStatus.Incomplete,
                 visibility: _symbol.GetMemberVisibility(),
                 modifier: _symbol.GetMemberModifier(),

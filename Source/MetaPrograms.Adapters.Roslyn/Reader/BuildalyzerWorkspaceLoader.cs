@@ -1,6 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using Buildalyzer;
+using Buildalyzer.Environment;
 using Buildalyzer.Workspaces;
+using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader

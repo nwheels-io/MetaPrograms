@@ -25,12 +25,12 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             _member = new FieldMember(
                 name: _symbol.Name,
-                declaringType: _modelBuilder.GetMember<TypeMember>(_symbol.ContainingType),
+                declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
                 status: MemberStatus.Incomplete,
                 visibility: _symbol.GetMemberVisibility(),
                 modifier: _symbol.GetMemberModifier(),
                 attributes: ImmutableList<AttributeDescription>.Empty,
-                type: _modelBuilder.GetMember<TypeMember>(_symbol.Type),
+                type: _modelBuilder.TryGetMember<TypeMember>(_symbol.Type),
                 isReadOnly: _symbol.IsReadOnly,
                 initializer: null);
         }

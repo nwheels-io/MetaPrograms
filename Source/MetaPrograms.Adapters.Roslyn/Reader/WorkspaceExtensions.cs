@@ -28,5 +28,24 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
             return compilation;
         }
+        
+        public static void AddAssemblyReferences(this Workspace workspace, IEnumerable<string> assemblyReferencePaths)
+        {
+            var newSolution = workspace.CurrentSolution;
+            var assemblyReferences = assemblyReferencePaths.Select(path => MetadataReference.CreateFromFile(path)).ToArray();
+
+            foreach (var projectId in workspace.CurrentSolution.ProjectIds)
+            {
+                foreach (var reference in assemblyReferences)
+                {
+                    newSolution = newSolution.AddMetadataReference(projectId, reference);
+                }
+            }
+
+            if (!workspace.TryApplyChanges(newSolution))
+            {
+                throw new InvalidOperationException("Failed to set project references");
+            }
+        }
     }
 }

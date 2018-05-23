@@ -16,7 +16,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             var parameters = symbol.Parameters.Select((p, index) => new MethodParameter(
                 name: p.Name,
                 position: index + 1,
-                type: modelBuilder.GetMember<TypeMember, ITypeSymbol>(p.Type),
+                type: modelBuilder.TryGetMember<TypeMember>(p.Type),
                 modifier: p.GetParameterModifier(),
                 attributes: ImmutableList<AttributeDescription>.Empty
             ));
@@ -31,7 +31,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 ? new MethodParameter(
                     name: "$retVal", 
                     position: 0,
-                    type: modelBuilder.GetMember<TypeMember, ITypeSymbol>(symbol.ReturnType),
+                    type: modelBuilder.TryGetMember<TypeMember>(symbol.ReturnType),
                     modifier: symbol.GetReturnValueModifier(),
                     attributes: ImmutableList<AttributeDescription>.Empty)
                 : null);

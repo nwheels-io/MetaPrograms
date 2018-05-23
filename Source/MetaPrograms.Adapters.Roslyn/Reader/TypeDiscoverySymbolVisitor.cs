@@ -11,16 +11,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class TypeDiscoverySymbolVisitor : SymbolVisitor
     {
-        private readonly Compilation _compilation;
         private readonly CodeModelBuilder _modelBuilder;
         private readonly List<IPhasedTypeReader> _results;
         private readonly HashSet<INamedTypeSymbol> _includedSymbols = new HashSet<INamedTypeSymbol>();
         private int _codedTypeDescendLevel = 0;
         private int _anyTypeDescendLevel = 0;
 
-        public TypeDiscoverySymbolVisitor(Compilation compilation, CodeModelBuilder modelBuilder, List<IPhasedTypeReader> results)
+        public TypeDiscoverySymbolVisitor(CodeModelBuilder modelBuilder, List<IPhasedTypeReader> results)
         {
-            _compilation = compilation;
             _modelBuilder = modelBuilder;
             _results = results;
         }
@@ -50,7 +48,12 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public override void VisitNamedType(INamedTypeSymbol symbol)
         {
-            if (symbol != null && ShouldIncludeType(symbol) && _includedSymbols.Add(symbol))
+            IncludeType(symbol);
+        }
+
+        private void IncludeType(INamedTypeSymbol symbol, bool force = false)
+        {
+            if (symbol != null && (force || ShouldIncludeType(symbol)) && _includedSymbols.Add(symbol))
             {
                 EnterType(symbol);
 
@@ -58,6 +61,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 {
                     RegisterTypeReader(symbol);
                     VisitAttributes(symbol);
+                    VisitGenericArguments(symbol);
 
                     var allLinkedSymbols = QuerySymbolsLinkedToType(symbol);
 
@@ -70,6 +74,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 {
                     ExitType(symbol);
                 }
+            }
+        }
+
+        private void VisitGenericArguments(INamedTypeSymbol symbol)
+        {
+            foreach (var argument in symbol.TypeArguments.OfType<INamedTypeSymbol>())
+            {
+                IncludeType(argument, force: true);
             }
         }
 
@@ -102,10 +114,15 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
             if (symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is MethodDeclarationSyntax methodSyntax)
             {
-                var methodSemantic = _compilation.GetSemanticModel(methodSyntax.SyntaxTree, ignoreAccessibility: true);
+                var compilation = _modelBuilder.GetCompilation(methodSyntax.SyntaxTree);
+                var methodSemantic = compilation.GetSemanticModel(methodSyntax.SyntaxTree, ignoreAccessibility: true);
                 var bodyOperation = methodSemantic.GetOperation(methodSyntax.Body);
-                var walker = new TypeDiscoveryOperationWalker(type => type.Accept(this));
-                bodyOperation.Accept(walker);
+
+                if (bodyOperation != null)
+                {
+                    var walker = new TypeDiscoveryOperationWalker(type => type.Accept(this));
+                    bodyOperation.Accept(walker);
+                }
             }
         }
 
@@ -129,9 +146,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         private bool ShouldIncludeType(INamedTypeSymbol symbol)
         {
-            if (//symbol.SpecialType == SpecialType.System_Object || 
-                symbol.SpecialType == SpecialType.System_Void)
-                //|| symbol.ToString() == "System.Type")
+            if (symbol.SpecialType == SpecialType.System_Void)
             {
                 return false;
             }
@@ -190,7 +205,6 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             return new ISymbol[] { parent.BaseType }
                 .Concat(parent.Interfaces)
-                .Concat(parent.TypeArguments)
                 .Concat(parent.GetMembers())
                 .Where(s => s != null);
         }

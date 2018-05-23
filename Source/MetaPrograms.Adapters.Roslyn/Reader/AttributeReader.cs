@@ -23,7 +23,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 .ToImmutableList();
 
             return new AttributeDescription(
-                modelBuilder.GetMember<TypeMember>(data.AttributeClass),
+                modelBuilder.TryGetMember<TypeMember>(data.AttributeClass),
                 constructorArguments,
                 propertyValues);
         }
