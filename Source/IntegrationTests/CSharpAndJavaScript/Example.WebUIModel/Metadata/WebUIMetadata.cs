@@ -1,23 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace Example.WebUIModel.Metadata
 {
-    public class WebUIMetadata
+    public class WebUIMetadata : IBackendApiRegistry
     {
         private readonly ImmutableCodeModel _codeModel;
-        //private readonly List<WebPageMetadata> _webPages;
-
+        private readonly Dictionary<TypeMember, WebApiMetadata> _backendApiByType = new Dictionary<TypeMember, WebApiMetadata>();
+        
         public WebUIMetadata(ImmutableCodeModel codeModel)
         {
             _codeModel = codeModel;
-            DiscoverWebPages();
+            
+            this.Pages = DiscoverWebPages();
+            this.BackendApis = _backendApiByType.Values.ToImmutableArray();
         }
 
-        private void DiscoverWebPages()
+        public ImmutableArray<WebPageMetadata> Pages { get; }
+        public ImmutableArray<WebApiMetadata> BackendApis { get; }      
+
+        WebApiMetadata IBackendApiRegistry.GetApiMetadata(TypeMember interfaceType)
+        {
+            if (_backendApiByType.TryGetValue(interfaceType, out WebApiMetadata existingApi))
+            {
+                return existingApi;
+            }
+            
+            var newApi = new WebApiMetadata(_codeModel, interfaceType);
+            _backendApiByType.Add(interfaceType, newApi);
+            return newApi;
+        }
+
+        private ImmutableArray<WebPageMetadata> DiscoverWebPages()
         {
             var webPageClasses = _codeModel.TopLevelMembers
                 .OfType<TypeMember>()
@@ -29,23 +47,11 @@ namespace Example.WebUIModel.Metadata
             {
                 Console.WriteLine($"WEB PAGE CLASS >> {webPageClass?.FullName}");
             }
-            
 
-            // IsInheritedFromWabPageClass(TypeMember type)
-            //{
-            //    var clrBase = type.BaseType.Bindings.OfType<System.Type>().SingleOrDefault();
-                
-            //    if (clrBase != null)
-            //    {
-            //        return (clrBase.IsGenericType && clrBase.GetGenericTypeDefinition() == typeof(WebPage<>));
-            //    }
-                
-                
-            //}
-            
-            
+            return webPageClasses
+                .Select(pageClass => new WebPageMetadata(_codeModel, this, pageClass))
+                .ToImmutableArray();
         }
-
 
         private bool IsWebPageClass(TypeMember type)
         {

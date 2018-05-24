@@ -157,6 +157,51 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
         }
 
         [Test]
+        public void CanReadGenericsInMemberDeclarations()
+        {
+            // arrange
+            
+            var code = @"
+                using System;
+                namespace MyApp {
+                    class C1 { }
+                    class C2 {
+                         Action<C1> Callback { get; set; }
+                    }
+                }
+            ";
+
+            (ClassReader reader, CodeModelBuilder model) = GetClassReaderFromCode(
+                code, 
+                "MyApp.C2",
+                setupAllReaders: allReaders => {
+                    allReaders.ForEach(r => r.ReadName());
+                    allReaders.ForEach(r => r.RegisterProxy());
+                    allReaders.ForEach(r => r.ReadGenerics());
+                });
+
+            // act
+
+            reader.ReadMemberDeclarations();
+
+            // assert
+
+            var type = reader.TypeMember;
+            var property = type.Members
+                .Select(m => m.Get())
+                .OfType<PropertyMember>()
+                .Single(p => p.Name == "Callback");
+
+            var propertyType = property.PropertyType.Get();
+            
+            propertyType.IsGenericType.ShouldBe(true);
+            propertyType.IsGenericDefinition.ShouldBe(false);
+            propertyType.GenericParameters.Count.ShouldBe(1);
+            propertyType.GenericArguments.Count.ShouldBe(1);
+            propertyType.GenericArguments[0].Get().Name.ShouldBe("C1");
+        }
+        
+        [Test]
         public void CanReadTypeAttributes()
         {
             // arrange

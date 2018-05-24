@@ -1,19 +1,28 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace Example.WebUIModel.Metadata
 {
     public class WebComponentMetadata
     {
-        public WebComponentMetadata(TypeMember componentClass)
+        private readonly ImmutableCodeModel _codeModel;
+
+        public WebComponentMetadata(ImmutableCodeModel codeModel, PropertyMember declaredProperty)
         {
-            this.ComponentClass = componentClass;
-            IsPredefined = (
-                componentClass.Bindings.OfType<Type>().Single().GetCustomAttribute<ProgrammingModelAttribute>() != null);
+            _codeModel = codeModel;
+
+            this.DeclaredProperty = declaredProperty;
+            this.ComponentClass = declaredProperty.PropertyType;
+            
+            //TODO: add AbstractMember.HasAttribute<T>()/TryGetAttribute<T>()
+            this.IsPredefined = (
+                ComponentClass.Bindings.FirstOrDefault<Type>()?.GetCustomAttribute<ProgrammingModelAttribute>() != null);
         }
 
+        public PropertyMember DeclaredProperty { get; }
         public TypeMember ComponentClass { get; }
         public bool IsPredefined { get; }
     }
