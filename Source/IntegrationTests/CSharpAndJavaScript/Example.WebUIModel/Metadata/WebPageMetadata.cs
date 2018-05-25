@@ -86,11 +86,10 @@ namespace Example.WebUIModel.Metadata
                 var type = property.PropertyType.Get();
 
                 //TODO: add TypeMember.IsA(System.Type) + support open generic System.Type
-                if (type?.TypeKind == TypeMemberKind.Class && type.IsGenericType && !type.BaseType.IsNull)
+                if (type?.TypeKind == TypeMemberKind.Class && type.IsGenericType)
                 {
-                    var baseClrType = type.BaseType.Get().Bindings.FirstOrDefault<Type>();
-
-                    if (baseClrType?.IsGenericType == true && baseClrType.GetGenericTypeDefinition() == typeof(BackendApi<>))
+                    var clrType = type.Bindings.FirstOrDefault<Type>();
+                    if (clrType != null && clrType.GetGenericTypeDefinition() == typeof(BackendApi<>))
                     {
                         return type.GenericArguments[0];
                     }
