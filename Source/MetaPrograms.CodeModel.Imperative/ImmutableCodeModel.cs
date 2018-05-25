@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using MetaPrograms.CodeModel.Imperative.Members;
 
@@ -12,5 +13,6 @@ namespace MetaPrograms.CodeModel.Imperative
         }
 
         public ImmutableList<AbstractMember> TopLevelMembers { get; }
+        public TMember Get<TMember>(object binding) => throw new NotImplementedException();
     }
 }

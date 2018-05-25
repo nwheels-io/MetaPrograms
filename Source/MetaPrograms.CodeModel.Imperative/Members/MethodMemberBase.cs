@@ -69,6 +69,10 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
+        public bool IsVoid => Signature.IsVoid;
+        public bool IsAsync => Signature.IsAsync;
+        public TypeMember ReturnType => Signature.ReturnType;
+
         public MethodSignature Signature { get; }
         public BlockStatement Body { get; }
 

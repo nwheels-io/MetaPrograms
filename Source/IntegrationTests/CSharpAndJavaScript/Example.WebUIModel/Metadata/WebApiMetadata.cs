@@ -18,14 +18,14 @@ namespace Example.WebUIModel.Metadata
         }
 
         public TypeMember InterfaceType { get; }
-        public ImmutableArray<MethodMember> ApiMethods { get; }
+        public ImmutableList<MethodMember> ApiMethods { get; }
 
-        private ImmutableArray<MethodMember> DiscoverApiMethods()
+        private ImmutableList<MethodMember> DiscoverApiMethods()
         {
             return InterfaceType.Members
                 .Select(m => m.Get())
                 .OfType<MethodMember>()
-                .ToImmutableArray();
+                .ToImmutableList();
         }
     }
 }
