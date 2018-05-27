@@ -2,7 +2,7 @@
 
 namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
-    public class MemberExpression : AbstractExpression
+    public class MemberExpression : AbstractExpression, IAssignable
     {
         public MemberExpression(
             MemberRef<TypeMember> type, 

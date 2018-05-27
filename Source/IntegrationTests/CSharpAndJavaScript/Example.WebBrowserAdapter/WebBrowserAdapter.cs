@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.IO;
+using MetaPrograms.CodeModel.Imperative;
 
 namespace Example.WebBrowserAdapter
 {
     public class WebBrowserAdapter
     {
-        public WebBrowserAdapter(Func<string, Stream> outputStreamFactory)
+        private readonly ICodeGeneratorOutput _output;
+
+        public WebBrowserAdapter(ICodeGeneratorOutput output)
         {
+            _output = output;
         }
             
-        public ImmutableDictionary<string, Stream> GenerateImplementations(WebUIModel.Metadata.WebUIMetadata metadata) =>
-            ImmutableDictionary<string, Stream>.Empty;
+        public void GenerateImplementations(WebUIModel.Metadata.WebUIMetadata metadata)
+        { 
+        }
     }
 }

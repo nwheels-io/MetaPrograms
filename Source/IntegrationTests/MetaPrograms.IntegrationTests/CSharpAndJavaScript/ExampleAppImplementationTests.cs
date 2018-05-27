@@ -50,27 +50,33 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             
             var reader = new RoslynCodeModelReader(workspace);
             reader.Read();
+
             var codeModel = reader.GetCodeModel();
-            
             var uiMetadata = new WebUIMetadata(codeModel);
             
-            var frontEndAdapter = new WebBrowserAdapter(outputStreamFactory: filePath => new MemoryStream());
-            var frontEndOutputs = frontEndAdapter.GenerateImplementations(uiMetadata);
+            var frontEndOutput = new TestCodeGeneratorOutput();
+            var frontEndAdapter = new WebBrowserAdapter(frontEndOutput);
+            frontEndAdapter.GenerateImplementations(uiMetadata);
             
-            var backEndAdapter = new AspNetAdapter(outputStreamFactory: filePath => new MemoryStream());
-            var backEndOutputs = backEndAdapter.GenerateImplementations(uiMetadata);
+            var backEndOutput = new TestCodeGeneratorOutput();
+            var backEndAdapter = new AspNetAdapter(backEndOutput);
+            backEndAdapter.GenerateImplementations(uiMetadata);
 
             // assert
 
-            AssertOutputs(frontEndOutputs, "index.html", "index.js", "tinyfx.js");
-            AssertOutputs(backEndOutputs, "IndexController.cs", "InvalidModelAutoResponderAttribute.cs");
+            AssertOutputs(frontEndOutput.SourceFiles, "index.html", "index.js", "tinyfx.js");
+            AssertOutputs(backEndOutput.SourceFiles, "IndexController.cs", "InvalidModelAutoResponderAttribute.cs");
         }
 
         private void AssertOutputs(ImmutableDictionary<string, Stream> outputs, params string[] expectedFileNames)
         {
-            outputs.Select(kvp => kvp.Key).ShouldBe(expectedFileNames, ignoreOrder: true);
+            outputs
+                .Select(kvp => kvp.Key)
+                .Select(Path.GetFileName)
+                .ShouldBe(expectedFileNames, ignoreOrder: true);
 
             var expectedOutputsDirectory = Path.Combine(ExamplesRootDirectory, "ExpectedOutput");
+            
             foreach (var fileName in expectedFileNames)
             {
                 outputs[fileName].ShouldMatchTextFile(Path.Combine(expectedOutputsDirectory, fileName));

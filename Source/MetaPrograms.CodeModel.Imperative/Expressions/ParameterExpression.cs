@@ -2,7 +2,7 @@
 
 namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
-    public class ParameterExpression : AbstractExpression
+    public class ParameterExpression : AbstractExpression, IAssignable
     {
         public ParameterExpression(
             MethodParameter parameter) 

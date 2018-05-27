@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using MetaPrograms.CodeModel.Imperative.Expressions;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
-    public class MethodParameter
+    public class MethodParameter : IAssignable
     {
         public MethodParameter(
             string name, 
@@ -41,5 +42,10 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public ImmutableList<AttributeDescription> Attributes { get; }
 
         public static MethodParameter ReturnVoid => null;
+
+        public static implicit operator ParameterExpression(MethodParameter source)
+        {
+            return new ParameterExpression(source);
+        }
     }
 }

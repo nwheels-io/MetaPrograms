@@ -9,9 +9,4 @@
   <ItemGroup>
     <ProjectReference Include="..\CommonExtensions\CommonExtensions.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.CodeAnalysis">
-      <HintPath>..\..\..\..\Users\felix.b\.nuget\packages\microsoft.codeanalysis.common\2.6.1\lib\netstandard1.3\Microsoft.CodeAnalysis.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>

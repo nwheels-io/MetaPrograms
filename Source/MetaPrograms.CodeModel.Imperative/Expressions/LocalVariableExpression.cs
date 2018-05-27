@@ -2,7 +2,7 @@
 
 namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
-    public class LocalVariableExpression : AbstractExpression
+    public class LocalVariableExpression : AbstractExpression, IAssignable
     {
         public LocalVariableExpression(
             MemberRef<TypeMember> type, 
