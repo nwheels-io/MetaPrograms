@@ -125,7 +125,7 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public ImmutableCodeModel GetCodeModel()
         {
-            return new ImmutableCodeModel(_topLevelMembers.Select(m => m.Get()));
+            return new ImmutableCodeModel(_topLevelMembers.Select(m => m.Get()), _memberByBinding);
         }
 
         private static IEnumerable<Compilation> WithReferencedCompilations(Compilation[] knownCompilations)

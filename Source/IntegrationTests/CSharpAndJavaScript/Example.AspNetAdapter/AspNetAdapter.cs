@@ -6,10 +6,12 @@ namespace Example.AspNetAdapter
 {
     public class AspNetAdapter
     {
+        private readonly ImmutableCodeModel _codeModel;
         private readonly ICodeGeneratorOutput _output;
 
-        public AspNetAdapter(ICodeGeneratorOutput output)
+        public AspNetAdapter(ImmutableCodeModel codeModel, ICodeGeneratorOutput output)
         {
+            _codeModel = codeModel;
             _output = output;
         }
 
@@ -17,12 +19,12 @@ namespace Example.AspNetAdapter
         {
             var writer = new RoslynCodeModelWriter(_output);
 
-            using (var session = CodeGenerator.NewSession())
+            using (var context = new CodeGeneratorContext(_codeModel))
             {
                 GenerateInfrastructureTypes();
                 GenerateControllerTypes(ui);
 
-                writer.AddCodeModel(session.GetCodeModel());
+                writer.AddCodeModel(context.GetGeneratedCodeModel());
             }
 
             writer.WriteAll();

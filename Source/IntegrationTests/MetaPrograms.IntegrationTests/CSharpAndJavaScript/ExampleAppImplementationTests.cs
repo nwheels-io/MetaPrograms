@@ -59,7 +59,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             frontEndAdapter.GenerateImplementations(uiMetadata);
             
             var backEndOutput = new TestCodeGeneratorOutput();
-            var backEndAdapter = new AspNetAdapter(backEndOutput);
+            var backEndAdapter = new AspNetAdapter(codeModel, backEndOutput);
             backEndAdapter.GenerateImplementations(uiMetadata);
 
             // assert

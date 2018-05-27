@@ -2,6 +2,7 @@
 using System.Reflection;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
+using static MetaPrograms.CodeModel.Imperative.CodeGeneratorContext;
 
 // ReSharper disable InconsistentNaming
 
@@ -9,15 +10,13 @@ namespace MetaPrograms.CodeModel.Imperative
 {
     public static class CodeGenerator
     {
-        public static CodeGeneratorSession NewSession()
+        public static void NAMESPACE(string name, Action body)
         {
-            return new CodeGeneratorSession();
+            using (GetContextOrThrow().PushState(new NamespaceContext(name)))
+            {
+                //TODO: invoke body();
+            }
         }
-        
-        public static void USE(ImmutableCodeModel codeModel) { }
-        public static ImmutableCodeModel CodeModel => null;
-
-        public static void NAMESPACE(string name, Action body) { }
 
         public static void ATTRIBUTE<T>(params object[] constructorArgumentsAndBody) { }
         public static void ATTRIBUTE(TypeMember type, params object[] constructorArgumentsAndBody) { }
@@ -89,6 +88,16 @@ namespace MetaPrograms.CodeModel.Imperative
         {
             public MemberContext ASYNC => null;
             public MemberContext READONLY => null;
+        }
+
+        public class NamespaceContext
+        {
+            public NamespaceContext(string namespaceName)
+            {
+                NamespaceName = namespaceName;
+            }
+
+            public string NamespaceName { get; }
         }
         
         public class MemberContext
