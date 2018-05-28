@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -12,7 +13,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests
     public static class TestWorkspaceFactory
     {
         private static readonly IReadOnlyList<string> TrustedAssemblyPaths = 
-            AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES").ToString().Split(';');
+            AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES").ToString().Split(GetTrustedAssemblyListDelimiter());
 
         public static AdhocWorkspace CreateWithCode(string csharpCode, out Project project)
         {
@@ -51,6 +52,11 @@ namespace MetaPrograms.Adapters.Roslyn.Tests
         {
             var workspace = CreateWithCode(csharpCode, references, out Project project);
             return workspace.CompileCodeOrThrow();
+        }
+
+        private static char GetTrustedAssemblyListDelimiter()
+        {
+            return (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ';' : ':');
         }
         
         private static string[] GetSystemAssemblyPaths(params string[] additionalAssemblyNames)

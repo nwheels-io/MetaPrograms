@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using MetaPrograms.CodeModel.Imperative.Members;
 
@@ -70,14 +71,17 @@ namespace MetaPrograms.Adapters.Reflection.Reader
 
         private void ReadAttributes()
         {
-            foreach (var clrAttribute in ClrType.GetCustomAttributes(inherit: true))
+            foreach (var clrAttribute in ClrType.GetCustomAttributesData())
             {
                 Builder.Attributes.Add(ReadAttribute(clrAttribute));
             }
         }
 
-        private AttributeDescription ReadAttribute(object clrAttribute)
+        private AttributeDescription ReadAttribute(CustomAttributeData clrAttribute)
         {
+            return new AttributeDescription(
+                Resolver.GetType(clrAttribute.AttributeType),
+                clrAttribute.ConstructorArguments.Select())
             
         }
     }
