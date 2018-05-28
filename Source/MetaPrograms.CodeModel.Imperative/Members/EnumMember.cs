@@ -25,13 +25,22 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
             Mutator<ImmutableList<AttributeDescription>>? attributes = null,
-            Mutator<object>? value = null) 
-            : base(source, name, declaringType, status, visibility, modifier, attributes)
+            Mutator<object>? value = null,
+            bool shouldReplaceSource = false) 
+            : base(source, name, declaringType, status, visibility, modifier, attributes, shouldReplaceSource)
         {
             Value = value.MutatedOrOriginal(source.Value);
         }
 
         public MemberRef<EnumMember> GetRef() => new MemberRef<EnumMember>(SelfReference);
+
+        public override AbstractMember WithAttributes(ImmutableList<AttributeDescription> attributes, bool shouldReplaceSource = false)
+        {
+            return new EnumMember(
+                source: this,
+                attributes: attributes,
+                shouldReplaceSource: shouldReplaceSource);
+        }
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {

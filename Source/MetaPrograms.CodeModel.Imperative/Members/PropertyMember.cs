@@ -24,16 +24,17 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public PropertyMember(
             PropertyMember source,
-            Mutator<MemberRef<TypeMember>>? propertyType,
-            Mutator<MemberRef<MethodMember>>? getter,
-            Mutator<MemberRef<MethodMember>>? setter, 
+            Mutator<MemberRef<TypeMember>>? propertyType = null,
+            Mutator<MemberRef<MethodMember>>? getter = null,
+            Mutator<MemberRef<MethodMember>>? setter = null, 
             Mutator<string>? name = null, 
             Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
             Mutator<MemberModifier>? modifier = null, 
-            Mutator<ImmutableList<AttributeDescription>>? attributes = null) 
-            : base(source, name, declaringType, status, visibility, modifier, attributes)
+            Mutator<ImmutableList<AttributeDescription>>? attributes = null,
+            bool shouldReplaceSource = false) 
+            : base(source, name, declaringType, status, visibility, modifier, attributes, shouldReplaceSource)
         {
             PropertyType = propertyType.MutatedOrOriginal(source.PropertyType);
             Getter = getter.MutatedOrOriginal(source.Getter);
@@ -41,6 +42,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         }
 
         public MemberRef<PropertyMember> GetRef() => new MemberRef<PropertyMember>(SelfReference);
+
+        public override AbstractMember WithAttributes(ImmutableList<AttributeDescription> attributes, bool shouldReplaceSource = false)
+        {
+            return new PropertyMember(
+                source: this,
+                attributes: attributes,
+                shouldReplaceSource: shouldReplaceSource);
+        }
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {

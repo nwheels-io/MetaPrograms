@@ -19,7 +19,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 .ToImmutableList<AbstractExpression>();
 
             var propertyValues = data.NamedArguments
-                .Select(kvp => new PropertyValue(kvp.Key, ExpressionReader.ReadTypedConstant(modelBuilder, kvp.Value)))
+                .Select(kvp => new NamedPropertyValue(kvp.Key, ExpressionReader.ReadTypedConstant(modelBuilder, kvp.Value)))
                 .ToImmutableList();
 
             return new AttributeDescription(

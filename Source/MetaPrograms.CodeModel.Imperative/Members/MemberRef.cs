@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
-    public struct MemberRef<TMember> : IEquatable<MemberRef<TMember>>
+    public struct MemberRef<TMember> : IEquatable<MemberRef<TMember>>, IMemberRef
         where TMember : AbstractMember
     {
         private readonly MemberRefState _state;
@@ -18,6 +18,13 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         {
             _state = state;
         }
+
+        AbstractMember IMemberRef.Get()
+        {
+            return Get();
+        }
+
+        Type IMemberRef.MemberType => typeof(TMember);
 
         public TMember Get()
         {

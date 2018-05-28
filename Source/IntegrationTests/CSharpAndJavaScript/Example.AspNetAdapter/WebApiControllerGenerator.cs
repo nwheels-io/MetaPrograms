@@ -9,7 +9,8 @@ using Example.WebUIModel.Metadata;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.AspNetCore.Mvc;
-using static MetaPrograms.CodeModel.Imperative.CodeGenerator;
+using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
+
 // ReSharper disable InconsistentNaming
 
 namespace Example.AspNetAdapter
@@ -22,10 +23,10 @@ namespace Example.AspNetAdapter
                 EXTENDS<Controller>();
                 ATTRIBUTE<RouteAttribute>("api/[controller]");
 
-                PRIVATE.READONLY.FIELD(api.InterfaceType, "_service", out FieldMember @serviceField);
+                PRIVATE.READONLY.FIELD(api.InterfaceType, "_service", out var @serviceField);
 
                 PUBLIC.CONSTRUCTOR(() => {
-                    PARAMETER(api.InterfaceType, "service", out MethodParameter @service);
+                    PARAMETER(api.InterfaceType, "service", out var @service);
                     @serviceField.ASSIGN(@service);
                 });
 

@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
+using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace MetaPrograms.CodeModel.Imperative
@@ -35,6 +39,63 @@ namespace MetaPrograms.CodeModel.Imperative
         public IDisposable PushState(object state)
         {
             return new StackStateScope(_stateStack, state);
+        }
+
+        public TState PopStateOrThrow<TState>()
+        {
+            var state = PeekStateOrThrow<TState>();
+            _stateStack.Pop();
+            return state;
+        }
+
+        public TState PeekStateOrThrow<TState>()
+        {
+            if (_stateStack.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Code generator state stack mismatch: attempted to pop a {typeof(TState).Name}, but the stack is empty.");
+            }
+
+            if (!(_stateStack.Peek() is TState state))
+            {
+                throw new InvalidOperationException(
+                    $"Code generator state stack mismatch: attempted to pop a {typeof(TState).Name}, " +
+                    $"but the top item is a {_stateStack.Peek().GetType().Name}'.");
+            }
+
+            return state;
+        }
+
+        public TState TryLookupState<TState>()
+        {
+            return _stateStack.OfType<TState>().FirstOrDefault();
+        }
+
+        public TState LookupStateOrThrow<TState>()
+        {
+            var state = TryLookupState<TState>();
+
+            if (state != null)
+            {
+                return state;
+            }
+
+            throw new InvalidOperationException($"Could not find a {typeof(TState).Name} down the state stack.");
+        }
+
+        public TypeMember TryGetCurrentType()
+        {
+            return TryLookupState<MemberRef<TypeMember>>().Get();
+        }
+
+        public TypeMember GetCurrentType()
+        {
+            return LookupStateOrThrow<MemberRef<TypeMember>>().Get();
+        }
+
+        public AbstractMember GetCurrentMember()
+        {
+            return LookupStateOrThrow<IMemberRef>().Get();
         }
 
         public void AddGeneratedMember(AbstractMember member)
@@ -76,6 +137,42 @@ namespace MetaPrograms.CodeModel.Imperative
             }
             
             throw new KeyNotFoundException($"Could not find '{typeof(TMember).Name}' with binding '{binding}'.");
+        }
+
+        public TypeMember FindType<T>()
+        {
+            return FindMemberOrThrow<TypeMember>(binding: typeof(T));
+        }
+
+        public TypeMember FindType(Type clrType)
+        {
+            return FindMemberOrThrow<TypeMember>(binding: clrType);
+        }
+
+        public AbstractExpression GetConstantExpression(object value)
+        {
+            if (value == null)
+            {
+                return new ConstantExpression(MemberRef<TypeMember>.Null, null);
+            }
+
+            if (value is AbstractExpression expr)
+            {
+                return expr;
+            }
+
+            var type = FindType(value.GetType());
+            
+            if (type.IsArray)
+            {
+                return new NewArrayExpression(
+                    type.GetRef(), 
+                    type.UnderlyingType, 
+                    GetConstantExpression(((IList)value).Count),
+                    ((IEnumerable)value).Cast<object>().Select(GetConstantExpression).ToImmutableList());
+            }
+            
+            return new ConstantExpression(type.GetRef(), value);
         }
 
         public ImmutableCodeModel OriginalCodeModel { get; }

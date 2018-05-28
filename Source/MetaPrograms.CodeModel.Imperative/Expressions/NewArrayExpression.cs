@@ -10,6 +10,19 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         public NewArrayExpression(
             MemberRef<TypeMember> type,
             MemberRef<TypeMember> elementType, 
+            AbstractExpression length, 
+            ImmutableList<AbstractExpression> initializerValues) 
+            : this(
+                type, 
+                elementType, 
+                ImmutableList<AbstractExpression>.Empty.Add(length), 
+                ImmutableList<ImmutableList<AbstractExpression>>.Empty.Add(initializerValues))
+        {
+        }
+
+        public NewArrayExpression(
+            MemberRef<TypeMember> type,
+            MemberRef<TypeMember> elementType, 
             ImmutableList<AbstractExpression> dimensionLengths, 
             ImmutableList<ImmutableList<AbstractExpression>> dimensionInitializerValues) 
             : base(type)

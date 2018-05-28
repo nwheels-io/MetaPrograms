@@ -45,6 +45,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public new MemberRef<ConstructorMember> GetRef() => new MemberRef<ConstructorMember>(SelfReference);
 
+        public override AbstractMember WithAttributes(ImmutableList<AttributeDescription> attributes, bool shouldReplaceSource = false)
+        {
+            return new ConstructorMember(
+                source: this, 
+                attributes: attributes, 
+                shouldReplaceSource: shouldReplaceSource);
+        }
+
         public override void AcceptVisitor(MemberVisitor visitor)
         {
             base.AcceptVisitor(visitor);

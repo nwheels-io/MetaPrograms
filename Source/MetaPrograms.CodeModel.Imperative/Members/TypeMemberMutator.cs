@@ -64,5 +64,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public Mutator<MemberRef<TypeMember>>? UnderlyingType { get; set; }
         public Mutator<ImmutableList<MemberRef<AbstractMember>>>? Members { get; set; }
         public Mutator<TypeGeneratorInfo>? Generator { get; set; }
+
+        public static implicit operator TypeMemberMutator(TypeMemberMutatorBuilder builder)
+            => new TypeMemberMutator(builder);
     }
 }

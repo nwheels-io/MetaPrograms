@@ -1,6 +1,7 @@
 ﻿using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.Roslyn.Writer;
 using MetaPrograms.CodeModel.Imperative;
+using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
 
 namespace Example.AspNetAdapter
 {
@@ -34,7 +35,7 @@ namespace Example.AspNetAdapter
         {
             foreach (var api in ui.BackendApis)
             {
-                CodeGenerator.NAMESPACE($"{api.InterfaceType.Namespace}.WebApi", () => {
+                NAMESPACE($"{api.InterfaceType.Namespace}.WebApi", () => {
                     WebApiControllerGenerator.WebApiController(api);
                 });
             }
@@ -42,7 +43,7 @@ namespace Example.AspNetAdapter
 
         private static void GenerateInfrastructureTypes()
         {
-            CodeGenerator.NAMESPACE(typeof(AspNetMiddlewareGenerator).Namespace, () => {
+            NAMESPACE(typeof(AspNetMiddlewareGenerator).Namespace, () => {
                 AspNetMiddlewareGenerator.InvalidModelAutoResponderAttribute();
             });
         }

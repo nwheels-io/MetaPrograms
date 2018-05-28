@@ -32,8 +32,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<ImmutableList<AttributeDescription>>? attributes = null,
             Mutator<MemberRef<TypeMember>>? delegateType = null,
             Mutator<MethodMember>? adder = null,
-            Mutator<MethodMember>? remover = null) 
-            : base(source, name, declaringType, status, visibility, modifier, attributes)
+            Mutator<MethodMember>? remover = null,
+            bool shouldReplaceSource = false) 
+            : base(source, name, declaringType, status, visibility, modifier, attributes, shouldReplaceSource)
         {
             DelegateType = delegateType.MutatedOrOriginal(source.DeclaringType);
             Adder = adder.MutatedOrOriginal(source.Adder);
@@ -41,6 +42,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         }
 
         public MemberRef<EventMember> GetRef() => new MemberRef<EventMember>(SelfReference);
+
+        public override AbstractMember WithAttributes(ImmutableList<AttributeDescription> attributes, bool shouldReplaceSource = false)
+        {
+            return new EventMember(
+                source: this,
+                attributes: attributes,
+                shouldReplaceSource: shouldReplaceSource);
+        }
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {

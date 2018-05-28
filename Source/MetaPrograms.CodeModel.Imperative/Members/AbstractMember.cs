@@ -57,6 +57,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
+        public abstract AbstractMember WithAttributes(ImmutableList<AttributeDescription> attributes, bool shouldReplaceSource = false);
+
         //public bool HasAttribute<TAttribute>()
         //    where TAttribute : Attribute
         //{

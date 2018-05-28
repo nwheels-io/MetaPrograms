@@ -71,12 +71,12 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
             public override bool Equals(TypeMember other)
             {
-                throw new NotSupportedException("TemporaryTypeMember does not support Equals");
+                throw new NotSupportedException("TypeMemberProxy does not support Equals");
             }
 
             public override TypeMember MakeGenericType(params TypeMember[] typeArguments)
             {
-                throw new NotSupportedException("TemporaryTypeMember does not support MakeGenericType");
+                throw new NotSupportedException("TypeMemberProxy does not support MakeGenericType");
             }
 
             public override string AssemblyName => _builder.AssemblyName;
@@ -118,6 +118,19 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             public override ImmutableList<MemberRef<AbstractMember>> Members => _builder.Members.ToImmutableList();
 
             public override TypeGeneratorInfo Generator => _builder.Generator;
+
+            public override AbstractMember WithAttributes(ImmutableList<AttributeDescription> attributes, bool shouldReplaceSource = false)
+            {
+                if (!shouldReplaceSource)
+                {
+                    throw new NotSupportedException("Parameter shouldReplaceSource must be true because TypeMemberProxy cannot create copies");
+                }
+                
+                _builder.Attributes.Clear();
+                _builder.Attributes.AddRange(attributes);
+                
+                return this;
+            }
 
             public override string Name => _builder.Name;
 

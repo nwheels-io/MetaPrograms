@@ -119,6 +119,21 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return new RealTypeMember(this, mutator);
         }
 
+        public override AbstractMember WithAttributes(ImmutableList<AttributeDescription> attributes, bool shouldReplaceSource = false)
+        {
+            var mutator = new TypeMemberMutatorBuilder();
+            mutator.Attributes = attributes.ToList();
+
+            var mutatedType = new RealTypeMember(this, mutator);
+
+            if (shouldReplaceSource)
+            {
+                SelfReference.Reassign(mutatedType);
+            }
+
+            return mutatedType;
+        }
+
         public override void AcceptVisitor(MemberVisitor visitor)
         {
             base.AcceptVisitor(visitor);

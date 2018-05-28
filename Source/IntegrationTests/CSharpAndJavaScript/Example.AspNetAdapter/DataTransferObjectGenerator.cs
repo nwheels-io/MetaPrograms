@@ -1,7 +1,7 @@
 ﻿using CommonExtensions;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
-using static MetaPrograms.CodeModel.Imperative.CodeGenerator;
+using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
 
 namespace Example.AspNetAdapter
 {

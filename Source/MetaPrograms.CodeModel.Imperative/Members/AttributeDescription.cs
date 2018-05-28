@@ -10,7 +10,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public AttributeDescription(
             MemberRef<TypeMember> attributeType, 
             ImmutableList<AbstractExpression> constructorArguments, 
-            ImmutableList<PropertyValue> propertyValues)
+            ImmutableList<NamedPropertyValue> propertyValues)
         {
             AttributeType = attributeType;
             ConstructorArguments = constructorArguments;
@@ -21,7 +21,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             AttributeDescription source,
             Mutator<MemberRef<TypeMember>>? attributeType,
             Mutator<ImmutableList<AbstractExpression>>? constructorArguments,
-            Mutator<ImmutableList<PropertyValue>>? propertyValues)
+            Mutator<ImmutableList<NamedPropertyValue>>? propertyValues)
         {
             AttributeType = attributeType.MutatedOrOriginal(source.AttributeType);
             ConstructorArguments = constructorArguments.MutatedOrOriginal(source.ConstructorArguments);
@@ -35,18 +35,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public MemberRef<TypeMember> AttributeType { get; }
         public ImmutableList<AbstractExpression> ConstructorArguments { get; }
-        public ImmutableList<PropertyValue> PropertyValues { get; }
-    }
-
-    public class PropertyValue
-    {
-        public PropertyValue(string name, AbstractExpression value)
-        {
-            Name = name;
-            Value = value;
-        }
-
-        public string Name { get; }
-        public AbstractExpression Value { get; }
+        public ImmutableList<NamedPropertyValue> PropertyValues { get; }
     }
 }

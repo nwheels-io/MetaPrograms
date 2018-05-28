@@ -3,7 +3,7 @@ using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using static MetaPrograms.CodeModel.Imperative.CodeGenerator;
+using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
 
 namespace Example.AspNetAdapter
 {

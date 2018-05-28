@@ -25,10 +25,10 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public FieldMember(
             FieldMember source,
-            Mutator<MemberRef<TypeMember>>? type,
-            Mutator<FieldInfo>? clrBinding,
-            Mutator<bool>? isReadOnly,
-            Mutator<AbstractExpression>? initializer, 
+            Mutator<MemberRef<TypeMember>>? type = null,
+            Mutator<FieldInfo>? clrBinding = null,
+            Mutator<bool>? isReadOnly = null,
+            Mutator<AbstractExpression>? initializer = null, 
             Mutator<string>? name = null, 
             Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
@@ -44,6 +44,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         }
 
         public MemberRef<FieldMember> GetRef() => new MemberRef<FieldMember>(SelfReference);
+
+        public override AbstractMember WithAttributes(ImmutableList<AttributeDescription> attributes, bool shouldReplaceSource = false)
+        {
+            return new FieldMember(
+                source: this,
+                attributes: attributes,
+                shouldReplaceSource: shouldReplaceSource);
+        }
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {
