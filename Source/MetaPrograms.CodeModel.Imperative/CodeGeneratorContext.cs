@@ -66,6 +66,18 @@ namespace MetaPrograms.CodeModel.Imperative
             return state;
         }
 
+        public bool TryPeekState<TState>(out TState state)
+        {
+            if (_stateStack.Count > 0 && _stateStack.Peek() is TState foundState)
+            {
+                state = foundState;
+                return true;
+            }
+
+            state = default;
+            return false;
+        }
+
         public TState TryLookupState<TState>()
         {
             return _stateStack.OfType<TState>().FirstOrDefault();

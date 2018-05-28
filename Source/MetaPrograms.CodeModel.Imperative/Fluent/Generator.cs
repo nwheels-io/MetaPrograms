@@ -33,28 +33,17 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public static void ATTRIBUTE(TypeMember type, params object[] constructorArgumentsAndBody)
         {
             var context = GetContextOrThrow();
-            var member = context.GetCurrentMember();
-            var attributeContext = new AttributeContext();
+            var attribute = FluentHelpers.BuildAttribute(context, type, constructorArgumentsAndBody);
 
-            var body = constructorArgumentsAndBody.OfType<Action>().FirstOrDefault();
-            var constructorArguments = constructorArgumentsAndBody
-                .Where(x => !(x is Action))
-                .Select(context.GetConstantExpression);
-            
-            if (body != null)
+            if (context.TryPeekState<TypeMemberBuilder>(out var builder))
             {
-                using (context.PushState(attributeContext))
-                {
-                    body();
-                }
+                builder.Attributes.Add(attribute);
             }
-
-            var newAttribute = new AttributeDescription(
-                type.GetRef(), 
-                constructorArguments.ToImmutableList(), 
-                attributeContext.NamedProperties.ToImmutableList());
-            
-            member.WithAttributes(member.Attributes.Add(newAttribute), shouldReplaceSource: true);
+            else
+            {
+                var member = context.GetCurrentMember();
+                member.WithAttributes(member.Attributes.Add(attribute), shouldReplaceSource: true);
+            }
         }
 
         public static void NAMED(string name, object value)

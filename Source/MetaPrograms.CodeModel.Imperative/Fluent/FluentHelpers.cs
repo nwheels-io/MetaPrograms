@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Immutable;
+using System.Linq;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
+using static MetaPrograms.CodeModel.Imperative.CodeGeneratorContext;
 
 namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
@@ -18,6 +21,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             builder.Name = name;
             builder.TypeKind = typeKind;
             builder.DeclaringType = containingTypeRef;
+            builder.Modifier = traits.Modifier;
+            builder.Visibility = traits.Visibility;
 
             using (context.PushState(builder))
             {
@@ -28,5 +33,57 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             builder.GetMemberSelfReference().Reassign(finalMember);
             return finalMember;
         }
+
+        public static AttributeDescription BuildAttribute(CodeGeneratorContext context, TypeMember type, object[] constructorArgumentsAndBody)
+        {
+            var attributeContext = new AttributeContext();
+
+            var body = constructorArgumentsAndBody.OfType<Action>().FirstOrDefault();
+            var constructorArguments = constructorArgumentsAndBody
+                .Where(x => !(x is Action))
+                .Select(context.GetConstantExpression);
+
+            if (body != null)
+            {
+                using (context.PushState(attributeContext))
+                {
+                    body();
+                }
+            }
+
+            var newAttribute = new AttributeDescription(
+                type.GetRef(),
+                constructorArguments.ToImmutableList(),
+                attributeContext.NamedProperties.ToImmutableList());
+
+            return newAttribute;
+        }
+
+        //public static void BuildMemberAttribute(TypeMember type, object[] constructorArgumentsAndBody)
+        //{
+        //    var context = GetContextOrThrow();
+        //    var member = context.GetCurrentMember();
+        //    var attributeContext = new AttributeContext();
+
+        //    var body = constructorArgumentsAndBody.OfType<Action>().FirstOrDefault();
+        //    var constructorArguments = constructorArgumentsAndBody
+        //        .Where(x => !(x is Action))
+        //        .Select(context.GetConstantExpression);
+
+        //    if (body != null)
+        //    {
+        //        using (context.PushState(attributeContext))
+        //        {
+        //            body();
+        //        }
+        //    }
+
+        //    var newAttribute = new AttributeDescription(
+        //        type.GetRef(),
+        //        constructorArguments.ToImmutableList(),
+        //        attributeContext.NamedProperties.ToImmutableList());
+
+        //    member.WithAttributes(member.Attributes.Add(newAttribute), shouldReplaceSource: true);
+        //}
     }
 }
