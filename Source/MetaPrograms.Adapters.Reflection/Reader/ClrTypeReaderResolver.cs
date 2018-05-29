@@ -16,10 +16,15 @@ namespace MetaPrograms.Adapters.Reflection.Reader
             _baseModel = baseModel;
         }
 
-        public MemberRef<TypeMember> GetType(Type clrType, int distance = 0)
+        public MemberRef<TypeMember> GetType(Type clrType, int distance)
         {
             if (_baseModel.MembersByBndings.TryGetValue(clrType, out var member) && member is TypeMember type)
             {
+                if (type.Status == MemberStatus.Incomplete && distance == 0)
+                {
+                        
+                }
+                
                 return type.GetRef();
             }
             
@@ -33,7 +38,7 @@ namespace MetaPrograms.Adapters.Reflection.Reader
 
         public AbstractExpression GetConstantExpression(object value)
         {
-            return AbstractExpression.FromValue(value, resolveType: t => GetType(t).Get());
+            return AbstractExpression.FromValue(value, resolveType: t => GetType(t, distance: 0).Get());
         }
 
         public IReadOnlyDictionary<Type, MemberRef<TypeMember>> TypeMemberByClrType => _typeMemberByClrType;
@@ -41,7 +46,7 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         private TypeMember ReadAndRegisterMember(Type clrType, int distance)
         {
             var builder = new TypeMemberBuilder();
-            var reader = new ClrTypeReader(clrType, builder, resolver: this);
+            var reader = new ClrTypeReader(clrType, builder, resolver: this, distance);
 
             _typeMemberByClrType.Add(clrType, builder.GetTemporaryProxy().GetRef());
 
