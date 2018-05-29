@@ -18,6 +18,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.GenericArguments = new List<MemberRef<TypeMember>>();
             this.GenericParameters = new List<MemberRef<TypeMember>>();
             this.Members = new List<MemberRef<AbstractMember>>();
+            this.Status = MemberStatus.Incomplete;
 
             _temporaryProxy = new TypeMemberProxy(this);
             _memberSelfReference = _temporaryProxy.GetSelfReference();

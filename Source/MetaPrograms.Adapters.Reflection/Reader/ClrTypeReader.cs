@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace MetaPrograms.Adapters.Reflection.Reader
 {
     public class ClrTypeReader
     {
+        private const BindingFlags LookupBindingFlags =
+            BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+        
         public Type ClrType { get; } 
         public TypeMemberBuilder Builder { get; }
         public ClrTypeReaderResolver Resolver { get; }
@@ -20,19 +25,38 @@ namespace MetaPrograms.Adapters.Reflection.Reader
             this.Resolver = resolver;
         }
 
-        public void Read()
+        public void ReadNameOnly()
         {
             ReadName();
-            ReadGenerics();
-            ReadAncestors();
-            ReadAttributes();
+        }
+
+        public void ReadAll()
+        {
+            ReadName();
+
+            if (Builder.TypeKind != TypeMemberKind.GenericParameter)
+            {
+                ReadGenerics();
+                ReadAncestors();
+                ReadAttributes();
+
+                if (Builder.TypeKind != TypeMemberKind.Primitive)
+                {
+                    ReadMembers();
+                }
+            }
+
+            Builder.Status = MemberStatus.Compiled;
         }
 
         private void ReadName()
         {
-            Builder.AssemblyName = ClrType.Assembly.GetName().Name;
-            Builder.Namespace = ClrType.Namespace;
+            Builder.TypeKind = ReadTypeKind();
             Builder.Name = ClrType.Name;
+            Builder.Namespace = ClrType.Namespace;
+            Builder.AssemblyName = ClrType.Assembly.GetName().Name;
+            Builder.Visibility = ReadVisibility();
+            Builder.Modifier = ReadModifier();
         }
 
         private void ReadGenerics()
@@ -79,10 +103,132 @@ namespace MetaPrograms.Adapters.Reflection.Reader
 
         private AttributeDescription ReadAttribute(CustomAttributeData clrAttribute)
         {
-            return new AttributeDescription(
-                Resolver.GetType(clrAttribute.AttributeType),
-                clrAttribute.ConstructorArguments.Select())
+            var attributeType = Resolver.GetType(clrAttribute.AttributeType); 
             
+            var constructorArguments = clrAttribute.ConstructorArguments
+                .Select(arg => Resolver.GetConstantExpression(arg.Value));
+
+            var namedArguments = clrAttribute.NamedArguments
+                .Select(arg => new NamedPropertyValue(
+                    arg.MemberName, 
+                    Resolver.GetConstantExpression(arg.TypedValue.Value)));
+
+            return new AttributeDescription(
+                attributeType,
+                constructorArguments.ToImmutableList(),
+                namedArguments.ToImmutableList());
+        }
+
+        private void ReadMembers()
+        {
+            ReadFields();
+            ReadConstructors();
+            ReadMethods();
+            ReadProperties();
+            ReadEvents();
+        }
+
+        private TypeMemberKind ReadTypeKind()
+        {
+            if (ClrType.IsClass)
+            {
+                return TypeMemberKind.Class;
+            }
+            
+            if (ClrType.IsEnum)
+            {
+                return TypeMemberKind.Enum;
+            }
+
+            if (ClrType.IsValueType)
+            {
+                return (ClrType.IsPrimitive ? TypeMemberKind.Primitive : TypeMemberKind.Struct);
+            }
+
+            if (ClrType.IsInterface)
+            {
+                return TypeMemberKind.Enum;
+            }
+
+            if (ClrType.IsGenericParameter)
+            {
+                return TypeMemberKind.GenericParameter;
+            }
+            
+            throw new NotSupportedException($"CLR type '{ClrType.FullName}' is not of a supported kind.");
+        }
+
+        private MemberVisibility ReadVisibility()
+        {
+            if (ClrType.IsNestedPrivate)
+            {
+                return MemberVisibility.Private;
+            }
+
+            if (ClrType.IsNestedAssembly)
+            {
+                return MemberVisibility.Internal;
+            }
+
+            if (ClrType.IsNestedFamORAssem)
+            {
+                return MemberVisibility.InternalProtected;
+            }
+
+            if (ClrType.IsNestedFamANDAssem)
+            {
+                return MemberVisibility.PrivateProtected;
+            }
+
+            return (
+                ClrType.IsPublic || ClrType.IsNestedPublic 
+                ? MemberVisibility.Public 
+                : MemberVisibility.Internal);
+        }
+
+        private MemberModifier ReadModifier()
+        {
+            return (ClrType.IsAbstract ? MemberModifier.Abstract : MemberModifier.None);
+        }
+
+        private void ReadFields()
+        {
+            foreach (var info in ClrType.GetFields(LookupBindingFlags))
+            {
+                
+            }
+        }
+
+        private void ReadConstructors()
+        {
+            foreach (var info in ClrType.GetConstructors(LookupBindingFlags))
+            {
+                
+            }
+        }
+
+        private void ReadMethods()
+        {
+            foreach (var info in ClrType.GetMethods(LookupBindingFlags))
+            {
+                
+            }
+        }
+
+        private void ReadProperties()
+        {
+            foreach (var info in ClrType.GetProperties(LookupBindingFlags))
+            {
+                
+            }
+        }
+
+        private void ReadEvents()
+        {
+            foreach (var info in ClrType.GetEvents(LookupBindingFlags))
+            {
+                
+            }
         }
     }
 }

@@ -163,28 +163,7 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public AbstractExpression GetConstantExpression(object value)
         {
-            if (value == null)
-            {
-                return new ConstantExpression(MemberRef<TypeMember>.Null, null);
-            }
-
-            if (value is AbstractExpression expr)
-            {
-                return expr;
-            }
-
-            var type = FindType(value.GetType());
-            
-            if (type.IsArray)
-            {
-                return new NewArrayExpression(
-                    type.GetRef(), 
-                    type.UnderlyingType, 
-                    GetConstantExpression(((IList)value).Count),
-                    ((IEnumerable)value).Cast<object>().Select(GetConstantExpression).ToImmutableList());
-            }
-            
-            return new ConstantExpression(type.GetRef(), value);
+            return AbstractExpression.FromValue(value, resolveType: this.FindType);
         }
 
         public ImmutableCodeModel OriginalCodeModel { get; }

@@ -2,6 +2,7 @@
 {
     public enum TypeMemberKind
     {
+        Primitive,
         Class,
         Struct,
         Enum,
