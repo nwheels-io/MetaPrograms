@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
@@ -12,11 +14,12 @@ namespace MetaPrograms.CodeModel.Imperative
     public class CodeGeneratorContext : IDisposable
     {
         private static readonly AsyncLocal<CodeGeneratorContext> Current = new AsyncLocal<CodeGeneratorContext>();
+
+        private readonly IClrTypeResolver _clrTypeResolver;
         private readonly Stack<object> _stateStack = new Stack<object>();
-        private readonly List<AbstractMember> _generatedMembers = new List<AbstractMember>();
-        private readonly Dictionary<object, AbstractMember> _generatedMembersByBindings = new Dictionary<object, AbstractMember>();
+        private readonly List<IMemberRef> _generatedMembers = new List<IMemberRef>();
         
-        public CodeGeneratorContext(ImmutableCodeModel originalCodeModel)
+        public CodeGeneratorContext(ImperativeCodeModel codeModel, IClrTypeResolver clrTypeResolver)
         {
             if (Current.Value != null)
             {
@@ -24,8 +27,10 @@ namespace MetaPrograms.CodeModel.Imperative
                     "Another instance of CodeGeneratorContext is already associated with the current call context.");
             }
 
+            _clrTypeResolver = clrTypeResolver;
+
             Current.Value = this;
-            this.OriginalCodeModel = originalCodeModel;
+            this.CodeModel = codeModel;
         }
 
         public void Dispose()
@@ -44,7 +49,10 @@ namespace MetaPrograms.CodeModel.Imperative
         public TState PopStateOrThrow<TState>()
         {
             var state = PeekStateOrThrow<TState>();
+
             _stateStack.Pop();
+            Debug.WriteLine($"CODE GENERATOR CONTEXT >> PopStateOrThrow >> POP {state.GetType().Name} >> COUNT = {_stateStack.Count}");
+
             return state;
         }
 
@@ -110,40 +118,30 @@ namespace MetaPrograms.CodeModel.Imperative
             return LookupStateOrThrow<IMemberRef>().Get();
         }
 
-        public void AddGeneratedMember(AbstractMember member)
-        {
-            _generatedMembers.Add(member);
-
-            foreach (var binding in member.Bindings)
-            {
-                _generatedMembersByBindings.Add(binding, member);
-            }
-        }
-
-        public TMember TryFindMember<TMember>(object binding)
+        public void AddGeneratedMember<TMember>(MemberRef<TMember> member, bool isTopLevel)
             where TMember : AbstractMember
         {
-            AbstractMember member;
+            _generatedMembers.Add(member);
+            this.CodeModel.Add(member, isTopLevel);
+        }
 
-            if (OriginalCodeModel.MembersByBndings.TryGetValue(binding, out member))
+        public bool TryFindMember<TMember>(object binding, out MemberRef<TMember> memberRef)
+            where TMember : AbstractMember
+        {
+            if (CodeModel.MembersByBndings.TryGetValue(binding, out var untypedMemberRef))
             {
-                return (TMember)member;
-            }
-            
-            if (_generatedMembersByBindings.TryGetValue(binding, out member))
-            {
-                return (TMember)member;
+                memberRef = untypedMemberRef.AsRef<TMember>();
+                return true;
             }
 
-            return null;
+            memberRef = default;
+            return false;
         }
 
         public TMember FindMemberOrThrow<TMember>(object binding)
             where TMember : AbstractMember
         {
-            var member = TryFindMember<TMember>(binding);
-
-            if (member != null)
+            if (TryFindMember<TMember>(binding, out var member))
             {
                 return member;
             }
@@ -151,14 +149,28 @@ namespace MetaPrograms.CodeModel.Imperative
             throw new KeyNotFoundException($"Could not find '{typeof(TMember).Name}' with binding '{binding}'.");
         }
 
-        public TypeMember FindType<T>()
+        public MemberRef<TypeMember> FindType<T>()
         {
-            return FindMemberOrThrow<TypeMember>(binding: typeof(T));
+            return FindType(typeof(T));
         }
 
-        public TypeMember FindType(Type clrType)
+        public MemberRef<TypeMember> FindType(Type clrType)
         {
-            return FindMemberOrThrow<TypeMember>(binding: clrType);
+            MemberRef<TypeMember> typeRef;
+
+            if (TryFindMember(binding: clrType, out typeRef))
+            {
+                if (typeRef.Get().Status == MemberStatus.Incomplete)
+                {
+                    _clrTypeResolver.Complete(typeRef, this.CodeModel);
+                }
+            }
+            else 
+            {
+                typeRef = _clrTypeResolver.Resolve(clrType, this.CodeModel, distance: 0);
+            }
+
+            return typeRef;
         }
 
         public AbstractExpression GetConstantExpression(object value)
@@ -166,10 +178,9 @@ namespace MetaPrograms.CodeModel.Imperative
             return AbstractExpression.FromValue(value, resolveType: this.FindType);
         }
 
-        public ImmutableCodeModel OriginalCodeModel { get; }
+        public ImperativeCodeModel CodeModel { get; }
+        public IEnumerable<IMemberRef> GeneratedMembers => _generatedMembers;
 
-        public ImmutableCodeModel GetGeneratedCodeModel() => new ImmutableCodeModel(_generatedMembers);
-        
         public static CodeGeneratorContext CurrentContext => Current.Value;
 
         public static CodeGeneratorContext GetContextOrThrow() => 
@@ -189,6 +200,7 @@ namespace MetaPrograms.CodeModel.Imperative
                 _stateStack = stateStack;
                 _state = state;
                 _stateStack.Push(state);
+                Debug.WriteLine($"CODE GENERATOR CONTEXT >> StackStateScope.ctor >> PUSH {_state.GetType().Name} >> COUNT = {_stateStack.Count}");
             }
 
             public void Dispose()
@@ -206,6 +218,7 @@ namespace MetaPrograms.CodeModel.Imperative
                 }
 
                 _stateStack.Pop();
+                Debug.WriteLine($"CODE GENERATOR CONTEXT >> StackStateScope.Dispose >> POP {_state.GetType().Name} >> COUNT = {_stateStack.Count}");
             }
         }
     }

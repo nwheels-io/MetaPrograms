@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\CommonExtensions\CommonExtensions.csproj" />
+    <ProjectReference Include="..\..\..\MetaPrograms.Adapters.Reflection\MetaPrograms.Adapters.Reflection.csproj" />
     <ProjectReference Include="..\..\..\MetaPrograms.Adapters.Roslyn\MetaPrograms.Adapters.Roslyn.csproj" />
     <ProjectReference Include="..\..\..\MetaPrograms.CodeModel.Imperative\MetaPrograms.CodeModel.Imperative.csproj" />
     <ProjectReference Include="..\Example.WebUIModel\Example.WebUIModel.csproj" />

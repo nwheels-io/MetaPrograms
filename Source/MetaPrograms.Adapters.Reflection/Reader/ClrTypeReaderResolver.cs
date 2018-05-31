@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if false
+
+using System;
 using System.Collections.Generic;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Expressions;
@@ -8,23 +10,20 @@ namespace MetaPrograms.Adapters.Reflection.Reader
 {
     public class ClrTypeReaderResolver
     {
-        private readonly ImmutableCodeModel _baseModel;
+        private readonly CodeModel.Imperative.ImperativeCodeModel _baseModel;
         private readonly Dictionary<Type, MemberRef<TypeMember>> _typeMemberByClrType = new Dictionary<Type, MemberRef<TypeMember>>();
 
-        public ClrTypeReaderResolver(ImmutableCodeModel baseModel)
+        public ClrTypeReaderResolver(CodeModel.Imperative.ImperativeCodeModel baseModel)
         {
             _baseModel = baseModel;
         }
 
         public MemberRef<TypeMember> GetType(Type clrType, int distance)
         {
+            //TODO: handle case of initially incomplete type, which is required later in full
+            
             if (_baseModel.MembersByBndings.TryGetValue(clrType, out var member) && member is TypeMember type)
             {
-                if (type.Status == MemberStatus.Incomplete && distance == 0)
-                {
-                        
-                }
-                
                 return type.GetRef();
             }
             
@@ -38,7 +37,7 @@ namespace MetaPrograms.Adapters.Reflection.Reader
 
         public AbstractExpression GetConstantExpression(object value)
         {
-            return AbstractExpression.FromValue(value, resolveType: t => GetType(t, distance: 0).Get());
+            return AbstractExpression.FromValue(value, resolveType: t => GetType(t, distance: 0));
         }
 
         public IReadOnlyDictionary<Type, MemberRef<TypeMember>> TypeMemberByClrType => _typeMemberByClrType;
@@ -66,3 +65,5 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         }
     }
 }
+
+#endif

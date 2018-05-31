@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using MetaPrograms.CodeModel.Imperative.Members;
+using static MetaPrograms.CodeModel.Imperative.CodeGeneratorContext;
 
 // ReSharper disable InconsistentNaming
 
@@ -66,15 +67,39 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public TypeMember INTERFACE(string name, Action body) 
             => FluentHelpers.BuildTypeMember(TypeMemberKind.Interface, name, body);
 
-        public void CONSTRUCTOR(Action body) { }
+        public void CONSTRUCTOR(Action body)
+        {
+            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
+        }
 
-        public void FUNCTION<TReturnType>(string name, Action body) { }
-        public void FUNCTION(TypeMember returnType, string name) { }
+        public void FUNCTION<TReturnType>(string name, Action body)
+        {
+            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
+        }
 
-        public void VOID(string name, Action body) { }
-        public void VOID(MethodMember ancestorMethod, Action body) { }
+        public void FUNCTION(TypeMember returnType, string name)
+        {
+            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
+        }
 
-        public FluentProperty PROPERTY<T>(string name, Action body = null) => null;
-        public FluentProperty PROPERTY(TypeMember type, string name, Action body = null) => null;
+        public void VOID(string name, Action body)
+        {
+            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
+        }
+
+        public void VOID(MethodMember ancestorMethod, Action body)
+        {
+            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
+        }
+
+        public void PROPERTY<T>(string name, Action body = null)
+        {
+            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
+        }
+
+        public void PROPERTY(TypeMember type, string name, Action body = null)
+        {
+            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
+        }
     }
 }

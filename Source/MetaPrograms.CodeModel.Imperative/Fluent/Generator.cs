@@ -30,7 +30,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             ATTRIBUTE(GetContextOrThrow().FindType<T>(), constructorArgumentsAndBody);
         }
 
-        public static void ATTRIBUTE(TypeMember type, params object[] constructorArgumentsAndBody)
+        public static void ATTRIBUTE(MemberRef<TypeMember> type, params object[] constructorArgumentsAndBody)
         {
             var context = GetContextOrThrow();
             var attribute = FluentHelpers.BuildAttribute(context, type, constructorArgumentsAndBody);

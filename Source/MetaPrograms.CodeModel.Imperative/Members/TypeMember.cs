@@ -78,6 +78,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public abstract TypeMember MakeGenericType(params TypeMember[] typeArguments);
 
+        public TypeMemberBuilder CreateCompletionBuilder()
+        {
+            return new TypeMemberBuilder(SelfReference);
+        }
+        
         public string MakeGenericName(string openBracket, string closeBracket, string commaSeparator)
         {
             if (!IsGenericType)

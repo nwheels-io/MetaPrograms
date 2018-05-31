@@ -154,5 +154,15 @@ namespace MetaPrograms.Adapters.Reflection
 
             return MemberModifier.None;
         }
+
+        public static MethodParameterModifier GetMethodParameterModifier(this ParameterInfo parameter)
+        {
+            if (parameter.ParameterType.IsByRef)
+            {
+                return (parameter.IsOut ? MethodParameterModifier.Out : MethodParameterModifier.Ref);
+            }
+
+            return MethodParameterModifier.None;
+        }
     }
 }

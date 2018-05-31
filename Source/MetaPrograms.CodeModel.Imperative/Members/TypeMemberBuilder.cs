@@ -12,6 +12,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         private readonly MemberRefState _memberSelfReference;
 
         public TypeMemberBuilder()
+            : this(selfReference: null)
+        {
+        }
+
+        public TypeMemberBuilder(MemberRefState selfReference)
         {
             this.Attributes = new List<AttributeDescription>();
             this.Interfaces = new HashSet<MemberRef<TypeMember>>();
@@ -20,7 +25,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.Members = new List<MemberRef<AbstractMember>>();
             this.Status = MemberStatus.Incomplete;
 
-            _temporaryProxy = new TypeMemberProxy(this);
+            _temporaryProxy = new TypeMemberProxy(this, selfReference);
             _memberSelfReference = _temporaryProxy.GetSelfReference();
         }
 
@@ -59,8 +64,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         {
             private readonly TypeMemberBuilder _builder;
 
-            public TypeMemberProxy(TypeMemberBuilder builder)
-                : base(builder)
+            public TypeMemberProxy(TypeMemberBuilder builder, MemberRefState selfReference = null)
+                : base(builder, selfReference)
             {
                 _builder = builder;
             }

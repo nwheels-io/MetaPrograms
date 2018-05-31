@@ -1,16 +1,22 @@
-﻿using Example.WebUIModel.Metadata;
+﻿using System.Linq;
+using System.Runtime.CompilerServices;
+using Example.WebUIModel.Metadata;
+using MetaPrograms.Adapters.Reflection.Reader;
 using MetaPrograms.Adapters.Roslyn.Writer;
 using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms.CodeModel.Imperative.Members;
 using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
 
 namespace Example.AspNetAdapter
 {
     public class AspNetAdapter
     {
-        private readonly ImmutableCodeModel _codeModel;
+        private readonly ImperativeCodeModel _codeModel;
         private readonly ICodeGeneratorOutput _output;
+        private CodeGeneratorContext _context;
+        private MemberRef<TypeMember> _middlewareType;
 
-        public AspNetAdapter(ImmutableCodeModel codeModel, ICodeGeneratorOutput output)
+        public AspNetAdapter(ImperativeCodeModel codeModel, ICodeGeneratorOutput output)
         {
             _codeModel = codeModel;
             _output = output;
@@ -18,34 +24,35 @@ namespace Example.AspNetAdapter
 
         public void GenerateImplementations(WebUIMetadata ui)
         {
-            var writer = new RoslynCodeModelWriter(_output);
+            var writer = new RoslynCodeModelWriter(_codeModel, _output);
 
-            using (var context = new CodeGeneratorContext(_codeModel))
+            using (_context = new CodeGeneratorContext(_codeModel, new ClrTypeResolver()))
             {
                 GenerateInfrastructureTypes();
                 GenerateControllerTypes(ui);
 
-                writer.AddCodeModel(context.GetGeneratedCodeModel());
+                writer.AddMembers(_context.GeneratedMembers);
             }
 
             writer.WriteAll();
         }
 
-        private static void GenerateControllerTypes(WebUIMetadata ui)
+        private void GenerateInfrastructureTypes()
+        {
+            NAMESPACE(typeof(AspNetMiddlewareGenerator).Namespace, () => {
+                _middlewareType = AspNetMiddlewareGenerator.InvalidModelAutoResponderAttribute().GetRef();
+            });
+        }
+
+        private void GenerateControllerTypes(WebUIMetadata ui)
         {
             foreach (var api in ui.BackendApis)
             {
                 NAMESPACE($"{api.InterfaceType.Namespace}.WebApi", () => {
-                    WebApiControllerGenerator.WebApiController(api);
+                    WebApiControllerGenerator.WebApiController(_middlewareType, api);
                 });
             }
         }
 
-        private static void GenerateInfrastructureTypes()
-        {
-            NAMESPACE(typeof(AspNetMiddlewareGenerator).Namespace, () => {
-                AspNetMiddlewareGenerator.InvalidModelAutoResponderAttribute();
-            });
-        }
     }
 }

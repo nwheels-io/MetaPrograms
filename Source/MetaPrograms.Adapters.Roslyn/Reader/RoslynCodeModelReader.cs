@@ -29,7 +29,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             ReadAllTypes();
         }
 
-        public ImmutableCodeModel GetCodeModel() => ModelBuilder.GetCodeModel();
+        public CodeModel.Imperative.ImperativeCodeModel GetCodeModel() => ModelBuilder.GetCodeModel();
 
         public Workspace Workspace { get; }
         public CodeModelBuilder ModelBuilder { get; private set; }

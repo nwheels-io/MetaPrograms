@@ -8,12 +8,12 @@ namespace Example.WebUIModel.Metadata
 {
     public class WebPageMetadata
     {
-        private readonly ImmutableCodeModel _codeModel;
+        private readonly ImperativeCodeModel _imperativeCodeModel;
         private readonly IBackendApiRegistry _apiRegistry;
 
-        public WebPageMetadata(ImmutableCodeModel codeModel, IBackendApiRegistry apiRegistry, TypeMember pageClass)
+        public WebPageMetadata(ImperativeCodeModel imperativeCodeModel, IBackendApiRegistry apiRegistry, TypeMember pageClass)
         {
-            _codeModel = codeModel;
+            _imperativeCodeModel = imperativeCodeModel;
             _apiRegistry = apiRegistry;
 
             this.PageClass = pageClass;
@@ -37,7 +37,7 @@ namespace Example.WebUIModel.Metadata
                 .Select(m => m.Get())
                 .OfType<PropertyMember>()
                 .Where(IsComponentProperty)
-                .Select(property => new WebComponentMetadata(_codeModel, property))
+                .Select(property => new WebComponentMetadata(_imperativeCodeModel, property))
                 .ToImmutableArray();
 
             bool IsComponentProperty(PropertyMember property)

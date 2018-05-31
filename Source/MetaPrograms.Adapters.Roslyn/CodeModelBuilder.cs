@@ -123,9 +123,9 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public ImmutableArray<Compilation> GetCompilations() => _compilations;
 
-        public ImmutableCodeModel GetCodeModel()
+        public ImperativeCodeModel GetCodeModel()
         {
-            return new ImmutableCodeModel(_topLevelMembers.Select(m => m.Get()), _memberByBinding);
+            return new ImperativeCodeModel(_topLevelMembers.Select(m => m.Get()), _memberByBinding);
         }
 
         private static IEnumerable<Compilation> WithReferencedCompilations(Compilation[] knownCompilations)

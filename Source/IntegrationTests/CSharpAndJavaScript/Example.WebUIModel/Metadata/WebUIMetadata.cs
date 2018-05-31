@@ -9,12 +9,12 @@ namespace Example.WebUIModel.Metadata
 {
     public class WebUIMetadata : IBackendApiRegistry
     {
-        private readonly ImmutableCodeModel _codeModel;
+        private readonly ImperativeCodeModel _imperativeCodeModel;
         private readonly Dictionary<TypeMember, WebApiMetadata> _backendApiByType = new Dictionary<TypeMember, WebApiMetadata>();
         
-        public WebUIMetadata(ImmutableCodeModel codeModel)
+        public WebUIMetadata(ImperativeCodeModel imperativeCodeModel)
         {
-            _codeModel = codeModel;
+            _imperativeCodeModel = imperativeCodeModel;
             
             this.Pages = DiscoverWebPages();
             this.BackendApis = _backendApiByType.Values.ToImmutableArray();
@@ -30,14 +30,15 @@ namespace Example.WebUIModel.Metadata
                 return existingApi;
             }
             
-            var newApi = new WebApiMetadata(_codeModel, interfaceType);
+            var newApi = new WebApiMetadata(_imperativeCodeModel, interfaceType);
             _backendApiByType.Add(interfaceType, newApi);
             return newApi;
         }
 
         private ImmutableArray<WebPageMetadata> DiscoverWebPages()
         {
-            var webPageClasses = _codeModel.TopLevelMembers
+            var webPageClasses = _imperativeCodeModel.TopLevelMembers
+                .Select(m => m.Get())
                 .OfType<TypeMember>()
                 .Where(t => t.TypeKind == TypeMemberKind.Class)
                 .Where(IsWebPageClass)
@@ -49,7 +50,7 @@ namespace Example.WebUIModel.Metadata
             }
 
             return webPageClasses
-                .Select(pageClass => new WebPageMetadata(_codeModel, this, pageClass))
+                .Select(pageClass => new WebPageMetadata(_imperativeCodeModel, this, pageClass))
                 .ToImmutableArray();
         }
 

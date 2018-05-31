@@ -8,11 +8,11 @@ namespace Example.WebUIModel.Metadata
 {
     public class WebComponentMetadata
     {
-        private readonly ImmutableCodeModel _codeModel;
+        private readonly ImperativeCodeModel _imperativeCodeModel;
 
-        public WebComponentMetadata(ImmutableCodeModel codeModel, PropertyMember declaredProperty)
+        public WebComponentMetadata(ImperativeCodeModel imperativeCodeModel, PropertyMember declaredProperty)
         {
-            _codeModel = codeModel;
+            _imperativeCodeModel = imperativeCodeModel;
 
             this.DeclaredProperty = declaredProperty;
             this.ComponentClass = declaredProperty.PropertyType;

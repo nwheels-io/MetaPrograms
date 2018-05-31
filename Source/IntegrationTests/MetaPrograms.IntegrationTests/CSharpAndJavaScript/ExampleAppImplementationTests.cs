@@ -7,6 +7,8 @@ using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.Roslyn;
 using MetaPrograms.Adapters.Roslyn.Reader;
+using MetaPrograms.CodeModel.Imperative;
+using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using Shouldly;
 
@@ -20,13 +22,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
         {
             // arrange
             
-            var loader = new BuildalyzerWorkspaceLoader();
-            var workspace = loader.LoadWorkspace(new[] {
-                GetExampleProjectFilePath("Example.App"),
-            });
-            workspace.AddAssemblyReferences(new[] {
-                typeof(WebUIMetadata).Assembly.Location
-            });
+            var workspace = LoadExampleWebAppWorkspace();
 
             // act & assert
             
@@ -34,38 +30,70 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
         }
 
         [Test]
-        public void CanGenerateImplementations()
+        public void CanGenerateFrontEndImplementation()
         {
             // arrange
             
+            var workspace = LoadExampleWebAppWorkspace();
+
+            // act
+            
+            var codeModel = ReadCodeModel(workspace);
+            var uiMetadata = new WebUIMetadata(codeModel);
+            
+            var output = new TestCodeGeneratorOutput();
+            var adapter = new WebBrowserAdapter(output);
+            adapter.GenerateImplementations(uiMetadata);
+
+            // assert
+
+            AssertOutputs(output.SourceFiles, "index.html", "index.js", "tinyfx.js");
+        }
+
+        [Test]
+        public void CanGenerateBackEndImplementation()
+        {
+            // arrange
+            
+            var workspace = LoadExampleWebAppWorkspace();
+
+            // act
+            
+            var codeModel = ReadCodeModel(workspace);
+            var uiMetadata = new WebUIMetadata(codeModel);
+            
+            var output = new TestCodeGeneratorOutput();
+            var adapter = new AspNetAdapter(codeModel, output);
+            adapter.GenerateImplementations(uiMetadata);
+
+            // assert
+
+            WriteOutputToDisk(output);
+
+            //AssertOutputs(backEndOutput.SourceFiles, "IndexController.cs", "InvalidModelAutoResponderAttribute.cs");
+        }
+
+        private Workspace LoadExampleWebAppWorkspace()
+        {
             var loader = new BuildalyzerWorkspaceLoader();
             var workspace = loader.LoadWorkspace(new[] {
                 GetExampleProjectFilePath("Example.App"),
             });
+
             workspace.AddAssemblyReferences(new[] {
                 typeof(WebUIMetadata).Assembly.Location
             });
 
-            // act
-            
+            return workspace;
+        }
+
+        private ImperativeCodeModel ReadCodeModel(Workspace workspace)
+        {
             var reader = new RoslynCodeModelReader(workspace);
             reader.Read();
 
             var codeModel = reader.GetCodeModel();
-            var uiMetadata = new WebUIMetadata(codeModel);
-            
-            var frontEndOutput = new TestCodeGeneratorOutput();
-            var frontEndAdapter = new WebBrowserAdapter(frontEndOutput);
-            frontEndAdapter.GenerateImplementations(uiMetadata);
-            
-            var backEndOutput = new TestCodeGeneratorOutput();
-            var backEndAdapter = new AspNetAdapter(codeModel, backEndOutput);
-            backEndAdapter.GenerateImplementations(uiMetadata);
-
-            // assert
-
-            AssertOutputs(frontEndOutput.SourceFiles, "index.html", "index.js", "tinyfx.js");
-            AssertOutputs(backEndOutput.SourceFiles, "IndexController.cs", "InvalidModelAutoResponderAttribute.cs");
+            return codeModel;
         }
 
         private void AssertOutputs(ImmutableDictionary<string, Stream> outputs, params string[] expectedFileNames)
@@ -80,6 +108,29 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             foreach (var fileName in expectedFileNames)
             {
                 outputs[fileName].ShouldMatchTextFile(Path.Combine(expectedOutputsDirectory, fileName));
+            }
+        }
+
+        private void WriteOutputToDisk(TestCodeGeneratorOutput output)
+        {
+            var outputPath = @"C:\temp\codegen";
+            
+            foreach (var pair in output.SourceFiles)
+            {
+                var filePath = Path.Combine(outputPath, pair.Key);
+                var folderPath = Path.GetDirectoryName(filePath);
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                using (var file = File.Create(filePath))
+                {
+                    pair.Value.Position = 0;
+                    pair.Value.CopyTo(file);
+                    file.Flush();
+                }
             }
         }
 

@@ -1,7 +1,10 @@
-﻿namespace MetaPrograms.CodeModel.Imperative
+﻿using System;
+using System.Collections.Generic;
+
+namespace MetaPrograms.CodeModel.Imperative
 {
     public interface ICodeGeneratorOutput
     {
-        void AddSourceFile(string[] folderPath, string fileName, string contents);
+        void AddSourceFile(IEnumerable<string> folderPath, string fileName, string contents);
     }
 }

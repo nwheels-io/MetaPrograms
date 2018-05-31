@@ -98,8 +98,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public virtual MemberModifier Modifier { get; }
         public virtual ImmutableList<AttributeDescription> Attributes { get; }
 
-        public MemberRef<AbstractMember> GetRefAsAbstract() => new MemberRef<AbstractMember>(SelfReference);
-
+        public MemberRef<AbstractMember> GetAbstractRef() => new MemberRef<AbstractMember>(SelfReference);
         protected MemberRefState SelfReference { get; }
     }
 }

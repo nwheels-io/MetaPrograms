@@ -117,7 +117,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _memberReaders.ForEach(reader => {
                 reader.ReadDeclaration();
                 reader.Member.Bindings.Add(reader.Symbol);
-                MemberBuilder.Members.Add(reader.Member.GetRefAsAbstract());
+                MemberBuilder.Members.Add(reader.Member.GetAbstractRef());
             });
         }
 

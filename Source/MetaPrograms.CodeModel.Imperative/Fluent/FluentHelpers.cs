@@ -24,6 +24,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             builder.Modifier = traits.Modifier;
             builder.Visibility = traits.Visibility;
 
+            context.AddGeneratedMember(builder.GetTemporaryProxy().GetRef(), isTopLevel: containingTypeRef.IsNull);
+
             using (context.PushState(builder))
             {
                 body?.Invoke();

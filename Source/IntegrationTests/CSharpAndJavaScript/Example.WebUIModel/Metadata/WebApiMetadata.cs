@@ -7,11 +7,11 @@ namespace Example.WebUIModel.Metadata
 {
     public class WebApiMetadata
     {
-        private readonly ImmutableCodeModel _codeModel;
+        private readonly ImperativeCodeModel _imperativeCodeModel;
 
-        public WebApiMetadata(ImmutableCodeModel codeModel, TypeMember interfaceType)
+        public WebApiMetadata(ImperativeCodeModel imperativeCodeModel, TypeMember interfaceType)
         {
-            _codeModel = codeModel;
+            _imperativeCodeModel = imperativeCodeModel;
             
             this.InterfaceType = interfaceType;
             this.ApiMethods = DiscoverApiMethods();

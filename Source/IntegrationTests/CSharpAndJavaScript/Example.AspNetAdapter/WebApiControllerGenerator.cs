@@ -18,7 +18,7 @@ namespace Example.AspNetAdapter
     public static class WebApiControllerGenerator
     {
         //TODO: add detection & resolution of duplicate names
-        public static TypeMember WebApiController(WebApiMetadata api) =>
+        public static TypeMember WebApiController(MemberRef<TypeMember> middlewareType, WebApiMetadata api) =>
             PUBLIC.CLASS($"{api.InterfaceType.Name.TrimPrefix("I")}Controller", () => {
                 EXTENDS<Controller>();
                 ATTRIBUTE<RouteAttribute>("api/[controller]");
@@ -32,10 +32,9 @@ namespace Example.AspNetAdapter
 
                 api.ApiMethods.ForEach(apiMethod => {
                     var requestClass = DataTransferObjectGenerator.MethodInvocation(apiMethod);
-                    var invalidModelAttributeClass = AspNetMiddlewareGenerator.InvalidModelAutoResponderAttribute();
 
                     PUBLIC.ASYNC.FUNCTION<IActionResult>(apiMethod.Name, () => {
-                        ATTRIBUTE(invalidModelAttributeClass);
+                        ATTRIBUTE(middlewareType);
                         ATTRIBUTE<HttpPostAttribute>(apiMethod.Name.ToCamelCase());
                         PARAMETER(requestClass, "requestData", out MethodParameter @requestData, () => {
                             ATTRIBUTE<FromBodyAttribute>();

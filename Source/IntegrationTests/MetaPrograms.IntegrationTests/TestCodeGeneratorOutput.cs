@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using MetaPrograms.CodeModel.Imperative;
@@ -12,9 +14,9 @@ namespace MetaPrograms.IntegrationTests
             SourceFiles = ImmutableDictionary<string, Stream>.Empty;
         }
 
-        public void AddSourceFile(string[] folderPath, string fileName, string contents)
+        public void AddSourceFile(IEnumerable<string> folderPath, string fileName, string contents)
         {
-            var filePath = string.Join('/', folderPath.Concat(new[] {fileName}));
+            var filePath = Path.Combine(folderPath.Concat(new[] { fileName }).ToArray());
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             
