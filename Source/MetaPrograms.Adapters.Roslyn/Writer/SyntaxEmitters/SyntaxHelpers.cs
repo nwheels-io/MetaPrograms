@@ -219,7 +219,8 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
             if (!string.IsNullOrEmpty(type.Namespace))
             {
-                var isNamespaceImported = IsTypeNamespaceImported(type);
+                //TODO: handle namespace imports
+                var isNamespaceImported = false;//IsTypeNamespaceImported(type);
 
                 if (!isNamespaceImported)
                 {
@@ -232,20 +233,20 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
-        private static bool IsTypeNamespaceImported(TypeMember type)
-        {
-            if (type.SafeBackendTag().IsNamespaceImported)
-            {
-                return true;
-            }
-
-            if (type.IsGenericType && type.GenericTypeDefinition.IsNotNull)
-            {
-                return IsTypeNamespaceImported(type.GenericTypeDefinition);
-            }
-
-            return false;
-        }
+        // private static bool IsTypeNamespaceImported(TypeMember type)
+        // {
+        //     if (type.SafeBackendTag().IsNamespaceImported)
+        //     {
+        //         return true;
+        //     }
+        //
+        //     if (type.IsGenericType && type.GenericTypeDefinition.IsNotNull)
+        //     {
+        //         return IsTypeNamespaceImported(type.GenericTypeDefinition);
+        //     }
+        //
+        //     return false;
+        // }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 

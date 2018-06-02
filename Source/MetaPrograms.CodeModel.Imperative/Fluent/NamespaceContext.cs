@@ -1,4 +1,6 @@
-﻿namespace MetaPrograms.CodeModel.Imperative.Fluent
+﻿using System.Collections.Generic;
+
+namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public class NamespaceContext
     {
@@ -6,7 +8,7 @@
         {
             Name = name;
         }
-
+        
         public string Name { get; }
     }
 }

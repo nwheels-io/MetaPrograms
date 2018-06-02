@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if false
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
@@ -78,3 +80,5 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
         }
     }
 }
+
+#endif

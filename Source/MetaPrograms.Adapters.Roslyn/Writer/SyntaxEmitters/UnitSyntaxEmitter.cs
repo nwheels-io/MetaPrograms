@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis;
@@ -10,12 +11,12 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace MetaPrograms.Adapters.Roslyn.Writer
 {
-    public class FileSyntaxBuilder
+    public class UnitSyntaxEmitter
     {
         private readonly ImperativeCodeModel _codeModel;
         private readonly TypeMember _type;
 
-        public FileSyntaxBuilder(ImperativeCodeModel codeModel, TypeMember type)
+        public UnitSyntaxEmitter(ImperativeCodeModel codeModel, TypeMember type)
         {
             _codeModel = codeModel;
             _type = type;
@@ -27,7 +28,7 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
                 .WithMembers(
                     SingletonList<MemberDeclarationSyntax>(
                         NamespaceDeclaration(CreateQualifiedNameSyntax(_type.Namespace.Split('.')))
-                            .WithMembers(SingletonList(MemberSyntaxBuilder.GetSyntax(_type)))
+                            .WithMembers(SingletonList(TypeSyntaxEmitter.GetSyntax(_type)))
                     )
                 )
                 .NormalizeWhitespace();
@@ -50,6 +51,5 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
                     );
             }
         }
-
     }
 }

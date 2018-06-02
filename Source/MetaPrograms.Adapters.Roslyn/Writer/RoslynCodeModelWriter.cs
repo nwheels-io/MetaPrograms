@@ -47,7 +47,7 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
 
         private void WriteType(TypeMember type, IList<string> commonNamespaceParts)
         {
-            var syntaxBuilder = new FileSyntaxBuilder(_codeModel, type);
+            var syntaxBuilder = new UnitSyntaxEmitter(_codeModel, type);
             var syntaxTree = syntaxBuilder.BuildSyntaxTree();
 
             var subFolderParts = GetSubFolder(type, commonNamespaceParts);

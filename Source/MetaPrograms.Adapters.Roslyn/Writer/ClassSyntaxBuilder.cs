@@ -1,4 +1,6 @@
-﻿using MetaPrograms.CodeModel.Imperative.Members;
+﻿#if false
+
+using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -16,3 +18,5 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
         }
     }
 }
+
+#endif
