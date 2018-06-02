@@ -113,6 +113,11 @@ namespace MetaPrograms.CodeModel.Imperative
             return LookupStateOrThrow<MemberRef<TypeMember>>().Get();
         }
 
+        public TypeMemberBuilder GetCurrentTypeBuilder()
+        {
+            return LookupStateOrThrow<TypeMemberBuilder>();
+        }
+
         public AbstractMember GetCurrentMember()
         {
             return LookupStateOrThrow<IMemberRef>().Get();

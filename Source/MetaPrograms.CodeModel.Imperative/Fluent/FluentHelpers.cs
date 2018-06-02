@@ -61,6 +61,11 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             return newAttribute;
         }
 
+        // public static TMember BuildMethodMember<TMember>(string name, TypeMember returnType, Action body)
+        // {
+        //     
+        // }
+
         //public static void BuildMemberAttribute(TypeMember type, object[] constructorArgumentsAndBody)
         //{
         //    var context = GetContextOrThrow();

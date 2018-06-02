@@ -44,6 +44,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 traits.IsReadonly,
                 initializer: null);
 
+            context.GetCurrentTypeBuilder().Members.Add(member.GetAbstractRef());
+            
             using (context.PushState(member.GetRef()))
             {
                 body?.Invoke();
@@ -67,9 +69,35 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public TypeMember INTERFACE(string name, Action body) 
             => FluentHelpers.BuildTypeMember(TypeMemberKind.Interface, name, body);
 
-        public void CONSTRUCTOR(Action body)
+        public ConstructorMember CONSTRUCTOR(Action body)
         {
-            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
+            var context = CodeGeneratorContext.GetContextOrThrow();
+            var declaringTypeBuilder = context.GetCurrentTypeBuilder();
+            var declaringType = context.GetCurrentType();
+            var traits = GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
+            var member = new ConstructorMember(
+                name: "constructor", 
+                declaringTypeBuilder.GetTemporaryProxy().GetRef(),  //??declaringType.GetRef(), 
+                MemberStatus.Generator, 
+                traits.Visibility,
+                traits.Modifier,
+                ImmutableList<AttributeDescription>.Empty,
+                new MethodSignature(
+                    isAsync: false, 
+                    returnValue: null, 
+                    parameters: ImmutableList<MethodParameter>.Empty),
+                body: null,
+                callThisConstructor: null,
+                callBaseConstructor: null);
+            
+            declaringTypeBuilder.Members.Add(member.GetAbstractRef());
+
+            using (context.PushState(member.GetRef()))
+            {
+                body?.Invoke();
+            }
+
+            return member;
         }
 
         public void FUNCTION<TReturnType>(string name, Action body)
