@@ -1,3 +1,5 @@
+#if false
+
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -67,3 +69,5 @@ namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
         }
     }
 }
+
+#endif

@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿#if false
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
@@ -142,3 +144,5 @@ namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
         public delegate bool BoolSignatureWithRefOutParams(ref int num, out string str);
     }
 }
+
+#endif

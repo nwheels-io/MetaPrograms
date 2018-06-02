@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿#if false
+
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
@@ -362,3 +364,5 @@ namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
         }
     }
 }
+
+#endif

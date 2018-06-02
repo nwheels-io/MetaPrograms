@@ -1,4 +1,6 @@
-﻿using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
+﻿#if false
+
+using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 using System;
@@ -85,3 +87,5 @@ namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
         }
     }
 }
+
+#endif

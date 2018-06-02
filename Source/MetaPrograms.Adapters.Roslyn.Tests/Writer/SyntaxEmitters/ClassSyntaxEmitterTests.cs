@@ -1,4 +1,6 @@
-﻿using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
+﻿#if false
+
+using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative.Members;
 using System;
 using System.Collections.Generic;
@@ -438,3 +440,6 @@ namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
         }
     }
 }
+
+
+#endif

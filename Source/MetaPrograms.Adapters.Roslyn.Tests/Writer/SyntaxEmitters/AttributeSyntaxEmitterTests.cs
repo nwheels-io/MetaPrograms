@@ -1,16 +1,19 @@
-﻿using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
+﻿#if false
+
+using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Xunit;
+using NUnit.Framework;
 
 namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
 {
-    public class AttributeSyntaxEmitterTests : SyntaxEmittingTestBase
+    [TestFixture]
+    public class AttributeSyntaxEmitterTests
     {
-        [Fact]
+        [Test]
         public void AttributeWithNoValues()
         {
             //-- arrange 
@@ -30,7 +33,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
-        [Fact]
+        [Test]
         public void AttributeWithConstructorArguments()
         {
             //-- arrange
@@ -53,7 +56,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
-        [Fact]
+        [Test]
         public void AttributeWithPropertyValues()
         {
             //-- arrange
@@ -76,7 +79,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
-        [Fact]
+        [Test]
         public void AttributeWithMixOfArgumentsAndProperties()
         {
             //-- arrange
@@ -107,3 +110,5 @@ namespace TestAttributes
     {
     } 
 }
+
+#endif

@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿#if false
+
+using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative.Expressions;
@@ -351,3 +353,5 @@ namespace NWheels.Compilation.Adapters.Roslyn.UnitTests.SyntaxEmitters
         public class TestNestedType {  }
     }
 }
+
+#endif
