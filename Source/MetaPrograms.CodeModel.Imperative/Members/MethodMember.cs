@@ -45,6 +45,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 shouldReplaceSource: shouldReplaceSource);
         }
 
+        public override MethodMemberBase WithSignature(MethodSignature signature, bool shouldReplaceSource = false)
+        {
+            return new MethodMember(
+                source: this,
+                signature: signature,
+                shouldReplaceSource: shouldReplaceSource);
+        }
+
         public override void AcceptVisitor(MemberVisitor visitor)
         {
             base.AcceptVisitor(visitor);

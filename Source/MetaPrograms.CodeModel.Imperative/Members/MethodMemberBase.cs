@@ -42,6 +42,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public MemberRef<MethodMemberBase> GetRef() => new MemberRef<MethodMemberBase>(SelfReference);
 
+        public abstract MethodMemberBase WithSignature(MethodSignature signature, bool shouldReplaceSource = false);
+
         public override void AcceptVisitor(MemberVisitor visitor)
         {
             base.AcceptVisitor(visitor);

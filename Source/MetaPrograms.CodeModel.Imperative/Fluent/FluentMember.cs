@@ -76,7 +76,6 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             var declaringType = context.GetCurrentType();
             var traits = GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
             var member = new ConstructorMember(
-                name: "constructor", 
                 declaringTypeBuilder.GetTemporaryProxy().GetRef(),  //??declaringType.GetRef(), 
                 MemberStatus.Generator, 
                 traits.Visibility,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Net.Mime;
 using System.Reflection;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
@@ -80,12 +81,29 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static void PARAMETER<T>(string name, out MethodParameter @ref, Action body = null)
         {
-            @ref = null;
+            PARAMETER(GetContextOrThrow().FindType<T>(), name, out @ref, body);
         }
 
         public static void PARAMETER(TypeMember type, string name, out MethodParameter @ref, Action body = null)
         {
-            @ref = null;
+            var context = CodeGeneratorContext.GetContextOrThrow();
+            var method = (MethodMemberBase)context.GetCurrentMember();
+            var newParameter = new MethodParameter(
+                name, 
+                method.Signature.Parameters.Count,
+                type.GetRef(),
+                MethodParameterModifier.None,
+                ImmutableList<AttributeDescription>.Empty);
+            var newSignature = method.Signature.AddParameter(newParameter);
+
+            method = method.WithSignature(newSignature, shouldReplaceSource: true);
+
+            using (context.PushState(newParameter))
+            {
+                body?.Invoke();
+            }
+            
+            @ref = newParameter;
         }
 
         public static void LOCAL(TypeMember type, string name, out LocalVariable @ref)

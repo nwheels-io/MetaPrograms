@@ -8,7 +8,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     public class ConstructorMember : MethodMemberBase
     {
         public ConstructorMember(
-            string name,
             MemberRef<TypeMember> declaringType, 
             MemberStatus status, 
             MemberVisibility visibility, 
@@ -18,7 +17,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             BlockStatement body, 
             MethodCallExpression callThisConstructor, 
             MethodCallExpression callBaseConstructor) 
-            : base(name, declaringType, status, visibility, modifier, attributes, signature, body)
+            : base(name: "constructor", declaringType, status, visibility, modifier, attributes, signature, body)
         {
             CallThisConstructor = callThisConstructor;
             CallBaseConstructor = callBaseConstructor;
@@ -26,7 +25,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public ConstructorMember(
             ConstructorMember source,
-            Mutator<string>? name = null, 
             Mutator<MemberRef<TypeMember>>? declaringType = null, 
             Mutator<MemberStatus>? status = null, 
             Mutator<MemberVisibility>? visibility = null, 
@@ -37,7 +35,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Mutator<MethodCallExpression>? callThisConstructor = null,
             Mutator<MethodCallExpression>? callBaseConstructor = null,
             bool shouldReplaceSource = false) 
-            : base(source, name, declaringType, status, visibility, modifier, attributes, signature, body, shouldReplaceSource)
+            : base(source, name: null, declaringType, status, visibility, modifier, attributes, signature, body, shouldReplaceSource)
         {
             CallThisConstructor = callThisConstructor.MutatedOrOriginal(source.CallThisConstructor);
             CallBaseConstructor = callBaseConstructor.MutatedOrOriginal(source.CallBaseConstructor);
@@ -52,6 +50,15 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 attributes: attributes, 
                 shouldReplaceSource: shouldReplaceSource);
         }
+        
+        public override MethodMemberBase WithSignature(MethodSignature signature, bool shouldReplaceSource = false)
+        {
+            return new ConstructorMember(
+                source: this,
+                signature: signature,
+                shouldReplaceSource: shouldReplaceSource);
+        }
+
 
         public override void AcceptVisitor(MemberVisitor visitor)
         {

@@ -27,6 +27,13 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Parameters = parameters.MutatedOrOriginal(source.Parameters);
         }
 
+        public MethodSignature AddParameter(MethodParameter parameter)
+        {
+            return new MethodSignature(
+                this, 
+                parameters: this.Parameters.Add(parameter));
+        }
+        
         public bool IsVoid => (ReturnValue == null);
         public bool IsAsync { get; }
         public MemberRef<TypeMember> ReturnType => (IsVoid ? TypeMember.Void : ReturnValue.Type);

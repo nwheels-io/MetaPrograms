@@ -191,7 +191,6 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         private ConstructorMember ReadConstructor(ConstructorInfo info)
         {
             return new ConstructorMember(
-                info.Name,
                 _builder.GetTemporaryProxy().GetRef(),
                 MemberStatus.Compiled,
                 info.GetMemberVisibility(),

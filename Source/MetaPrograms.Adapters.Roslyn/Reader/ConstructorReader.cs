@@ -24,7 +24,6 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         public void ReadDeclaration()
         {
             _member = new ConstructorMember(
-                name: _symbol.Name, 
                 declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
                 status: MemberStatus.Incomplete,
                 visibility: _symbol.GetMemberVisibility(),
