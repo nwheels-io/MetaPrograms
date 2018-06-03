@@ -22,6 +22,18 @@
             return s;
         }
 
+        public static string TrimEndStartingWith(this string s, string subString)
+        {
+            int position;
+            
+            if (s != null && (position = s.IndexOf(subString)) >= 0)
+            {
+                return s.Substring(0, position);
+            }
+
+            return s;
+        }
+
         public static string ToCamelCase(this string s)
         {
             if (s?.Length > 0)

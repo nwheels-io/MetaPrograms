@@ -29,5 +29,16 @@ namespace CommonExtensions.Tests
         {
             input.TrimSuffix(suffix).ShouldBe(expectedOutput);
         }
+
+        [TestCase("abZZcd", "ZZ", "ab")]
+        [TestCase("abcd", "ZZ", "abcd")]
+        [TestCase("abZZ", "ZZ", "ab")]
+        [TestCase("ZZab", "ZZ", "")]
+        [TestCase("", "ZZ", "")]
+        [TestCase(null, "ZZ", null)]
+        public void CanTrimEndStartingWith(string input, string subString, string expectedOutput)
+        {
+            input.TrimEndStartingWith(subString).ShouldBe(expectedOutput);
+        }
     }
 }
