@@ -16,9 +16,9 @@ namespace Example.AspNetAdapter
                 PUBLIC.OVERRIDE.VOID("OnActionExecuting", () => {
                     PARAMETER<ActionExecutingContext>("context", out MethodParameter @context);
                     
-                    DO.IF(NOT(context.DOT("ModelState").DOT("Valid"))).THEN(() => {
-                        @context.DOT("Result").ASSIGN(NEW<BadRequestObjectResult>(@context.DOT("ModelState")));
-                    });
+                    // DO.IF(NOT(context.DOT("ModelState").DOT("Valid"))).THEN(() => {
+                    //     @context.DOT("Result").ASSIGN(NEW<BadRequestObjectResult>(@context.DOT("ModelState")));
+                    // });
                 });
             });
     }

@@ -4,6 +4,7 @@ using MetaPrograms.CodeModel.Imperative.Members;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.CodeAnalysis;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
@@ -36,9 +37,26 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
                 OutputSyntax = OutputSyntax.WithParameterList(MethodSignatureSyntaxEmitter.EmitParameterListSyntax(Member.Signature));
             }
 
+            if (Member.Attributes.Count > 0)
+            {
+                OutputSyntax = OutputSyntax.WithAttributeLists(EmitAttributeLists());
+            }
+            
             OutputSyntax = OutputSyntax.WithBody(Member.Body.ToSyntax());
 
             return OutputSyntax;
+        }
+
+        protected override SyntaxTokenList EmitMemberModifiers()
+        {
+            var baseList = base.EmitMemberModifiers();
+
+            if (Member.Signature.IsAsync)
+            {
+                return baseList.Add(Token(SyntaxKind.AsyncKeyword));
+            }
+
+            return baseList;
         }
     }
 }

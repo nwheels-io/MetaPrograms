@@ -33,21 +33,21 @@ namespace Example.AspNetAdapter
                 api.ApiMethods.ForEach(apiMethod => {
                     var requestClass = DataTransferObjectGenerator.MethodInvocation(apiMethod);
 
-                    PUBLIC.ASYNC.FUNCTION<IActionResult>(apiMethod.Name, () => {
+                    PUBLIC.ASYNC.FUNCTION<Task<IActionResult>>(apiMethod.Name, () => {
                         ATTRIBUTE(middlewareType);
                         ATTRIBUTE<HttpPostAttribute>(apiMethod.Name.ToCamelCase());
                         PARAMETER(requestClass, "requestData", out MethodParameter @requestData, () => {
                             ATTRIBUTE<FromBodyAttribute>();
                         });
 
-                        LOCAL(apiMethod.ReturnType.GenericArguments[0], "resultValue", out LocalVariable resultValueLocal);
-                        resultValueLocal.ASSIGN(
-                            AWAIT(THIS.DOT(@serviceField).DOT(apiMethod).INVOKE(() => {
-                                apiMethod.Signature.Parameters.ForEach(p => ARGUMENT(@requestData.DOT(p.Name.ToPascalCase())));
-                            }))
-                        );
-
-                        DO.RETURN(THIS.DOT("Json").INVOKE(resultValueLocal));
+                        // LOCAL(apiMethod.ReturnType.GenericArguments[0], "resultValue", out LocalVariable resultValueLocal);
+                        // resultValueLocal.ASSIGN(
+                        //     AWAIT(THIS.DOT(@serviceField).DOT(apiMethod).INVOKE(() => {
+                        //         apiMethod.Signature.Parameters.ForEach(p => ARGUMENT(@requestData.DOT(p.Name.ToPascalCase())));
+                        //     }))
+                        // );
+                        //
+                        // DO.RETURN(THIS.DOT("Json").INVOKE(resultValueLocal));
                     });
                 });
             });

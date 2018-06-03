@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using CommonExtensions;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
@@ -14,6 +15,8 @@ namespace MetaPrograms.Adapters.Reflection.Reader
     {
         private const BindingFlags LookupBindingFlags =
             BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
+        private static readonly string GenericTypeArityBackQuote = "`";
 
         private readonly Type _clrType;
         private readonly TypeMemberBuilder _builder;
@@ -65,7 +68,7 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         private void ReadName()
         {
             _builder.TypeKind = _clrType.GetTypeMemberKind();
-            _builder.Name = _clrType.Name;
+            _builder.Name = _clrType.Name.TrimEndStartingWith(GenericTypeArityBackQuote);
             _builder.Namespace = _clrType.Namespace;
             _builder.AssemblyName = _clrType.Assembly.GetName().Name;
             _builder.Visibility = _clrType.GetMemberVisibility();
@@ -95,7 +98,7 @@ namespace MetaPrograms.Adapters.Reflection.Reader
 
         private void ReadAncestors()
         {
-            if (_clrType.BaseType != typeof(object))
+            if (_clrType.BaseType != null && _clrType.BaseType != typeof(object))
             {
                 _builder.BaseType = ResolveType(_clrType.BaseType);
             }
