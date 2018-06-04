@@ -59,6 +59,12 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             visitor.VisitField(this);
         }
 
+        public MemberExpression AsThisMemberExpression()
+        {
+            var target = (Modifier != MemberModifier.Static ? new ThisExpression(DeclaringType) : null);
+            return new MemberExpression(Type, target, GetAbstractRef());
+        }
+
         public MemberRef<TypeMember> Type { get; }
         public bool IsReadOnly { get; }
         public AbstractExpression Initializer { get; }

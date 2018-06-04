@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using MetaPrograms.CodeModel.Imperative.Expressions;
+using MetaPrograms.CodeModel.Imperative.Fluent;
 using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace MetaPrograms.CodeModel.Imperative
@@ -108,6 +109,11 @@ namespace MetaPrograms.CodeModel.Imperative
         public AbstractMember GetCurrentMember()
         {
             return LookupStateOrThrow<IMemberRef>().Get();
+        }
+
+        public BlockContext GetCurrentBlock()
+        {
+            return PeekStateOrThrow<BlockContext>();
         }
 
         public void AddGeneratedMember<TMember>(MemberRef<TMember> member, bool isTopLevel)

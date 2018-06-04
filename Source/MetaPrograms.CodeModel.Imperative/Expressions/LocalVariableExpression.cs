@@ -21,6 +21,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             Variable = variable.MutatedOrOriginal(source.Variable);
         }
 
+        public AbstractExpression AsExpression()
+        {
+            return this;
+        }
+
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitLocalVariableExpression(this);

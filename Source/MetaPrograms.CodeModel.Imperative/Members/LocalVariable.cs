@@ -17,5 +17,15 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         {
             return new LocalVariableExpression(source.Type, source);
         }
+
+        public AbstractExpression AsExpression()
+        {
+            return new LocalVariableExpression(this.Type, this);
+        }
+
+        public void AcceptVisitor(StatementVisitor visitor)
+        {
+            visitor.VisitReferenceToLocalVariable(this);
+        }
     }
 }

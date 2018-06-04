@@ -45,5 +45,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
         public AbstractExpression Condition { get; }
         public BlockStatement ThenBlock { get; }
         public BlockStatement ElseBlock { get; }
+
+        public IfStatement WithThenBlock(BlockStatement thenBlock)
+            => new IfStatement(this, thenBlock: thenBlock);
+
+        public IfStatement WithElseBlock(BlockStatement elseBlock)
+            => new IfStatement(this, elseBlock: elseBlock);
     }
 }

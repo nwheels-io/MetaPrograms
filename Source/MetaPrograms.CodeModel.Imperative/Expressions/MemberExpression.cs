@@ -1,4 +1,5 @@
-﻿using MetaPrograms.CodeModel.Imperative.Members;
+﻿using MetaPrograms.CodeModel.Imperative.Fluent;
+using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
@@ -28,6 +29,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             MemberName = memberName.MutatedOrOriginal(source.MemberName);
         }
 
+        public AbstractExpression AsExpression()
+        {
+            return this;
+        }
+
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitMemberExpression(this);
@@ -41,5 +47,22 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         public AbstractExpression Target { get; }
         public MemberRef<AbstractMember> Member { get; }
         public string MemberName { get; }
+
+        public static MemberExpression Create(AbstractExpression target, MemberRef<AbstractMember> member)
+        {
+            return BlockContext.GetBlockOrThrow().PushExpression(new MemberExpression(
+                type: target.Type, 
+                target, 
+                member));
+        }
+
+        public static MemberExpression Create(AbstractExpression target, string memberName)
+        {
+            return BlockContext.GetBlockOrThrow().PushExpression(new MemberExpression(
+                type: target.Type, 
+                target, 
+                member: MemberRef<AbstractMember>.Null, 
+                memberName));
+        }
     }
 }

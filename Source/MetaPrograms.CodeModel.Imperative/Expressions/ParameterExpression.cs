@@ -19,6 +19,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             Parameter = parameter.MutatedOrOriginal(source.Parameter);
         }
 
+        public AbstractExpression AsExpression()
+        {
+            return this;
+        }
+
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitParameterExpression(this);

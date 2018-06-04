@@ -2,5 +2,7 @@
 {
     public interface IAssignable
     {
+        AbstractExpression AsExpression();
+        void AcceptVisitor(StatementVisitor visitor);
     }
 }

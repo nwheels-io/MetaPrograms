@@ -35,6 +35,16 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             Attributes = attributes.MutatedOrOriginal(source.Attributes);
         }
 
+        public AbstractExpression AsExpression()
+        {
+            return new ParameterExpression(this);
+        }
+
+        public void AcceptVisitor(StatementVisitor visitor)
+        {
+            visitor.VisitReferenceToMethodParameter(this);
+        }
+
         public string Name { get; }
         public int Position { get; }
         public MemberRef<TypeMember> Type { get; }

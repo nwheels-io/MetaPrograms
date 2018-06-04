@@ -48,7 +48,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             {
                 return AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
-                    EmitSyntax(assignment.Left),
+                    EmitSyntax(assignment.Left.AsExpression()),
                     EmitSyntax(assignment.Right));
             }
             if (expression is MemberExpression member)

@@ -170,15 +170,19 @@ namespace MetaPrograms.CodeModel.Imperative
         {
         }
 
+        public virtual void VisitReferenceToMethodParameter(MethodParameter parameter)
+        {
+        }
+
         public virtual void VisitReferenceToTypeMember(TypeMember type)
         {
         }
 
-        internal protected virtual void VisitAbstractStatement(AbstractStatement statement)
+        protected internal virtual void VisitAbstractStatement(AbstractStatement statement)
         {
         }
 
-        internal protected virtual void VisitAbstractExpression(AbstractExpression expression)
+        protected internal virtual void VisitAbstractExpression(AbstractExpression expression)
         {
             if (expression.Type.IsNotNull)
             {

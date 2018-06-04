@@ -27,7 +27,7 @@ namespace Example.AspNetAdapter
 
                 PUBLIC.CONSTRUCTOR(() => {
                     PARAMETER(api.InterfaceType, "service", out var @service);
-                    //@serviceField.ASSIGN(@service);
+                    @serviceField.ASSIGN(@service);
                 });
 
                 api.ApiMethods.ForEach(apiMethod => {

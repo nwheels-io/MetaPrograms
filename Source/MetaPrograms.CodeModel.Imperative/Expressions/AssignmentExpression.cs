@@ -5,9 +5,9 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public class AssignmentExpression : AbstractExpression
     {
         public AssignmentExpression(
-            AbstractExpression left, 
+            IAssignable left, 
             AbstractExpression right) 
-            : base(left.Type)
+            : base(right.Type)
         {
             this.Left = left;
             this.Right = right;
@@ -15,9 +15,9 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public AssignmentExpression(
             AssignmentExpression expression,
-            Mutator<AbstractExpression>? left = null,
+            Mutator<IAssignable>? left = null,
             Mutator<AbstractExpression>? right = null) 
-            : base(expression, left.MutatedOrOriginal(expression.Left).Type)
+            : base(expression, right.MutatedOrOriginal(expression.Right).Type)
         {
             this.Left = left.MutatedOrOriginal(expression.Left);
             this.Right = right.MutatedOrOriginal(expression.Right);
@@ -27,7 +27,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         {
             visitor.VisitAssignmentExpression(this);
 
-            if (Left != null)
+            if (Left is AbstractExpression leftExpression)
             {
                 Left.AcceptVisitor(visitor);
             }
@@ -38,7 +38,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public AbstractExpression Left { get; }
+        public IAssignable Left { get; }
         public AbstractExpression Right { get; }
     }
 }

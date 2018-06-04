@@ -5,6 +5,7 @@ using System.Net.Mime;
 using System.Reflection;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.CodeModel.Imperative.Statements;
 using static MetaPrograms.CodeModel.Imperative.CodeGeneratorContext;
 
 // ReSharper disable InconsistentNaming
@@ -115,7 +116,9 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public static void LOCAL(MemberRef<TypeMember> type, string name, out LocalVariable @ref)
         {
             @ref = new LocalVariable(name, type);
-            GetContextOrThrow().PeekStateOrThrow<BlockContext>().AddLocal(@ref);
+            var block = BlockContext.GetBlockOrThrow();
+            block.AddLocal(@ref);
+            block.AppendStatement(new VariableDeclarationStatement(@ref, initialValue: null));
         }
 
         public static void LOCAL<T>(string name, out LocalVariable @ref)
@@ -131,7 +134,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public static void ARGUMENT(AbstractExpression value) { }
 
         public static AbstractExpression AWAIT(AbstractExpression promiseExpression) => null;
-        public static FluentStatement DO => null;
+        public static FluentStatement DO => new FluentStatement();
         public static ThisExpression THIS => null;
         
         public static AbstractExpression DOT(this AbstractExpression target, AbstractMember member) => null;
@@ -139,17 +142,48 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public static AbstractExpression DOT(this LocalVariable target, AbstractMember member) => null;
         public static AbstractExpression DOT(this LocalVariable target, string memberName) => null;
         public static AbstractExpression DOT(this MethodParameter target, AbstractMember member) => null;
-        public static AbstractExpression DOT(this MethodParameter target, string memberName) => null;
 
-        public static AbstractExpression NOT(AbstractExpression value) => null;
-        public static AbstractExpression NEW<T>(params object[] constructorArguments) => null;
+        public static AbstractExpression DOT(this MethodParameter target, string memberName)
+            => new MemberExpression(target.Type, target.AsExpression(), MemberRef<AbstractMember>.Null, memberName);
+
+        public static AbstractExpression NOT(AbstractExpression value)
+            => new UnaryExpression(GetContextOrThrow().FindType<bool>(), UnaryOperator.LogicalNot, PopExpression(value));
+
+        public static AbstractExpression NEW<T>(params object[] constructorArguments)
+        {
+            var context = GetContextOrThrow();
+            return new NewObjectExpression(new MethodCallExpression(
+                context.FindType<T>(),
+                target: null,
+                method: MemberRef<MethodMember>.Null,
+                constructorArguments
+                    .Select(value => new Argument(context.GetConstantExpression(value), MethodParameterModifier.None))
+                    .ToImmutableList(),
+                isAsyncAwait: false));
+        }
+
         public static AbstractExpression NEW(TypeMember type, params object[] constructorArguments) => null;
         
-        public static AbstractExpression ASSIGN(this AbstractExpression target, AbstractExpression value) => null;
-        public static AbstractExpression ASSIGN(this AbstractMember target, AbstractExpression value) => null;
-        public static AbstractExpression ASSIGN(this IAssignable target, AbstractExpression value) => null;
+        public static AbstractExpression ASSIGN(this AbstractExpression target, AbstractExpression value) 
+            => PushExpression(new AssignmentExpression((IAssignable)PopExpression(target), PopExpression(value)));
+
+        public static AbstractExpression ASSIGN(this MemberExpression member, AbstractExpression value) 
+            => PushExpression(new AssignmentExpression(member, PopExpression(value)));
+
+        public static AbstractExpression ASSIGN(this FieldMember target, AbstractExpression value)
+            => PushExpression(new AssignmentExpression(target.AsThisMemberExpression(), PopExpression(value)));
 
         public static AbstractExpression INVOKE(this AbstractExpression target, params AbstractExpression[] arguments) => null;
         public static AbstractExpression INVOKE(this AbstractExpression target, Action body) => null;
+
+        private static AbstractExpression PushExpression(AbstractExpression expression)
+        {
+            return BlockContext.Push(expression);
+        }
+
+        private static AbstractExpression PopExpression(AbstractExpression expression)
+        {
+            return BlockContext.Pop(expression);
+        }
     }
 }
