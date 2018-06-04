@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
@@ -8,7 +9,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         {
             Name = name;
         }
-        
+
         public string Name { get; }
     }
 }

@@ -53,6 +53,14 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 shouldReplaceSource: shouldReplaceSource);
         }
 
+        public override MethodMemberBase WithBody(BlockStatement block, bool shouldReplaceSource = false)
+        {
+            return new MethodMember(
+                source: this,
+                body: block,
+                shouldReplaceSource: shouldReplaceSource);
+        }
+
         public override void AcceptVisitor(MemberVisitor visitor)
         {
             base.AcceptVisitor(visitor);

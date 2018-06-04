@@ -17,8 +17,6 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             return ParameterList(SeparatedList<ParameterSyntax>(signature.Parameters.Select(EmitParameterSyntax)));
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
         private static ParameterSyntax EmitParameterSyntax(MethodParameter parameter)
         {
             var syntax = Parameter(Identifier(parameter.Name));
@@ -31,6 +29,11 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
                 case MethodParameterModifier.Out:
                     syntax = syntax.WithModifiers(TokenList(Token(SyntaxKind.OutKeyword)));
                     break;
+            }
+
+            if (parameter.Attributes.Count > 0)
+            {
+                syntax = syntax.WithAttributeLists(AttributeSyntaxEmitter.EmitSyntaxList(parameter.Attributes));
             }
 
             syntax = syntax.WithType(parameter.Type.GetTypeNameSyntax());

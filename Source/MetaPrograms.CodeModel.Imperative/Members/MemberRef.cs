@@ -34,6 +34,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public MemberRef<TBaseMember> AsRef<TBaseMember>()
             where TBaseMember : AbstractMember
         {
+            ValidateMemberIs<TBaseMember>();
             return new MemberRef<TBaseMember>(_state);
         }
 
@@ -63,6 +64,12 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public bool IsNull => Get() == null;
         public bool IsNotNull => Get() != null;
+
+        private void ValidateMemberIs<TBaseMember>()
+            where TBaseMember : AbstractMember
+        {
+            _state.Get<TBaseMember>();
+        }
 
         public static readonly MemberRef<TMember> Null = 
             new MemberRef<TMember>(new MemberRefState(null).MakeImmutable());

@@ -16,8 +16,6 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         {
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
         public override MethodDeclarationSyntax EmitSyntax()
         {
             TypeSyntax returnTypeSyntax = (Member.Signature.IsVoid

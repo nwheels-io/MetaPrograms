@@ -36,7 +36,11 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             var context = GetContextOrThrow();
             var attribute = FluentHelpers.BuildAttribute(context, type, constructorArgumentsAndBody);
 
-            if (context.TryPeekState<TypeMemberBuilder>(out var builder))
+            if (context.TryPeekState<ParameterContext>(out var parameterContext))
+            {
+                parameterContext.Attributes = parameterContext.Attributes.Add(attribute);
+            }
+            else if (context.TryPeekState<TypeMemberBuilder>(out var builder))
             {
                 builder.Attributes.Add(attribute);
             }
@@ -86,39 +90,44 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static void PARAMETER(TypeMember type, string name, out MethodParameter @ref, Action body = null)
         {
-            var context = CodeGeneratorContext.GetContextOrThrow();
+            var context = GetContextOrThrow();
             var method = (MethodMemberBase)context.GetCurrentMember();
+            var parameterContext = new ParameterContext();
+
+            using (context.PushState(parameterContext))
+            {
+                body?.Invoke();
+            }
+
             var newParameter = new MethodParameter(
                 name, 
                 method.Signature.Parameters.Count,
                 type.GetRef(),
-                MethodParameterModifier.None,
-                ImmutableList<AttributeDescription>.Empty);
-            var newSignature = method.Signature.AddParameter(newParameter);
+                parameterContext.Modifier,
+                parameterContext.Attributes);
 
+            var newSignature = method.Signature.AddParameter(newParameter);
             method = method.WithSignature(newSignature, shouldReplaceSource: true);
 
-            using (context.PushState(newParameter))
-            {
-                body?.Invoke();
-            }
-            
             @ref = newParameter;
         }
 
-        public static void LOCAL(TypeMember type, string name, out LocalVariable @ref)
+        public static void LOCAL(MemberRef<TypeMember> type, string name, out LocalVariable @ref)
         {
-            @ref = null;
+            @ref = new LocalVariable(name, type);
+            GetContextOrThrow().PeekStateOrThrow<BlockContext>().AddLocal(@ref);
         }
 
         public static void LOCAL<T>(string name, out LocalVariable @ref)
         {
-            @ref = null;
+            var type = GetContextOrThrow().FindType<T>();
+            LOCAL(type, name, out @ref);
         }
 
-        public static void AUTOMATIC() { }
-        public static void AUTOMATIC(FieldMember field) { }
-        
+        public static void GET() { }
+        public static void GET(Action body) { }
+        public static void SET(Action<LocalVariable> body) { }
+
         public static void ARGUMENT(AbstractExpression value) { }
 
         public static AbstractExpression AWAIT(AbstractExpression promiseExpression) => null;

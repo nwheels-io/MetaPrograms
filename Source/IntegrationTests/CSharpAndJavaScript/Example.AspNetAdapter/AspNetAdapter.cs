@@ -24,17 +24,15 @@ namespace Example.AspNetAdapter
 
         public void GenerateImplementations(WebUIMetadata ui)
         {
-            var writer = new RoslynCodeModelWriter(_codeModel, _output);
-
             using (_context = new CodeGeneratorContext(_codeModel, new ClrTypeResolver()))
             {
                 GenerateInfrastructureTypes();
                 GenerateControllerTypes(ui);
 
+                var writer = new RoslynCodeModelWriter(_codeModel, _output);
                 writer.AddMembers(_context.GeneratedMembers);
+                writer.WriteAll();
             }
-
-            writer.WriteAll();
         }
 
         private void GenerateInfrastructureTypes()
@@ -53,6 +51,5 @@ namespace Example.AspNetAdapter
                 });
             }
         }
-
     }
 }

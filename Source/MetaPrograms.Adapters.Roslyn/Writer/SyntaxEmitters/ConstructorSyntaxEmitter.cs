@@ -34,6 +34,11 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             {
                 OutputSyntax = OutputSyntax.WithModifiers(TokenList(Token(SyntaxKind.StaticKeyword)));
             }
+            
+            if (Member.Attributes.Count > 0)
+            {
+                OutputSyntax = OutputSyntax.WithAttributeLists(EmitAttributeLists());
+            }
 
             if (Member.CallThisConstructor != null)
             {

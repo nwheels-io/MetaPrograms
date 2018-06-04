@@ -10,6 +10,8 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
+using CommonExtensions;
+using MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -144,11 +146,13 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
-        public static NameSyntax GetTypeFullNameSyntax(this TypeMember type)
+        public static NameSyntax GetTypeFullNameSyntax(this TypeMember type, string stripSuffix = null)
         {
+            var nonQuialifiedName = (string.IsNullOrEmpty(stripSuffix) ? type.Name : type.Name.TrimSuffix(stripSuffix));
+
             if (!type.IsGenericType)
             {
-                return QualifyTypeNameSyntax(type, IdentifierName(type.Name));
+                return QualifyTypeNameSyntax(type, IdentifierName(nonQuialifiedName));
             }
 
             var genericSyntax = GenericName(type.Name)
@@ -219,8 +223,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
             if (!string.IsNullOrEmpty(type.Namespace))
             {
-                //TODO: handle namespace imports
-                var isNamespaceImported = false;//IsTypeNamespaceImported(type);
+                var isNamespaceImported = IsTypeNamespaceImported(type);
 
                 if (!isNamespaceImported)
                 {
@@ -233,20 +236,22 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
-        // private static bool IsTypeNamespaceImported(TypeMember type)
-        // {
-        //     if (type.SafeBackendTag().IsNamespaceImported)
-        //     {
-        //         return true;
-        //     }
-        //
-        //     if (type.IsGenericType && type.GenericTypeDefinition.IsNotNull)
-        //     {
-        //         return IsTypeNamespaceImported(type.GenericTypeDefinition);
-        //     }
-        //
-        //     return false;
-        // }
+        private static bool IsTypeNamespaceImported(TypeMember type)
+        {
+            var importContext = CodeGeneratorContext.GetContextOrThrow().LookupStateOrThrow<ImportContext>();
+
+            if (importContext.IsTypeImported(type))
+            {
+                return true;
+            }
+
+            if (type.IsGenericType && type.GenericTypeDefinition.IsNotNull)
+            {
+                return importContext.IsTypeImported(type.GenericTypeDefinition);
+            }
+
+            return false;
+        }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 

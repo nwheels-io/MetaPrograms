@@ -43,35 +43,22 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public IDisposable PushState(object state)
         {
-            return new StackStateScope(_stateStack, state);
+            if (state != null)
+            {
+                return new StackStateScope(_stateStack, state, pop: () => PopStateOrThrow(state.GetType()));
+            }
+
+            return null;
         }
 
         public TState PopStateOrThrow<TState>()
         {
-            var state = PeekStateOrThrow<TState>();
-
-            _stateStack.Pop();
-            Debug.WriteLine($"CODE GENERATOR CONTEXT >> PopStateOrThrow >> POP {state.GetType().Name} >> COUNT = {_stateStack.Count}");
-
-            return state;
+            return (TState)PopStateOrThrow(typeof(TState));
         }
 
         public TState PeekStateOrThrow<TState>()
         {
-            if (_stateStack.Count == 0)
-            {
-                throw new InvalidOperationException(
-                    $"Code generator state stack mismatch: attempted to pop a {typeof(TState).Name}, but the stack is empty.");
-            }
-
-            if (!(_stateStack.Peek() is TState state))
-            {
-                throw new InvalidOperationException(
-                    $"Code generator state stack mismatch: attempted to pop a {typeof(TState).Name}, " +
-                    $"but the top item is a {_stateStack.Peek().GetType().Name}'.");
-            }
-
-            return state;
+            return (TState)PeekStateOrThrow(typeof(TState));
         }
 
         public bool TryPeekState<TState>(out TState state)
@@ -186,6 +173,42 @@ namespace MetaPrograms.CodeModel.Imperative
         public ImperativeCodeModel CodeModel { get; }
         public IEnumerable<IMemberRef> GeneratedMembers => _generatedMembers;
 
+        private object PopStateOrThrow(Type stateType)
+        {
+            var state = PeekStateOrThrow(stateType);
+
+            _stateStack.Pop();
+
+            if (state is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+            
+            Debug.WriteLine($"CODE GENERATOR CONTEXT >> PopStateOrThrow >> POP {state.GetType().Name} >> COUNT = {_stateStack.Count}");
+
+            return state;
+        }
+
+        private object PeekStateOrThrow(Type stateType)
+        {
+            if (_stateStack.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Code generator state stack mismatch: attempted to pop a {stateType.Name}, but the stack is empty.");
+            }
+
+            var stateOnTop = _stateStack.Peek();
+            
+            if (!stateType.IsInstanceOfType(stateOnTop))
+            {
+                throw new InvalidOperationException(
+                    $"Code generator state stack mismatch: attempted to pop a {stateType.Name}, " +
+                    $"but the top item is a {stateOnTop.GetType().Name}'.");
+            }
+
+            return stateOnTop;
+        }
+
         public static CodeGeneratorContext CurrentContext => Current.Value;
 
         public static CodeGeneratorContext GetContextOrThrow() => 
@@ -199,30 +222,20 @@ namespace MetaPrograms.CodeModel.Imperative
         {
             private readonly Stack<object> _stateStack;
             private readonly object _state;
+            private readonly Action _pop;
 
-            public StackStateScope(Stack<object> stateStack, object state)
+            public StackStateScope(Stack<object> stateStack, object state, Action pop)
             {
                 _stateStack = stateStack;
                 _state = state;
+                _pop = pop;
                 _stateStack.Push(state);
                 Debug.WriteLine($"CODE GENERATOR CONTEXT >> StackStateScope.ctor >> PUSH {_state.GetType().Name} >> COUNT = {_stateStack.Count}");
             }
 
             public void Dispose()
             {
-                if (_stateStack.Count == 0)
-                {
-                    throw new InvalidOperationException(
-                        $"Code generator state stack mismatch: attempted to pop '{_state}', but the stack is empty.");
-                }
-                
-                if (_stateStack.Peek() != _state)
-                {
-                    throw new InvalidOperationException(
-                        $"Code generator state stack mismatch: attempted to pop '{_state}', but the top item is '{_stateStack.Peek()}'.");
-                }
-
-                _stateStack.Pop();
+                _pop();
                 Debug.WriteLine($"CODE GENERATOR CONTEXT >> StackStateScope.Dispose >> POP {_state.GetType().Name} >> COUNT = {_stateStack.Count}");
             }
         }

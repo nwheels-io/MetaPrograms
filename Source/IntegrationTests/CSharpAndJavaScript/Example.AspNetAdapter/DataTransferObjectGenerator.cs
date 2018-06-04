@@ -10,7 +10,7 @@ namespace Example.AspNetAdapter
         public static TypeMember MethodInvocation(MethodMember method) => 
             PUBLIC.CLASS($"{method.Name}Invocation", () => {
                 method.Signature.Parameters.ForEach(p => {
-                    PUBLIC.PROPERTY(p.Type, p.Name.ToPascalCase(), AUTOMATIC);
+                    PUBLIC.PROPERTY(p.Type, p.Name.ToPascalCase());
                 });
             });
     }

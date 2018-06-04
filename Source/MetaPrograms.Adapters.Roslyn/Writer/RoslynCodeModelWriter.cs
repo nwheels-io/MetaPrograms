@@ -48,7 +48,7 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
         private void WriteType(TypeMember type, IList<string> commonNamespaceParts)
         {
             var syntaxBuilder = new UnitSyntaxEmitter(_codeModel, type);
-            var syntaxTree = syntaxBuilder.BuildSyntaxTree();
+            var syntaxTree = syntaxBuilder.EmitSyntax();
 
             var subFolderParts = GetSubFolder(type, commonNamespaceParts);
             _output.AddSourceFile(subFolderParts, $"{type.Name}.cs", syntaxTree.ToString());
@@ -58,6 +58,19 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
         {
             var namespaceParts = type.Namespace?.Split('.') ?? new string[0];
             return namespaceParts.Skip(commonNamespaceParts.Count);
+        }
+
+        private IReadOnlyCollection<TypeMember> GetAllReferencedTypes(IEnumerable<TypeMember> typesToCompile)
+        {
+            var referencedTypes = new HashSet<TypeMember>();
+            var visitor = new TypeReferenceMemberVisitor(referencedTypes);
+
+            foreach (var type in typesToCompile)
+            {
+                type.AcceptVisitor(visitor);
+            }
+
+            return referencedTypes;
         }
     }
 }

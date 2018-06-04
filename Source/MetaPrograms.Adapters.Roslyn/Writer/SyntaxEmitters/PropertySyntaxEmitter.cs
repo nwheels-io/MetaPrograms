@@ -13,8 +13,6 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         {
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
         public override PropertyDeclarationSyntax EmitSyntax()
         {
             OutputSyntax = PropertyDeclaration(
@@ -26,14 +24,12 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
             OutputSyntax = OutputSyntax.WithAccessorList(
                 AccessorList(
-                    SingletonList<AccessorDeclarationSyntax>(
-                        AccessorDeclaration(
-                            SyntaxKind.GetAccessorDeclaration
-                        )
-                        .WithSemicolonToken(
-                            Token(SyntaxKind.SemicolonToken)
-                        )
-                    )
+                    List<AccessorDeclarationSyntax>(new[] {
+                        AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)                    
+                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                        AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                    })
                 )
             );
 

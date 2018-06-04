@@ -23,7 +23,7 @@ namespace Example.AspNetAdapter
                 EXTENDS<Controller>();
                 ATTRIBUTE<RouteAttribute>("api/[controller]");
 
-                PRIVATE.READONLY.FIELD(api.InterfaceType, "_service", out var @serviceField);
+                PRIVATE.READONLY.FIELD(api.InterfaceType.GetRef(), "_service", out var @serviceField);
 
                 PUBLIC.CONSTRUCTOR(() => {
                     PARAMETER(api.InterfaceType, "service", out var @service);
@@ -40,7 +40,7 @@ namespace Example.AspNetAdapter
                             ATTRIBUTE<FromBodyAttribute>();
                         });
 
-                        // LOCAL(apiMethod.ReturnType.GenericArguments[0], "resultValue", out LocalVariable resultValueLocal);
+                        LOCAL(apiMethod.ReturnType.Get().GenericArguments[0], "resultValue", out LocalVariable resultValueLocal);
                         // resultValueLocal.ASSIGN(
                         //     AWAIT(THIS.DOT(@serviceField).DOT(apiMethod).INVOKE(() => {
                         //         apiMethod.Signature.Parameters.ForEach(p => ARGUMENT(@requestData.DOT(p.Name.ToPascalCase())));

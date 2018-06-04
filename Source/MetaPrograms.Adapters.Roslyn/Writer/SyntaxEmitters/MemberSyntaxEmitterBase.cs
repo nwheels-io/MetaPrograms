@@ -28,10 +28,11 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         protected SyntaxList<AttributeListSyntax> EmitAttributeLists()
         {
-            return SingletonList<AttributeListSyntax>(
-                AttributeList(
-                    SeparatedList<AttributeSyntax>(
-                        Member.Attributes.Select(AttributeSyntaxEmitter.EmitSyntax))));
+            return AttributeSyntaxEmitter.EmitSyntaxList(Member.Attributes);
+            //return SingletonList<AttributeListSyntax>(
+            //    AttributeList(
+            //        SeparatedList<AttributeSyntax>(
+            //            Member.Attributes.Select(AttributeSyntaxEmitter.EmitSyntax))));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------

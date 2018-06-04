@@ -44,6 +44,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public abstract MethodMemberBase WithSignature(MethodSignature signature, bool shouldReplaceSource = false);
 
+        public abstract MethodMemberBase WithBody(BlockStatement block, bool shouldReplaceSource = false);
+
         public override void AcceptVisitor(MemberVisitor visitor)
         {
             base.AcceptVisitor(visitor);

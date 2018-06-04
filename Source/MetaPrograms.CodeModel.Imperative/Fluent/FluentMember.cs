@@ -28,37 +28,39 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         {
         }
 
-        public void FIELD(TypeMember type, string name, out FieldMember @ref, Action body = null)
-        {
-            var context = CodeGeneratorContext.GetContextOrThrow();
-            var traits = context.PopStateOrThrow<MemberTraitsContext>();
-            var declaringTypeRef = context.TryLookupState<MemberRef<TypeMember>>();
-            var member = new FieldMember(
-                name,
-                declaringTypeRef,
-                MemberStatus.Generator,
-                traits.Visibility,
-                traits.Modifier,
-                ImmutableList<AttributeDescription>.Empty,
-                type.GetRef(),
-                traits.IsReadonly,
-                initializer: null);
+        public void FIELD(MemberRef<TypeMember> type, string name, out FieldMember @ref, Action body = null)
+            => @ref = new FieldGenerator(GetContextOrThrow(), type, name, body).GenerateMember();
 
-            context.GetCurrentTypeBuilder().Members.Add(member.GetAbstractRef());
-            
-            using (context.PushState(member.GetRef()))
-            {
-                body?.Invoke();
-            }
+        public void FIELD(Type type, string name, out FieldMember @ref, Action body = null)
+            => @ref = new FieldGenerator(GetContextOrThrow(), type, name, body).GenerateMember();
 
-            @ref = member;
-        }
+        //{
+        //    var context = CodeGeneratorContext.GetContextOrThrow();
+        //    var traits = context.PopStateOrThrow<MemberTraitsContext>();
+        //    var declaringTypeRef = context.TryLookupState<MemberRef<TypeMember>>();
+        //    var member = new FieldMember(
+        //        name,
+        //        declaringTypeRef,
+        //        MemberStatus.Generator,
+        //        traits.Visibility,
+        //        traits.Modifier,
+        //        ImmutableList<AttributeDescription>.Empty,
+        //        type.GetRef(),
+        //        traits.IsReadonly,
+        //        initializer: null);
+
+        //    context.GetCurrentTypeBuilder().Members.Add(member.GetAbstractRef());
+
+        //    using (context.PushState(member.GetRef()))
+        //    {
+        //        body?.Invoke();
+        //    }
+
+        //    @ref = member;
+        //}
 
         public void FIELD<TType>(string name, out FieldMember @ref, Action body = null)
-        {
-            var type = CodeGeneratorContext.GetContextOrThrow().FindMemberOrThrow<TypeMember>(binding: typeof(TType));
-            FIELD(type, name, out @ref, body);
-        }
+            => @ref = new FieldGenerator(GetContextOrThrow(), typeof(TType), name, body).GenerateMember();
 
         public TypeMember CLASS(string name, Action body) 
             => FluentHelpers.BuildTypeMember(TypeMemberKind.Class, name, body);
@@ -71,100 +73,23 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public ConstructorMember CONSTRUCTOR(Action body)
             => new ConstructorGenerator(GetContextOrThrow(), body).GenerateMember();
-        //
-        // {
-        //     var context = CodeGeneratorContext.GetContextOrThrow();
-        //     var traits = GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
-        //     var declaringTypeBuilder = context.GetCurrentTypeBuilder();
-        //     var declaringType = context.GetCurrentType(); //TODO: why declaringType is null?
-        //     var member = new ConstructorMember(
-        //         declaringTypeBuilder.GetTemporaryProxy().GetRef(),   
-        //         MemberStatus.Generator, 
-        //         traits.Visibility,
-        //         traits.Modifier,
-        //         ImmutableList<AttributeDescription>.Empty,
-        //         new MethodSignature(
-        //             isAsync: false, 
-        //             returnValue: null, 
-        //             parameters: ImmutableList<MethodParameter>.Empty),
-        //         body: null,
-        //         callThisConstructor: null,
-        //         callBaseConstructor: null);
-        //     
-        //     declaringTypeBuilder.Members.Add(member.GetAbstractRef());
-        //
-        //     using (context.PushState(member.GetRef()))
-        //     {
-        //         body?.Invoke();
-        //     }
-        //
-        //     return member;
-        // }
 
         public MethodMember FUNCTION<TReturnType>(string name, Action body)
             => new MethodGenerator(GetContextOrThrow(), typeof(TReturnType), name, body).GenerateMember();
         
-        // {
-        //     var context = CodeGeneratorContext.GetContextOrThrow();
-        //     var traits = GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
-        //     var declaringTypeBuilder = context.GetCurrentTypeBuilder();
-        //     var returnType = context.FindType<TReturnType>();
-        //     var declaringType = context.GetCurrentType(); //TODO: why declaringType is null?
-        //     var member = new MethodMember(
-        //         name,
-        //         declaringTypeBuilder.GetTemporaryProxy().GetRef(),   
-        //         MemberStatus.Generator, 
-        //         traits.Visibility,
-        //         traits.Modifier,
-        //         ImmutableList<AttributeDescription>.Empty,
-        //         new MethodSignature(
-        //             isAsync: traits.IsAsync, 
-        //             returnValue: new MethodParameter(null, 0, returnType, MethodParameterModifier.None, ImmutableList<AttributeDescription>.Empty), 
-        //             parameters: ImmutableList<MethodParameter>.Empty),
-        //         body: null);
-        //     
-        //     declaringTypeBuilder.Members.Add(member.GetAbstractRef());
-        //
-        //     using (context.PushState(member.GetRef()))
-        //     {
-        //         body?.Invoke();
-        //     }
-        //
-        //     return member;
-        // }
-
         public MethodMember FUNCTION(MemberRef<TypeMember> returnType, string name, Action body)
             => new MethodGenerator(GetContextOrThrow(), returnType, name, body).GenerateMember();
-
-        // {
-        //     GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
-        //     return null;
-        // }
 
         public MethodMember VOID(string name, Action body)
             => new MethodGenerator(GetContextOrThrow(), name, body).GenerateMember();
 
-        // {
-        //     GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
-        //     return null;
-        // }
-
         public MethodMember VOID(MemberRef<MethodMember> ancestorMethod, Action body)
             => new MethodGenerator(GetContextOrThrow(), ancestorMethod, body).GenerateMember();
 
-        // {
-        //     GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
-        //     return null;
-        // }
-
         public void PROPERTY<T>(string name, Action body = null)
-        {
-            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
-        }
+            => new PropertyGenerator(GetContextOrThrow(), typeof(T), name, body).GenerateMember();
 
-        public void PROPERTY(TypeMember type, string name, Action body = null)
-        {
-            GetContextOrThrow().PopStateOrThrow<MemberTraitsContext>();
-        }
+        public void PROPERTY(MemberRef<TypeMember> type, string name, Action body = null)
+            => new PropertyGenerator(GetContextOrThrow(), type, name, body).GenerateMember();
     }
 }
