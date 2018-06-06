@@ -4,20 +4,18 @@ using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
-    public class MethodCallExpression : AbstractExpression
+    public class MethodCallExpression : InvocationExpression
     {
         public MethodCallExpression(
             MemberRef<TypeMember> type, 
             AbstractExpression target,
-            MemberRef<MethodMember> method, 
+            MemberRef<MethodMemberBase> method, 
             ImmutableList<Argument> arguments, 
-            bool isAsyncAwait,
-            string methodName = null) : base(type)
+            string methodName = null) 
+            : base(type, arguments)
         {
             Target = target;
             Method = method;
-            Arguments = arguments;
-            IsAsyncAwait = isAsyncAwait;
             MethodName = methodName;
         }
 
@@ -25,16 +23,13 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             MethodCallExpression source,
             Mutator<AbstractExpression>? target = null,
             Mutator<MemberRef<TypeMember>>? type = null,
-            Mutator<MemberRef<MethodMember>>? method = null,
+            Mutator<MemberRef<MethodMemberBase>>? method = null,
             Mutator<ImmutableList<Argument>>? arguments = null,
-            Mutator<bool>? isAsyncAwait = null,
             Mutator<string>? methodName = null) 
-            : base(source, type)
+            : base(source, type, arguments)
         {
             Target = target.MutatedOrOriginal(source.Target);
             Method = method.MutatedOrOriginal(source.Method);
-            Arguments = arguments.MutatedOrOriginal(source.Arguments);
-            IsAsyncAwait = isAsyncAwait.MutatedOrOriginal(source.IsAsyncAwait);
             MethodName = methodName.MutatedOrOriginal(source.MethodName);
         }
 
@@ -54,10 +49,8 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         }
 
         public AbstractExpression Target { get; }
-        public MemberRef<MethodMember> Method { get; }
+        public MemberRef<MethodMemberBase> Method { get; }
         public string MethodName { get; }
-        public ImmutableList<Argument> Arguments { get; }
-        public bool IsAsyncAwait { get; }
     }
 }
 

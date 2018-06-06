@@ -8,7 +8,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
     public class FluentStatement
     {
         public void RETURN(AbstractExpression value)
-            => BlockContext.Append(new ReturnStatement(BlockContext.Pop(value)));
+            => BlockContextBase.Append(new ReturnStatement(BlockContextBase.Pop(value)));
 
         public FluentIf IF(AbstractExpression condition)
             => new FluentIf(condition);

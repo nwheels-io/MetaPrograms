@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Mime;
@@ -116,7 +117,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public static void LOCAL(MemberRef<TypeMember> type, string name, out LocalVariable @ref)
         {
             @ref = new LocalVariable(name, type);
-            var block = BlockContext.GetBlockOrThrow();
+            var block = BlockContextBase.GetBlockOrThrow();
             block.AddLocal(@ref);
             block.AppendStatement(new VariableDeclarationStatement(@ref, initialValue: null));
         }
@@ -127,21 +128,37 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             LOCAL(type, name, out @ref);
         }
 
-        public static void GET() { }
-        public static void GET(Action body) { }
-        public static void SET(Action<LocalVariable> body) { }
+        public static void GET() => throw new NotImplementedException();
+        public static void GET(Action body) => throw new NotImplementedException();
+        public static void SET(Action<LocalVariable> body) => throw new NotImplementedException();
 
-        public static void ARGUMENT(AbstractExpression value) { }
+        public static void ARGUMENT(AbstractExpression value) 
+            => GetContextOrThrow().PeekStateOrThrow<InvocationContext>().AddArgument(value);
 
-        public static AbstractExpression AWAIT(AbstractExpression promiseExpression) => null;
-        public static FluentStatement DO => new FluentStatement();
-        public static ThisExpression THIS => null;
-        
-        public static AbstractExpression DOT(this AbstractExpression target, AbstractMember member) => null;
-        public static AbstractExpression DOT(this AbstractExpression target, string memberName) => null;
-        public static AbstractExpression DOT(this LocalVariable target, AbstractMember member) => null;
-        public static AbstractExpression DOT(this LocalVariable target, string memberName) => null;
-        public static AbstractExpression DOT(this MethodParameter target, AbstractMember member) => null;
+        public static void ARGUMENT_BYREF(AbstractExpression value)
+            => GetContextOrThrow().PeekStateOrThrow<InvocationContext>().AddArgument(value, MethodParameterModifier.Ref);
+
+        public static void ARGUMENT_OUT(AbstractExpression value)
+            => GetContextOrThrow().PeekStateOrThrow<InvocationContext>().AddArgument(value, MethodParameterModifier.Out);
+
+        public static AbstractExpression AWAIT(AbstractExpression promiseExpression)
+            => new AwaitExpression(promiseExpression.Type, promiseExpression);
+
+        public static FluentStatement DO 
+            => new FluentStatement();
+
+        public static ThisExpression THIS 
+            => new ThisExpression(GetContextOrThrow().GetCurrentTypeBuilder().GetRef());
+
+        public static AbstractExpression DOT(this AbstractExpression target, AbstractMember member)
+            => new MemberExpression(MemberRef<TypeMember>.Null, target, member.GetAbstractRef());
+
+        public static AbstractExpression DOT(this AbstractExpression target, string memberName)
+            => new MemberExpression(MemberRef<TypeMember>.Null, target, MemberRef<AbstractMember>.Null, memberName);
+
+        public static AbstractExpression DOT(this LocalVariable target, AbstractMember member) => throw new NotImplementedException();
+        public static AbstractExpression DOT(this LocalVariable target, string memberName) => throw new NotImplementedException();
+        public static AbstractExpression DOT(this MethodParameter target, AbstractMember member) => throw new NotImplementedException();
 
         public static AbstractExpression DOT(this MethodParameter target, string memberName)
             => new MemberExpression(target.Type, target.AsExpression(), MemberRef<AbstractMember>.Null, memberName);
@@ -155,15 +172,14 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             return new NewObjectExpression(new MethodCallExpression(
                 context.FindType<T>(),
                 target: null,
-                method: MemberRef<MethodMember>.Null,
+                method: MemberRef<MethodMemberBase>.Null,
                 constructorArguments
                     .Select(value => new Argument(context.GetConstantExpression(value), MethodParameterModifier.None))
-                    .ToImmutableList(),
-                isAsyncAwait: false));
+                    .ToImmutableList()));
         }
 
-        public static AbstractExpression NEW(TypeMember type, params object[] constructorArguments) => null;
-        
+        public static AbstractExpression NEW(TypeMember type, params object[] constructorArguments) => throw new NotImplementedException();
+
         public static AbstractExpression ASSIGN(this AbstractExpression target, AbstractExpression value) 
             => PushExpression(new AssignmentExpression((IAssignable)PopExpression(target), PopExpression(value)));
 
@@ -173,17 +189,45 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public static AbstractExpression ASSIGN(this FieldMember target, AbstractExpression value)
             => PushExpression(new AssignmentExpression(target.AsThisMemberExpression(), PopExpression(value)));
 
-        public static AbstractExpression INVOKE(this AbstractExpression target, params AbstractExpression[] arguments) => null;
-        public static AbstractExpression INVOKE(this AbstractExpression target, Action body) => null;
+        public static AbstractExpression ASSIGN(this LocalVariable target, AbstractExpression value)
+            => PushExpression(new AssignmentExpression(target, PopExpression(value)));
+
+        public static AbstractExpression INVOKE(this AbstractExpression expression, params AbstractExpression[] arguments)
+            => INVOKE(expression, arguments.Select(arg => new Argument(arg, MethodParameterModifier.None)));
+
+        public static AbstractExpression INVOKE(this AbstractExpression expression, IEnumerable<Argument> arguments)
+        {
+            if (expression is MemberExpression memberExpression)
+            {
+                var target = memberExpression.Target;
+                var member = memberExpression.Member.AsRef<MethodMemberBase>();
+                var returnType = (member.IsNotNull ? member.Get().ReturnType : MemberRef<TypeMember>.Null);
+                return new MethodCallExpression(returnType, target, member, arguments.ToImmutableList(), memberExpression.MemberName);
+            }
+
+            return new DelegateInvocationExpression(expression.Type, arguments.ToImmutableList(), expression);
+        }
+
+        public static AbstractExpression INVOKE(this AbstractExpression expression, Action body)
+        {
+            var invocation = new InvocationContext();
+
+            using (GetContextOrThrow().PushState(invocation))
+            {
+                body?.Invoke();
+            }
+
+            return INVOKE(expression, invocation.GetArguments());
+        }
 
         private static AbstractExpression PushExpression(AbstractExpression expression)
         {
-            return BlockContext.Push(expression);
+            return BlockContextBase.Push(expression);
         }
 
         private static AbstractExpression PopExpression(AbstractExpression expression)
         {
-            return BlockContext.Pop(expression);
+            return BlockContextBase.Pop(expression);
         }
     }
 }

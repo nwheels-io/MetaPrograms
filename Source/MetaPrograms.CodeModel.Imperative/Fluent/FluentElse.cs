@@ -28,14 +28,14 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public void ELSE(Action body)
         {
-            var container = new BlockContainer();
+            var block = new BlockContext();
 
-            using (CodeGeneratorContext.GetContextOrThrow().PushState(container))
+            using (CodeGeneratorContext.GetContextOrThrow().PushState(block))
             {
                 body?.Invoke();
             }
 
-            BlockContext.Replace(_statement, _statement.WithElseBlock(container.Block));
+            BlockContextBase.Replace(_statement, _statement.WithElseBlock(block));
         }
     }
 }

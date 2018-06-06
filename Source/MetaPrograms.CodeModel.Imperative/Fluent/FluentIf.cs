@@ -12,7 +12,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public FluentIf(AbstractExpression condition)
         {
-            var block = BlockContext.GetBlockOrThrow();
+            var block = BlockContextBase.GetBlockOrThrow();
 
             _statement = new IfStatement(block.PopExpression(condition), thenBlock: null, elseBlock: null);
             block.AppendStatement(_statement);
@@ -20,14 +20,14 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public FluentElse THEN(Action body)
         {
-            var container = new BlockContainer();
+            var block = new BlockContext();
 
-            using (CodeGeneratorContext.GetContextOrThrow().PushState(container))
+            using (CodeGeneratorContext.GetContextOrThrow().PushState(block))
             {
                 body?.Invoke();
             }
 
-            return new FluentElse(BlockContext.Replace(_statement, _statement.WithThenBlock(container.Block)));
+            return new FluentElse(BlockContextBase.Replace(_statement, _statement.WithThenBlock(block)));
         }
     }
 }

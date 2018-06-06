@@ -111,6 +111,11 @@ namespace MetaPrograms.CodeModel.Imperative
             VisitAbstractExpression(expression);
         }
 
+        public virtual void VisitAwaitExpression(AwaitExpression expression)
+        {
+            VisitAbstractExpression(expression);
+        }
+
         public virtual void VisitConstantExpression(ConstantExpression expression)
         {
             VisitAbstractExpression(expression);

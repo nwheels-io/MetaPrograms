@@ -112,7 +112,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 linkedSymbol.Accept(this);
             }
 
-            if (symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is MethodDeclarationSyntax methodSyntax)
+            if (!symbol.IsAbstract && symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is MethodDeclarationSyntax methodSyntax)
             {
                 var compilation = _modelBuilder.GetCompilation(methodSyntax.SyntaxTree);
                 var methodSemantic = compilation.GetSemanticModel(methodSyntax.SyntaxTree, ignoreAccessibility: true);

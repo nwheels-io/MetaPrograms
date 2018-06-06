@@ -59,6 +59,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public BindingCollection Bindings => _temporaryProxy.Bindings;
         public TypeMember GetTemporaryProxy() => _temporaryProxy;
         public MemberRefState GetMemberSelfReference() => _memberSelfReference;
+        public MemberRef<TypeMember> GetRef() => new MemberRef<TypeMember>(_memberSelfReference);
 
         private class TypeMemberProxy : TypeMember
         {

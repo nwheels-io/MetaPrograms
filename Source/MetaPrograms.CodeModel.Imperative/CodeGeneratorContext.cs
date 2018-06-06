@@ -111,9 +111,9 @@ namespace MetaPrograms.CodeModel.Imperative
             return LookupStateOrThrow<IMemberRef>().Get();
         }
 
-        public BlockContext GetCurrentBlock()
+        public BlockContextBase GetCurrentBlock()
         {
-            return PeekStateOrThrow<BlockContext>();
+            return PeekStateOrThrow<BlockContextBase>();
         }
 
         public void AddGeneratedMember<TMember>(MemberRef<TMember> member, bool isTopLevel)
@@ -200,7 +200,7 @@ namespace MetaPrograms.CodeModel.Imperative
             if (_stateStack.Count == 0)
             {
                 throw new InvalidOperationException(
-                    $"Code generator state stack mismatch: attempted to pop a {stateType.Name}, but the stack is empty.");
+                    $"Generator stack mismatch: expected '{stateType.Name}', but the stack is empty.");
             }
 
             var stateOnTop = _stateStack.Peek();
@@ -208,8 +208,7 @@ namespace MetaPrograms.CodeModel.Imperative
             if (!stateType.IsInstanceOfType(stateOnTop))
             {
                 throw new InvalidOperationException(
-                    $"Code generator state stack mismatch: attempted to pop a {stateType.Name}, " +
-                    $"but the top item is a {stateOnTop.GetType().Name}'.");
+                    $"Generator stack mismatch: expected '{stateType.Name}', but found '{stateOnTop.GetType().Name}'.");
             }
 
             return stateOnTop;

@@ -41,13 +41,14 @@ namespace Example.AspNetAdapter
                         });
 
                         LOCAL(apiMethod.ReturnType.Get().GenericArguments[0], "resultValue", out LocalVariable resultValueLocal);
-                        // resultValueLocal.ASSIGN(
-                        //     AWAIT(THIS.DOT(@serviceField).DOT(apiMethod).INVOKE(() => {
-                        //         apiMethod.Signature.Parameters.ForEach(p => ARGUMENT(@requestData.DOT(p.Name.ToPascalCase())));
-                        //     }))
-                        // );
-                        //
-                        // DO.RETURN(THIS.DOT("Json").INVOKE(resultValueLocal));
+
+                        resultValueLocal.ASSIGN(
+                            AWAIT(THIS.DOT(@serviceField).DOT(apiMethod).INVOKE(() => {
+                                apiMethod.Signature.Parameters.ForEach(p => ARGUMENT(@requestData.DOT(p.Name.ToPascalCase())));
+                            }))
+                        );
+
+                        DO.RETURN(THIS.DOT("Json").INVOKE(resultValueLocal));
                     });
                 });
             });

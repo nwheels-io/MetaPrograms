@@ -11,4 +11,17 @@
         PreDecrement,
         PostDecrement
     }
+
+    public static class UnaryOperatorExtensions
+    {
+        public static bool IsPostfix(this UnaryOperator op)
+        {
+            return (op == UnaryOperator.PostIncrement || op == UnaryOperator.PostDecrement);
+        }
+
+        public static bool IsPrefix(this UnaryOperator op)
+        {
+            return !IsPostfix(op);
+        }
+    }
 }

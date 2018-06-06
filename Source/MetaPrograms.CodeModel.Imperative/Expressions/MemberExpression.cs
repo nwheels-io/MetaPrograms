@@ -50,7 +50,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public static MemberExpression Create(AbstractExpression target, MemberRef<AbstractMember> member)
         {
-            return BlockContext.GetBlockOrThrow().PushExpression(new MemberExpression(
+            return BlockContextBase.GetBlockOrThrow().PushExpression(new MemberExpression(
                 type: target.Type, 
                 target, 
                 member));
@@ -58,7 +58,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public static MemberExpression Create(AbstractExpression target, string memberName)
         {
-            return BlockContext.GetBlockOrThrow().PushExpression(new MemberExpression(
+            return BlockContextBase.GetBlockOrThrow().PushExpression(new MemberExpression(
                 type: target.Type, 
                 target, 
                 member: MemberRef<AbstractMember>.Null, 
