@@ -15,6 +15,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public MemberModifier? Modifier { get; set; }
         public List<AttributeDescription> Attributes { get; set; }
         public string AssemblyName { get; set; }
+        public string ModuleName { get; set; }
         public string Namespace { get; set; }
         public MemberRef<TypeMember>? BaseType { get; set; }
         public HashSet<MemberRef<TypeMember>> Interfaces { get; set; }
@@ -32,6 +33,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public List<MemberRef<TypeMember>> GenericArguments { get; set; }
         public List<MemberRef<TypeMember>> GenericParameters { get; set; }
         public MemberRef<TypeMember>? UnderlyingType { get; set; }
+        public List<ImportDirective> Imports { get; set; }
         public List<MemberRef<AbstractMember>> Members { get; set; }
         public TypeGeneratorInfo? Generator { get; set; }
     }

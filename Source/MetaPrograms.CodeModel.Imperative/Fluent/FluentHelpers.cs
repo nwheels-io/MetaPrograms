@@ -14,6 +14,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             var context = CodeGeneratorContext.GetContextOrThrow();
             var traits = context.PopStateOrThrow<MemberTraitsContext>();
             var namespaceContext = context.TryLookupState<NamespaceContext>();
+            var moduleContext = context.TryLookupState<ModuleMemberContext>();
             var containingTypeRef = context.TryLookupState<MemberRef<TypeMember>>();
 
             var builder = new TypeMemberBuilder();
@@ -32,7 +33,10 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             }
 
             var finalMember = new RealTypeMember(builder);
+
             builder.GetMemberSelfReference().Reassign(finalMember);
+            moduleContext?.AddMember(finalMember.GetAbstractRef());
+
             return finalMember;
         }
 

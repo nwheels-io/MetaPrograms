@@ -17,6 +17,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.Modifier = this.Modifier.Assign(builder.Modifier);
             this.Attributes = this.Attributes.Assign(builder.Attributes?.ToImmutableList());
             this.AssemblyName = this.AssemblyName.Assign(builder.AssemblyName);
+            this.ModuleName = this.ModuleName.Assign(builder.ModuleName);
             this.Namespace = this.Namespace.Assign(builder.Namespace);
             this.BaseType = this.BaseType.Assign(builder.BaseType);
             this.Interfaces = this.Interfaces.Assign(builder.Interfaces?.ToImmutableHashSet());
@@ -34,6 +35,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.GenericArguments = this.GenericArguments.Assign(builder.GenericArguments?.ToImmutableList());
             this.GenericParameters = this.GenericParameters.Assign(builder.GenericParameters?.ToImmutableList());
             this.UnderlyingType = this.UnderlyingType.Assign(builder.UnderlyingType);
+            this.Imports = this.Imports.Assign(builder.Imports?.ToImmutableList());
             this.Members = this.Members.Assign(builder.Members?.ToImmutableList());
             this.Generator = this.Generator.Assign(builder.Generator);
         }
@@ -45,6 +47,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public Mutator<MemberModifier>? Modifier { get; set; }
         public Mutator<ImmutableList<AttributeDescription>>? Attributes { get; set; }
         public Mutator<string>? AssemblyName { get; set; }
+        public Mutator<string>? ModuleName { get; set; }
         public Mutator<string>? Namespace { get; set; }
         public Mutator<MemberRef<TypeMember>>? BaseType { get; set; }
         public Mutator<ImmutableHashSet<MemberRef<TypeMember>>>? Interfaces { get; set; }
@@ -62,6 +65,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public Mutator<ImmutableList<MemberRef<TypeMember>>>? GenericArguments { get; set; }
         public Mutator<ImmutableList<MemberRef<TypeMember>>>? GenericParameters { get; set; }
         public Mutator<MemberRef<TypeMember>>? UnderlyingType { get; set; }
+        public Mutator<ImmutableList<ImportDirective>>? Imports { get; set; }
         public Mutator<ImmutableList<MemberRef<AbstractMember>>>? Members { get; set; }
         public Mutator<TypeGeneratorInfo>? Generator { get; set; }
 

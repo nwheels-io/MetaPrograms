@@ -1,8 +1,9 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Example.AspNetAdapter;
-using Example.WebBrowserAdapter;
+using Example.HyperappAdapter;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.Roslyn;
@@ -42,12 +43,18 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             var uiMetadata = new WebUIMetadata(codeModel);
             
             var output = new TestCodeGeneratorOutput();
-            var adapter = new WebBrowserAdapter(output);
+            var adapter = new HyperappAdapter(output);
             adapter.GenerateImplementations(uiMetadata);
 
             // assert
 
-            AssertOutputs(output.SourceFiles, "index.html", "index.js", "tinyfx.js");
+            WriteOutputToDisk(output, "FrontEnd");
+            AssertOutputs(
+                output.SourceFiles, 
+                "build/index.html", 
+                "src/index.js",
+                "src/components/form.js",
+                "src/services/greetingService.js");
         }
 
         [Test]
@@ -68,9 +75,12 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
 
             // assert
 
-            WriteOutputToDisk(output);
-
-            //AssertOutputs(backEndOutput.SourceFiles, "IndexController.cs", "InvalidModelAutoResponderAttribute.cs");
+            WriteOutputToDisk(output, "BackEnd");
+            AssertOutputs(
+                output.SourceFiles,
+                "App/Services/WebApi/GreetingServiceController.cs",
+                "App/Services/WebApi/GetGreetingForNameInvocation.cs",
+                "AspNetAdapter/InvalidModelAutoResponderAttribute.cs");
         }
 
         private Workspace LoadExampleWebAppWorkspace()
@@ -100,7 +110,6 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
         {
             outputs
                 .Select(kvp => kvp.Key)
-                .Select(Path.GetFileName)
                 .ShouldBe(expectedFileNames, ignoreOrder: true);
 
             var expectedOutputsDirectory = Path.Combine(ExamplesRootDirectory, "ExpectedOutput");
@@ -111,9 +120,9 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             }
         }
 
-        private void WriteOutputToDisk(TestCodeGeneratorOutput output)
+        private void WriteOutputToDisk(TestCodeGeneratorOutput output, string subFolder)
         {
-            var outputPath = @"C:\temp\codegen";
+            var outputPath = Path.Combine(@"C:\temp\codegen", subFolder);
             
             foreach (var pair in output.SourceFiles)
             {

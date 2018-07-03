@@ -34,6 +34,9 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public void FIELD(Type type, string name, out FieldMember @ref, Action body = null)
             => @ref = new FieldGenerator(GetContextOrThrow(), type, name, body).GenerateMember();
 
+        public void FIELD(string name, out FieldMember @ref, Action body = null)
+            => @ref = new FieldGenerator(GetContextOrThrow(), MemberRef<TypeMember>.Null, name, body).GenerateMember();
+
         //{
         //    var context = CodeGeneratorContext.GetContextOrThrow();
         //    var traits = context.PopStateOrThrow<MemberTraitsContext>();
@@ -71,6 +74,9 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public TypeMember INTERFACE(string name, Action body) 
             => FluentHelpers.BuildTypeMember(TypeMemberKind.Interface, name, body);
 
+        public TypeMember MODULE(string name, Action body)
+            => FluentHelpers.BuildTypeMember(TypeMemberKind.Module, name, body);
+
         public ConstructorMember CONSTRUCTOR(Action body)
             => new ConstructorGenerator(GetContextOrThrow(), body).GenerateMember();
 
@@ -79,6 +85,9 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         
         public MethodMember FUNCTION(MemberRef<TypeMember> returnType, string name, Action body)
             => new MethodGenerator(GetContextOrThrow(), returnType, name, body).GenerateMember();
+
+        public MethodMember FUNCTION(string name, Action body)
+            => new MethodGenerator(GetContextOrThrow(), name, body).GenerateMember();
 
         public MethodMember VOID(string name, Action body)
             => new MethodGenerator(GetContextOrThrow(), name, body).GenerateMember();

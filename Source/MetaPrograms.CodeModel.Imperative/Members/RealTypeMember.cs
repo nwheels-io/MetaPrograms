@@ -11,6 +11,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             : base(builder, selfReference: builder.GetMemberSelfReference())
         {
             this.AssemblyName = builder.AssemblyName;
+            this.ModuleName = builder.ModuleName;
             this.Namespace = builder.Namespace;
             this.BaseType = builder.BaseType;
             this.Interfaces = builder.Interfaces.ToImmutableHashSet();
@@ -28,6 +29,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.GenericArguments = builder.GenericArguments.ToImmutableList();
             this.GenericParameters = builder.GenericParameters.ToImmutableList();
             this.UnderlyingType = builder.UnderlyingType;
+            this.Imports = builder.Imports.ToImmutableList();
             this.Members = builder.Members.ToImmutableList();
             this.Generator = builder.Generator;
             this.Bindings.UnionWith(builder.Bindings);
@@ -37,6 +39,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             : base(source, mutator)
         {
             this.AssemblyName = mutator.AssemblyName.MutatedOrOriginal(source.AssemblyName);
+            this.ModuleName = mutator.AssemblyName.MutatedOrOriginal(source.ModuleName);
             this.Namespace = mutator.Namespace.MutatedOrOriginal(source.AssemblyName);
             this.BaseType = mutator.BaseType.MutatedOrOriginal(source.BaseType);
             this.Interfaces = mutator.Interfaces.MutatedOrOriginal(source.Interfaces);
@@ -54,11 +57,13 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.GenericArguments = mutator.GenericArguments.MutatedOrOriginal(source.GenericArguments);
             this.GenericParameters = mutator.GenericParameters.MutatedOrOriginal(source.GenericParameters);
             this.UnderlyingType = mutator.UnderlyingType.MutatedOrOriginal(source.UnderlyingType);
+            this.Imports = mutator.Imports.MutatedOrOriginal(source.Imports);
             this.Members = mutator.Members.MutatedOrOriginal(source.Members);
             this.Generator = mutator.Generator.MutatedOrOriginal(source.Generator);
         }
 
         public override string AssemblyName { get; }
+        public override string ModuleName { get; }
         public override string Namespace { get; }
         public override MemberRef<TypeMember> BaseType { get; }
         public override ImmutableHashSet<MemberRef<TypeMember>> Interfaces { get; }
@@ -76,6 +81,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public override ImmutableList<MemberRef<TypeMember>> GenericArguments { get; }
         public override ImmutableList<MemberRef<TypeMember>> GenericParameters { get; }
         public override MemberRef<TypeMember> UnderlyingType { get; }
+        public override ImmutableList<ImportDirective> Imports { get; }
         public override ImmutableList<MemberRef<AbstractMember>> Members { get; }
         public override TypeGeneratorInfo Generator { get; }
 

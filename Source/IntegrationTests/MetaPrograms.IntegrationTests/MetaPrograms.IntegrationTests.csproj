@@ -16,7 +16,7 @@
     <ProjectReference Include="..\..\MetaPrograms.Adapters.Roslyn\MetaPrograms.Adapters.Roslyn.csproj" />
     <ProjectReference Include="..\CSharpAndJavaScript\Example.App\Example.App.csproj" />
     <ProjectReference Include="..\CSharpAndJavaScript\Example.AspNetAdapter\Example.AspNetAdapter.csproj" />
-    <ProjectReference Include="..\CSharpAndJavaScript\Example.WebBrowserAdapter\Example.WebBrowserAdapter.csproj" />
+    <ProjectReference Include="..\CSharpAndJavaScript\Example.HyperappAdapter\Example.HyperappAdapter.csproj" />
     <ProjectReference Include="..\CSharpAndJavaScript\Example.WebUIModel\Example.WebUIModel.csproj" />
   </ItemGroup>
 </Project>

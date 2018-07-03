@@ -2,12 +2,13 @@
 {
     public enum TypeMemberKind
     {
-        Primitive,
-        Class,
-        Struct,
-        Enum,
-        Interface,
+        Void,
         GenericParameter,
-        Void
+        Primitive,
+        Enum,
+        Struct,
+        Class,
+        Interface,
+        Module
     }
 }

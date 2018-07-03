@@ -92,6 +92,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public BindingCollection Bindings { get; } = new BindingCollection();
 
         public virtual string Name { get; }
+        public virtual string Url { get; }
         public virtual MemberRef<TypeMember> DeclaringType { get; }
         public virtual MemberStatus Status { get; }
         public virtual MemberVisibility Visibility { get; }

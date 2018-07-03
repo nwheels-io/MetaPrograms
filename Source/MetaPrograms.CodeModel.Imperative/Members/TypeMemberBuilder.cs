@@ -22,6 +22,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             this.Interfaces = new HashSet<MemberRef<TypeMember>>();
             this.GenericArguments = new List<MemberRef<TypeMember>>();
             this.GenericParameters = new List<MemberRef<TypeMember>>();
+            this.Imports = new List<ImportDirective>();
             this.Members = new List<MemberRef<AbstractMember>>();
             this.Status = MemberStatus.Incomplete;
 
@@ -36,6 +37,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public MemberModifier Modifier { get; set; }
         public List<AttributeDescription> Attributes { get; }
         public string AssemblyName { get; set; }
+        public string ModuleName { get; set; }
         public string Namespace { get; set; }
         public MemberRef<TypeMember> BaseType { get; set; }
         public HashSet<MemberRef<TypeMember>> Interfaces { get; }
@@ -53,6 +55,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public List<MemberRef<TypeMember>> GenericArguments { get; }
         public List<MemberRef<TypeMember>> GenericParameters { get; }
         public MemberRef<TypeMember> UnderlyingType { get; set; }
+        public List<ImportDirective> Imports { get; }
         public List<MemberRef<AbstractMember>> Members { get; }
         public TypeGeneratorInfo Generator { get; set; }
 
@@ -88,6 +91,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
             public override string AssemblyName => _builder.AssemblyName;
 
+            public override string ModuleName => _builder.ModuleName;
+
             public override string Namespace => _builder.Namespace;
 
             public override MemberRef<TypeMember> BaseType => _builder.BaseType;
@@ -121,6 +126,8 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             public override ImmutableList<MemberRef<TypeMember>> GenericParameters => _builder.GenericParameters.ToImmutableList();
 
             public override MemberRef<TypeMember> UnderlyingType => _builder.UnderlyingType;
+
+            public override ImmutableList<ImportDirective> Imports => _builder.Imports.ToImmutableList();
 
             public override ImmutableList<MemberRef<AbstractMember>> Members => _builder.Members.ToImmutableList();
 

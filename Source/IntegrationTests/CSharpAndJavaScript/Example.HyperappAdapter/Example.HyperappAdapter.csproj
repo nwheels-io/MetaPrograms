@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>7.2</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.6.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CommonExtensions\CommonExtensions.csproj" />
+    <ProjectReference Include="..\..\..\MetaPrograms.CodeModel.Imperative\MetaPrograms.CodeModel.Imperative.csproj" />
+    <ProjectReference Include="..\Example.WebUIModel\Example.WebUIModel.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="ClientSide\Components\form.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

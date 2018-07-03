@@ -116,6 +116,11 @@ namespace MetaPrograms.CodeModel.Imperative
             VisitAbstractExpression(expression);
         }
 
+        public virtual void VisitTupleExpression(TupleExpression expression)
+        {
+            VisitAbstractExpression(expression);
+        }
+
         public virtual void VisitConstantExpression(ConstantExpression expression)
         {
             VisitAbstractExpression(expression);
@@ -152,6 +157,11 @@ namespace MetaPrograms.CodeModel.Imperative
         }
 
         public virtual void VisitNewObjectExpression(NewObjectExpression expression)
+        {
+            VisitAbstractExpression(expression);
+        }
+
+        public virtual void VisitObjectInitializerExpression(ObjectInitializerExpression expression)
         {
             VisitAbstractExpression(expression);
         }

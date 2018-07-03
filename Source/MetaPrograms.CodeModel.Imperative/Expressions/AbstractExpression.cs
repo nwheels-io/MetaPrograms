@@ -24,7 +24,12 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public BindingCollection Bindings { get; } = new BindingCollection();
         public MemberRef<TypeMember> Type { get; }
-        
+
+        public static AbstractExpression FromValue(object value)
+        {
+            return FromValue(value, resolveType: t => MemberRef<TypeMember>.Null);
+        }
+
         public static AbstractExpression FromValue(object value, Func<Type, MemberRef<TypeMember>> resolveType)
         {
             if (value == null)
@@ -40,7 +45,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             var typeRef = resolveType(value.GetType());
             var type = typeRef.Get();
             
-            if (type.IsArray)
+            if (type != null && type.IsArray)
             {
                 return new NewArrayExpression(
                     typeRef, 
@@ -49,7 +54,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
                     ((IEnumerable)value).Cast<object>().Select(x => FromValue(x, resolveType)).ToImmutableList());
             }
             
-            return new ConstantExpression(type.GetRef(), value);
+            return new ConstantExpression(typeRef, value);
         }
     }
 }

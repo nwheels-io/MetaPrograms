@@ -32,6 +32,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         }
 
         public abstract string AssemblyName { get; }
+        public abstract string ModuleName { get; }
         public abstract string Namespace { get; }
         public abstract MemberRef<TypeMember> BaseType { get; }
         public abstract ImmutableHashSet<MemberRef<TypeMember>> Interfaces { get; }
@@ -49,6 +50,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public abstract ImmutableList<MemberRef<TypeMember>> GenericArguments { get; }
         public abstract ImmutableList<MemberRef<TypeMember>> GenericParameters { get; }
         public abstract MemberRef<TypeMember> UnderlyingType { get; }
+        public abstract ImmutableList<ImportDirective> Imports { get; }
         public abstract ImmutableList<MemberRef<AbstractMember>> Members { get; }
         public abstract TypeGeneratorInfo Generator { get; }
 

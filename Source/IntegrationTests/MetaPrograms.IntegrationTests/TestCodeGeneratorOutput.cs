@@ -16,7 +16,10 @@ namespace MetaPrograms.IntegrationTests
 
         public void AddSourceFile(IEnumerable<string> folderPath, string fileName, string contents)
         {
-            var filePath = Path.Combine(folderPath.Concat(new[] { fileName }).ToArray());
+            var filePath = Path
+                .Combine(folderPath.Concat(new[] { fileName }).ToArray())
+                .Replace(Path.DirectorySeparatorChar, '/');
+
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             
