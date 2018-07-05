@@ -17,5 +17,6 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public FluentMember ASYNC => new FluentMember(isAsync: true);
         public FluentMember READONLY => new FluentMember(isReadOnly: true);
+        public FluentMember DEFAULT => new FluentMember(isDefaultExport: true);
     }
 }

@@ -14,5 +14,6 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public MemberModifier Modifier { get; set; }
         public bool IsAsync { get; set; }
         public bool IsReadonly { get; set; }
+        public bool IsDefaultExport { get; set; }
     }
 }

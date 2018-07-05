@@ -290,6 +290,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             return INVOKE(expression, invocation.GetArguments());
         }
 
+        //public static AnonymousDelegateExpression LAMBDA()
+
         public static AbstractExpression TYPED(object value)
         {
             var context = GetContextOrThrow();

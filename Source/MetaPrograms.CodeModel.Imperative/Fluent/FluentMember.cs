@@ -9,7 +9,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public class FluentMember
     {
-        public FluentMember(bool? isAsync = null, bool? isReadOnly = null)
+        public FluentMember(bool? isAsync = null, bool? isReadOnly = null, bool? isDefaultExport = null)
         {
             var traits = CodeGeneratorContext.GetContextOrThrow().PeekStateOrThrow<MemberTraitsContext>();
 
@@ -21,6 +21,11 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             if (isReadOnly.HasValue)
             {
                 traits.IsReadonly = isReadOnly.Value;
+            }
+
+            if (isDefaultExport.HasValue)
+            {
+                traits.IsDefaultExport = isDefaultExport.Value;
             }
         }
 
