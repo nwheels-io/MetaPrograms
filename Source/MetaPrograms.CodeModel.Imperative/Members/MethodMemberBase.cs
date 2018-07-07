@@ -8,44 +8,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public abstract class MethodMemberBase : AbstractMember
     {
-        protected MethodMemberBase(
-            string name, 
-            MemberRef<TypeMember> declaringType, 
-            MemberStatus status, 
-            MemberVisibility visibility, 
-            MemberModifier modifier, 
-            ImmutableList<AttributeDescription> attributes, 
-            MethodSignature signature, 
-            BlockStatement body) 
-            : base(name, declaringType, status, visibility, modifier, attributes)
-        {
-            Signature = signature;
-            Body = body;
-        }
-
-        protected MethodMemberBase(
-            MethodMemberBase source, 
-            Mutator<string>? name = null, 
-            Mutator<MemberRef<TypeMember>>? declaringType = null, 
-            Mutator<MemberStatus>? status = null, 
-            Mutator<MemberVisibility>? visibility = null, 
-            Mutator<MemberModifier>? modifier = null, 
-            Mutator<ImmutableList<AttributeDescription>>? attributes = null,
-            Mutator<MethodSignature>? signature = null,
-            Mutator<BlockStatement>? body = null,
-            bool shouldReplaceSource = false) 
-            : base(source, name, declaringType, status, visibility, modifier, attributes, shouldReplaceSource)
-        {
-            Signature = signature.MutatedOrOriginal(source.Signature);
-            Body = body.MutatedOrOriginal(source.Body);
-        }
-
-        public MemberRef<MethodMemberBase> GetRef() => new MemberRef<MethodMemberBase>(SelfReference);
-
-        public abstract MethodMemberBase WithSignature(MethodSignature signature, bool shouldReplaceSource = false);
-
-        public abstract MethodMemberBase WithBody(BlockStatement block, bool shouldReplaceSource = false);
-
         public override void AcceptVisitor(MemberVisitor visitor)
         {
             base.AcceptVisitor(visitor);
@@ -75,10 +37,10 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public bool IsVoid => Signature.IsVoid;
         public bool IsAsync => Signature.IsAsync;
-        public MemberRef<TypeMember> ReturnType => Signature.ReturnType;
+        public TypeMember ReturnType => Signature.ReturnType;
 
-        public MethodSignature Signature { get; }
-        public BlockStatement Body { get; }
+        public MethodSignature Signature { get; set; }
+        public BlockStatement Body { get; set; }
 
         protected static MemberModifier GetMemberModifier(MethodBase binding)
         {

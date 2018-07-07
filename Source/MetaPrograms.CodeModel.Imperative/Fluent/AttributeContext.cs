@@ -5,11 +5,11 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public class AttributeContext
     {
-        public AttributeContext()
+        public AttributeContext(AttributeDescription attribute)
         {
-            NamedProperties = new List<NamedPropertyValue>();
+            Attribute = attribute;
         }
 
-        public List<NamedPropertyValue> NamedProperties { get; }
+        public AttributeDescription Attribute { get; }
     }
 }

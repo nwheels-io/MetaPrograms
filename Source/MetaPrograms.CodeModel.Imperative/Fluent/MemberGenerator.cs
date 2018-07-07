@@ -5,11 +5,11 @@ using MetaPrograms.CodeModel.Imperative.Members;
 namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public abstract class MemberGenerator<TMember>
-        where TMember : AbstractMember
+        where TMember : AbstractMember, new()
     {
         public CodeGeneratorContext Context { get; }
         public MemberTraitsContext Traits { get; }
-        public TypeMemberBuilder TypeBuilder { get; }
+        public TypeMember DeclaringType { get; }
         public string Name { get; }
         public Action Body { get; }
 
@@ -19,18 +19,19 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             this.Name = name;
             this.Body = body;
             this.Traits = context.PopStateOrThrow<MemberTraitsContext>();;
-            this.TypeBuilder = context.GetCurrentTypeBuilder();
+            this.DeclaringType = context.GetCurrentType();
         }
 
         public TMember GenerateMember()
         {
-            var member = CreateMember();
-            
-            TypeBuilder.Members.Add(member.GetAbstractRef());
+            var member = new TMember();
+            InitializeMember(member);
 
-            using (Context.PushState(member.GetAbstractRef()))
+            this.DeclaringType.Members.Add(member);
+
+            using (Context.PushState(member))
             {
-                using (Context.PushState(CreateStateAroundBody()))
+                using (Context.PushState(CreateStateAroundBody(member)))
                 {
                     Body?.Invoke();
                 }
@@ -38,50 +39,47 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
             return member;
         }
-        
-        protected abstract TMember CreateMember();
-        protected virtual IDisposable CreateStateAroundBody() => null;
-        
-        protected MemberRef<TypeMember> TypeBuilderRef => TypeBuilder.GetTemporaryProxy().GetRef();
-        protected ImmutableList<AttributeDescription> EmptyAttributes => ImmutableList<AttributeDescription>.Empty;
-        protected ImmutableList<MethodParameter> EmptyParameters => ImmutableList<MethodParameter>.Empty;
+
+        protected virtual void InitializeMember(TMember member)
+        {
+            member.DeclaringType = this.DeclaringType;
+            member.Name = this.Name;
+            member.Status = MemberStatus.Generator;
+            member.Visibility = Traits.Visibility;
+            member.Modifier = Traits.Modifier;
+        }
+
+        protected virtual IDisposable CreateStateAroundBody(TMember member) => null;
     }
 
     public class FieldGenerator : MemberGenerator<FieldMember>
     {
-        public MemberRef<TypeMember> FieldType { get; }
+        public TypeMember FieldType { get; }
 
         public FieldGenerator(CodeGeneratorContext context, Type fieldType, string name, Action body)
             : this(context, context.FindType(fieldType), name, body)
         {
         }
 
-        public FieldGenerator(CodeGeneratorContext context, MemberRef<TypeMember> fieldType, string name, Action body)
+        public FieldGenerator(CodeGeneratorContext context, TypeMember fieldType, string name, Action body)
             : base(context, name, body)
         {
             this.FieldType = fieldType;
         }
 
-        protected override FieldMember CreateMember()
+        protected override void InitializeMember(FieldMember member)
         {
-            return new FieldMember(
-                Name,
-                TypeBuilderRef,
-                MemberStatus.Generator,
-                Traits.Visibility,
-                Traits.Modifier,
-                EmptyAttributes,
-                FieldType,
-                Traits.IsReadonly,
-                initializer: null);
+            base.InitializeMember(member);
+            member.Type = FieldType;
+            member.IsReadOnly = Traits.IsReadOnly;
         }
     }
 
     public class PropertyGenerator : MemberGenerator<PropertyMember>
     {
-        public MemberRef<TypeMember> PropertyType { get; }
+        public TypeMember PropertyType { get; }
 
-        public PropertyGenerator(CodeGeneratorContext context, MemberRef<TypeMember> propertyType, string name, Action body)
+        public PropertyGenerator(CodeGeneratorContext context, TypeMember propertyType, string name, Action body)
             : base(context, name, body)
         {
             this.PropertyType = propertyType;
@@ -92,18 +90,10 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         {
         }
 
-        protected override PropertyMember CreateMember()
+        protected override void InitializeMember(PropertyMember member)
         {
-            return new PropertyMember(
-                Name,
-                TypeBuilderRef,
-                MemberStatus.Generator,
-                Traits.Visibility,
-                Traits.Modifier,
-                EmptyAttributes,
-                PropertyType,
-                getter: MemberRef<MethodMember>.Null,
-                setter: MemberRef<MethodMember>.Null);
+            base.InitializeMember(member);
+            member.PropertyType = this.PropertyType;
         }
     }
     
@@ -114,36 +104,26 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         {
         }
 
-        protected override ConstructorMember CreateMember()
+        protected override void InitializeMember(ConstructorMember member)
         {
-            return new ConstructorMember(
-                TypeBuilderRef,   
-                MemberStatus.Generator, 
-                Traits.Visibility,
-                Traits.Modifier,
-                EmptyAttributes,
-                new MethodSignature(
-                    isAsync: Traits.IsAsync, 
-                    returnValue: null, 
-                    parameters: EmptyParameters),
-                body: null,
-                callThisConstructor: null,
-                callBaseConstructor: null);
+            base.InitializeMember(member);
+            member.Signature = new MethodSignature();
+            member.Body = new Statements.BlockStatement();
         }
 
-        protected override IDisposable CreateStateAroundBody()
+        protected override IDisposable CreateStateAroundBody(ConstructorMember member)
         {
-            return new MethodBodyContext(this.Context);
+            return new BlockContext(member.Body);
         }
     }
     
     public class MethodGenerator : MemberGenerator<MethodMember>
     {
-        public MemberRef<TypeMember> ReturnType { get; }
+        public TypeMember ReturnType { get; }
         public MethodMember AncestorMethod { get; }
         
         public MethodGenerator(CodeGeneratorContext context, string name, Action body)
-            : this(context, MemberRef<TypeMember>.Null, name, body)
+            : this(context, (Type)null, name, body)
         {
         }
 
@@ -153,7 +133,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             this.ReturnType = Context.FindType(returnType);
         }
 
-        public MethodGenerator(CodeGeneratorContext context, MemberRef<TypeMember> returnType, string name, Action body)
+        public MethodGenerator(CodeGeneratorContext context, TypeMember returnType, string name, Action body)
             : base(context, name, body)
         {
             this.ReturnType = returnType;
@@ -166,36 +146,31 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             this.ReturnType = ancestorMethod.ReturnType;
         }
 
-        protected override MethodMember CreateMember()
+        protected override void InitializeMember(MethodMember member)
         {
-            return new MethodMember(
-                Name,
-                TypeBuilderRef,   
-                MemberStatus.Generator, 
-                Traits.Visibility,
-                Traits.Modifier,
-                EmptyAttributes,
-                CreateSignature(),
-                body: null);
+            base.InitializeMember(member);
+            member.Signature = CreateSignature();
+            member.Body = new Statements.BlockStatement();
         }
 
-        protected override IDisposable CreateStateAroundBody()
+        protected override IDisposable CreateStateAroundBody(MethodMember member)
         {
-            return new MethodBodyContext(this.Context);
+            return new BlockContext(member.Body);
         }
 
         private MethodSignature CreateSignature() => (
             AncestorMethod != null
                 ? AncestorMethod.Signature
-                : new MethodSignature(
-                    isAsync: Traits.IsAsync,
-                    returnValue: ReturnValueParameter,
-                    parameters: EmptyParameters)
+                : new MethodSignature { 
+                    IsAsync = Traits.IsAsync,
+                    ReturnValue = ReturnValueParameter
+                }
         );
  
         private MethodParameter ReturnValueParameter => (
-            ReturnType.IsNotNull
-            ? new MethodParameter(null, 0, ReturnType, MethodParameterModifier.None, EmptyAttributes)
-            : null);
+            ReturnType != null
+            ? new MethodParameter { Type = ReturnType }
+            : null
+        );
     }
 }

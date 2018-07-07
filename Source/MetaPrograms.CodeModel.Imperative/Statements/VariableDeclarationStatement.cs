@@ -5,23 +5,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
 {
     public class VariableDeclarationStatement : AbstractStatement
     {
-        public VariableDeclarationStatement(
-            LocalVariable variable, 
-            AbstractExpression initialValue)
-        {
-            Variable = variable;
-            InitialValue = initialValue;
-        }
-
-        public VariableDeclarationStatement(
-            VariableDeclarationStatement source,
-            Mutator<LocalVariable>? variable = null,
-            Mutator<AbstractExpression>? initialValue = null)
-        {
-            Variable = variable.MutatedOrOriginal(source.Variable);
-            InitialValue = initialValue.MutatedOrOriginal(source.InitialValue);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitVariableDeclaraitonStatement(this);
@@ -37,7 +20,7 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
-        public LocalVariable Variable { get; }
-        public AbstractExpression InitialValue { get; }
+        public LocalVariable Variable { get; set; }
+        public AbstractExpression InitialValue { get; set; }
     }
 }

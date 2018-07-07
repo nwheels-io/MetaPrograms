@@ -5,18 +5,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
 {
     public class SwitchStatement : AbstractStatement
     {
-        public SwitchStatement(ImmutableList<SwitchCaseBlock> caseBlocks)
-        {
-            CaseBlocks = caseBlocks;
-        }
-
-        public SwitchStatement(
-            SwitchStatement source,
-            Mutator<ImmutableList<SwitchCaseBlock>>? caseBlocks = null)
-        {
-            CaseBlocks = caseBlocks.MutatedOrOriginal(source.CaseBlocks);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitSwitchStatement(this);
@@ -27,6 +15,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
-        public ImmutableList<SwitchCaseBlock> CaseBlocks { get; }
+        public List<SwitchCaseBlock> CaseBlocks { get; } = new List<SwitchCaseBlock>();
     }
 }

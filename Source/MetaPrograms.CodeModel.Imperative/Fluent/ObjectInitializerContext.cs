@@ -8,13 +8,11 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public class ObjectInitializerContext
     {
-        private readonly List<NamedPropertyValue> _propertyValues = new List<NamedPropertyValue>();
-
         public void Add(string name, AbstractExpression value)
         {
-            _propertyValues.Add(new NamedPropertyValue(name, value));
+            PropertyValues.Add(new NamedPropertyValue(name, value));
         }
 
-        public IReadOnlyList<NamedPropertyValue> PropertyValues => _propertyValues;
+        public List<NamedPropertyValue> PropertyValues { get; } = new List<NamedPropertyValue>();
     }
 }

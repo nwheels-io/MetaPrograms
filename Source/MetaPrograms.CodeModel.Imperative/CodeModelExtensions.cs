@@ -9,7 +9,7 @@ namespace MetaPrograms.CodeModel.Imperative
     {
         public static TypeMember CloseType(this ImperativeCodeModel model, Type openType, params TypeMember[] typeArguments)
         {
-            return model.Get<TypeMember>(openType).Get().MakeGenericType(typeArguments);
+            return model.Get<TypeMember>(openType).MakeGenericType(typeArguments);
         }
 
         public static TypeMember Type<TClrType>(this ImperativeCodeModel model)

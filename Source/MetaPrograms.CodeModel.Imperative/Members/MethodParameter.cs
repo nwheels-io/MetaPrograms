@@ -6,38 +6,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class MethodParameter : IAssignable
     {
-        public MethodParameter(
-            string name, 
-            int position,
-            MemberRef<TypeMember> type, 
-            MethodParameterModifier modifier, 
-            ImmutableList<AttributeDescription> attributes)
-        {
-            Name = name;
-            Position = position;
-            Type = type;
-            Modifier = modifier;
-            Attributes = attributes;
-        }
-
-        public MethodParameter(
-            MethodParameter source,
-            Mutator<string>? name = null,
-            Mutator<int>? position = null,
-            Mutator<MemberRef<TypeMember>>? type = null,
-            Mutator<MethodParameterModifier>? modifier = null,
-            Mutator<ImmutableList<AttributeDescription>>? attributes = null)
-        {
-            Name = name.MutatedOrOriginal(source.Name);
-            Position = position.MutatedOrOriginal(source.Position);
-            Type = type.MutatedOrOriginal(source.Type);
-            Modifier = modifier.MutatedOrOriginal(source.Modifier);
-            Attributes = attributes.MutatedOrOriginal(source.Attributes);
-        }
-
         public AbstractExpression AsExpression()
         {
-            return new ParameterExpression(this);
+            return new ParameterExpression {
+                Parameter = this
+            };
         }
 
         public void AcceptVisitor(StatementVisitor visitor)
@@ -45,17 +18,19 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             visitor.VisitReferenceToMethodParameter(this);
         }
 
-        public string Name { get; }
-        public int Position { get; }
-        public MemberRef<TypeMember> Type { get; }
-        public MethodParameterModifier Modifier { get; }
-        public ImmutableList<AttributeDescription> Attributes { get; }
+        public string Name { get; set; }
+        public int Position { get; set; }
+        public TypeMember Type { get; set; }
+        public MethodParameterModifier Modifier { get; set; }
+        public List<AttributeDescription> Attributes { get; } = new List<AttributeDescription>();
 
         public static MethodParameter ReturnVoid => null;
 
         public static implicit operator ParameterExpression(MethodParameter source)
         {
-            return new ParameterExpression(source);
+            return new ParameterExpression {
+                Parameter = source
+            };
         }
     }
 }

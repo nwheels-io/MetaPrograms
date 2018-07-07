@@ -13,7 +13,10 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public void AddArgument(AbstractExpression expression, MethodParameterModifier modifier = MethodParameterModifier.None)
         {
-            _arguments.Add(new Argument(expression, modifier));
+            _arguments.Add(new Argument { 
+                Expression = expression, 
+                Modifier = modifier
+            });
         }
 
         public IReadOnlyList<Argument> GetArguments()

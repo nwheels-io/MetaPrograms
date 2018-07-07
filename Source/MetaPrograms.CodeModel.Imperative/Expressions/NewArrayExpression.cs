@@ -7,51 +7,13 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class NewArrayExpression : AbstractExpression
     {
-        public NewArrayExpression(
-            MemberRef<TypeMember> type,
-            MemberRef<TypeMember> elementType, 
-            AbstractExpression length, 
-            ImmutableList<AbstractExpression> initializerValues) 
-            : this(
-                type, 
-                elementType, 
-                ImmutableList<AbstractExpression>.Empty.Add(length), 
-                ImmutableList<ImmutableList<AbstractExpression>>.Empty.Add(initializerValues))
-        {
-        }
-
-        public NewArrayExpression(
-            MemberRef<TypeMember> type,
-            MemberRef<TypeMember> elementType, 
-            ImmutableList<AbstractExpression> dimensionLengths, 
-            ImmutableList<ImmutableList<AbstractExpression>> dimensionInitializerValues) 
-            : base(type)
-        {
-            ElementType = elementType;
-            DimensionLengths = dimensionLengths;
-            DimensionInitializerValues = dimensionInitializerValues;
-        }
-
-        public NewArrayExpression(
-            NewArrayExpression source,
-            Mutator<MemberRef<TypeMember>>? type = null,
-            Mutator<MemberRef<TypeMember>>? elementType = null,
-            Mutator<ImmutableList<AbstractExpression>>? dimensionLengths = null,
-            Mutator<ImmutableList<ImmutableList<AbstractExpression>>>? dimensionInitializerValues = null) 
-            : base(source, type)
-        {
-            ElementType = elementType.MutatedOrOriginal(source.ElementType);
-            DimensionLengths = dimensionLengths.MutatedOrOriginal(source.DimensionLengths);
-            DimensionInitializerValues = dimensionInitializerValues.MutatedOrOriginal(source.DimensionInitializerValues);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitNewArrayExpression(this);
 
-            if (ElementType.Get() != null)
+            if (ElementType != null)
             {
-                visitor.VisitReferenceToTypeMember(ElementType.Get());
+                visitor.VisitReferenceToTypeMember(ElementType);
             }
 
             if (DimensionLengths != null)
@@ -97,8 +59,8 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public MemberRef<TypeMember> ElementType { get; }
-        public ImmutableList<AbstractExpression> DimensionLengths { get; }
-        public ImmutableList<ImmutableList<AbstractExpression>> DimensionInitializerValues { get; }
+        public TypeMember ElementType { get; set; }
+        public List<AbstractExpression> DimensionLengths { get; } = new List<AbstractExpression>();
+        public List<List<AbstractExpression>> DimensionInitializerValues { get; set; } = new List<List<AbstractExpression>>();
     }
 }

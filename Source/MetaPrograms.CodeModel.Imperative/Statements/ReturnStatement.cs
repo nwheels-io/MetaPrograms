@@ -4,18 +4,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
 {
     public class ReturnStatement : AbstractStatement
     {
-        public ReturnStatement(AbstractExpression expression)
-        {
-            Expression = expression;
-        }
-
-        public ReturnStatement(
-            ReturnStatement source,
-            Mutator<AbstractExpression>? expression = null)
-        {
-            Expression = expression.MutatedOrOriginal(source.Expression);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitReturnStatement(this);
@@ -26,6 +14,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
-        public AbstractExpression Expression { get; }
+        public AbstractExpression Expression { get; set; }
     }
 }

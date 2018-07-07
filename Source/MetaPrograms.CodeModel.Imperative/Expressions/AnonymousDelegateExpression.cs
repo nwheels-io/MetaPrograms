@@ -6,24 +6,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class AnonymousDelegateExpression : AbstractExpression
     {
-        public AnonymousDelegateExpression(MethodSignature signature, BlockStatement body)
-            : base(signature.IsVoid ? TypeMember.Void : signature.ReturnValue.Type)
-        {
-            this.Body = body;
-        }
-
-        public AnonymousDelegateExpression(
-            AnonymousDelegateExpression expression,
-            Mutator<MethodSignature>? signature = null,
-            Mutator<BlockStatement>? body = null) : 
-            base(
-                expression, 
-                signature.MutatedOrOriginal(expression.Signature).ReturnValue?.Type)
-        {
-            this.Signature = signature.MutatedOrOriginal(expression.Signature);
-            this.Body = body.MutatedOrOriginal(expression.Body);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitAnonymousDelegateExpression(this);
@@ -31,6 +13,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         }
 
         public MethodSignature Signature { get; set; }
-        public BlockStatement Body { get; }
+        public BlockStatement Body { get; set; }
     }
 }

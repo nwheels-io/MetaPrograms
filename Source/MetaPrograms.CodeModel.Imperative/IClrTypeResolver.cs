@@ -5,13 +5,13 @@ namespace MetaPrograms.CodeModel.Imperative
 {
     public interface IClrTypeResolver
     {
-        MemberRef<TypeMember> Resolve(Type clrType, ImperativeCodeModel codeModel, int distance);
-        void Complete(MemberRef<TypeMember> existingRef, ImperativeCodeModel codeModel);
+        TypeMember Resolve(Type clrType, ImperativeCodeModel codeModel, int distance);
+        void Complete(TypeMember existingType, ImperativeCodeModel codeModel);
     }
 
     public static class ClrTypeResolverExtensions
     {
-        public static MemberRef<TypeMember> Resolve<TClrType>(
+        public static TypeMember Resolve<TClrType>(
             this IClrTypeResolver resolver, 
             ImperativeCodeModel codeModel, 
             int distance)

@@ -29,7 +29,6 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
     public interface IFluentImportFrom
     {
         void FROM(string moduleName);
-        void FROM(MemberRef<TypeMember> module);
+        void FROM(TypeMember module);
     }
-
 }

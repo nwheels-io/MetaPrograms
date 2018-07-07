@@ -6,23 +6,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
 {
     public class BlockStatement : AbstractStatement
     {
-        public BlockStatement(
-            ImmutableList<LocalVariable> locals, 
-            ImmutableList<AbstractStatement> statements)
-        {
-            this.Locals = locals;
-            this.Statements = statements;
-        }
-
-        public BlockStatement(
-            BlockStatement source,
-            Mutator<ImmutableList<LocalVariable>>? locals = null,
-            Mutator<ImmutableList<AbstractStatement>>? statements = null)
-        {
-            this.Locals = locals.MutatedOrOriginal(source.Locals);
-            this.Statements = statements.MutatedOrOriginal(source.Statements);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitBlockStatement(this);
@@ -33,7 +16,7 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
-        public ImmutableList<LocalVariable> Locals { get; }
-        public ImmutableList<AbstractStatement> Statements { get; }
+        public List<LocalVariable> Locals { get; } = new List<LocalVariable>();
+        public List<AbstractStatement> Statements { get; } = new List<AbstractStatement>();
     }
 }

@@ -5,58 +5,45 @@ using System.Reflection;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
-    public abstract class TypeMember : AbstractMember
+    public class TypeMember : AbstractMember
     {
-        protected TypeMember(TypeMemberBuilder builder, MemberRefState selfReference = null)
-            : base(
-                builder.Name, 
-                builder.DeclaringType, 
-                builder.Status, 
-                builder.Visibility, 
-                builder.Modifier, 
-                builder.Attributes.ToImmutableList(),
-                selfReference)
+        public string AssemblyName { get; set; }
+        public string ModuleName { get; set; }
+        public string Namespace { get; set; }
+        public TypeMember BaseType { get; set; }
+        public HashSet<TypeMember> Interfaces { get; } = new HashSet<TypeMember>();
+        public TypeMemberKind TypeKind { get; set; }
+        public bool IsAbstract { get; set; }
+        public bool IsValueType { get; set; }
+        public bool IsCollection { get; set; }
+        public bool IsArray { get; set; }
+        public bool IsNullable { get; set; }
+        public bool IsAwaitable { get; set; }
+        public bool IsGenericType { get; set; }
+        public bool IsGenericDefinition { get; set; }
+        public bool IsGenericParameter { get; set; }
+        public TypeMember GenericTypeDefinition { get; set; }
+        public List<TypeMember> GenericArguments { get; set; } = new List<TypeMember>();
+        public List<TypeMember> GenericParameters { get; } = new List<TypeMember>();
+        public TypeMember UnderlyingType { get; set; }
+        public List<AbstractMember> Members { get; } = new List<AbstractMember>();
+        public TypeGeneratorInfo Generator { get; set; }
+
+        public bool Equals(TypeMember other)
         {
+            if (ReferenceEquals(other, null))
+            {
+                return false;
+            }
+
+            //TODO: compare by bindings
+            //if (this.ClrBinding != null)
+            //{
+            //    return (this.ClrBinding == other.ClrBinding);
+            //}
+
+            return ReferenceEquals(this, other);
         }
-
-        protected TypeMember(TypeMember source, TypeMemberMutator mutator)
-            : base(
-                source,
-                name: mutator.Name,
-                declaringType: mutator.DeclaringType,
-                status: mutator.Status,
-                visibility: mutator.Visibility,
-                modifier: mutator.Modifier,
-                attributes: mutator.Attributes)
-        {
-        }
-
-        public abstract string AssemblyName { get; }
-        public abstract string ModuleName { get; }
-        public abstract string Namespace { get; }
-        public abstract MemberRef<TypeMember> BaseType { get; }
-        public abstract ImmutableHashSet<MemberRef<TypeMember>> Interfaces { get; }
-        public abstract TypeMemberKind TypeKind { get; }
-        public abstract bool IsAbstract { get; }
-        public abstract bool IsValueType { get; }
-        public abstract bool IsCollection { get; }
-        public abstract bool IsArray { get; }
-        public abstract bool IsNullable { get; }
-        public abstract bool IsAwaitable { get; }
-        public abstract bool IsGenericType { get; }
-        public abstract bool IsGenericDefinition { get; }
-        public abstract bool IsGenericParameter { get; }
-        public abstract MemberRef<TypeMember> GenericTypeDefinition { get; }
-        public abstract ImmutableList<MemberRef<TypeMember>> GenericArguments { get; }
-        public abstract ImmutableList<MemberRef<TypeMember>> GenericParameters { get; }
-        public abstract MemberRef<TypeMember> UnderlyingType { get; }
-        public abstract ImmutableList<ImportDirective> Imports { get; }
-        public abstract ImmutableList<MemberRef<AbstractMember>> Members { get; }
-        public abstract TypeGeneratorInfo Generator { get; }
-
-        public MemberRef<TypeMember> GetRef() => new MemberRef<TypeMember>(SelfReference);
-
-        public abstract bool Equals(TypeMember other);
 
         public override bool Equals(object obj)
         {
@@ -68,23 +55,33 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return base.Equals(obj);
         }
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
         public override string ToString()
         {
             return $"{this.TypeKind} {this.Name}";
         }
 
-        public abstract TypeMember MakeGenericType(params TypeMember[] typeArguments);
-
-        public TypeMemberBuilder CreateCompletionBuilder()
+        public override int GetHashCode()
         {
-            return new TypeMemberBuilder(SelfReference);
+            //TODO: calculate from bindings
+            //if (ClrBinding != null)
+            //{
+            //    return 127 ^ ClrBinding.GetHashCode();
+            //}
+
+            return 17 ^ base.GetHashCode();
         }
-        
+
+        public TypeMember MakeGenericType(params TypeMember[] typeArguments)
+        {
+            //TODO: validate type arguments
+
+            return new TypeMember {
+                IsGenericType = true,
+                GenericTypeDefinition = this,
+                GenericArguments = typeArguments.ToList()
+            };
+        }
+
         public string MakeGenericName(string openBracket, string closeBracket, string commaSeparator)
         {
             if (!IsGenericType)
@@ -97,7 +94,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 return (
                     this.Name + 
                     openBracket + 
-                    string.Join(commaSeparator, GenericParameters.Select(t => t.Get().Name)) +
+                    string.Join(commaSeparator, GenericParameters.Select(t => t.Name)) +
                     closeBracket);
             }
             else
@@ -105,7 +102,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                 return (
                     this.Name +
                     openBracket + 
-                    string.Join(commaSeparator, GenericArguments.Select(t => t.Get().MakeGenericName(openBracket, closeBracket, commaSeparator))) +
+                    string.Join(commaSeparator, GenericArguments.Select(t => t.MakeGenericName(openBracket, closeBracket, commaSeparator))) +
                     closeBracket);
             }
         }
@@ -130,9 +127,9 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         {
             get
             {
-                if (DeclaringType.IsNotNull)
+                if (DeclaringType != null)
                 {
-                    return DeclaringType.Get().FullName + "." + Name;
+                    return DeclaringType.FullName + "." + Name;
                 }
 
                 if (!string.IsNullOrEmpty(Namespace))
@@ -144,14 +141,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             }
         }
 
-        public static readonly MemberRef<TypeMember> Void = 
-            new RealTypeMember(
-                new TypeMemberBuilder() {
-                    Status = MemberStatus.Compiled,
-                    TypeKind = TypeMemberKind.Void,
-                    Name = "void"
-                }
-            ).GetRef();
+        public static readonly TypeMember Void = new TypeMember {
+            Status = MemberStatus.Compiled,
+            TypeKind = TypeMemberKind.Void,
+            Name = "void"
+        };
 
         public static bool operator == (TypeMember member1, TypeMember member2)
         {

@@ -8,18 +8,9 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class TupleExpression : AbstractExpression
     {
-        public TupleExpression(IEnumerable<LocalVariable> variables)
-            : base(MemberRef<TypeMember>.Null)
+        public TupleExpression(params LocalVariable[] variables)
         {
-            this.Variables = variables.ToImmutableList();
-        }
-
-        public TupleExpression(
-            TupleExpression source, 
-            Mutator<ImmutableList<LocalVariable>>? variables = null)
-            : base(source, type: null)
-        {
-            this.Variables = variables.MutatedOrOriginal(source.Variables);
+            Variables.AddRange(variables);
         }
 
         public override void AcceptVisitor(StatementVisitor visitor)
@@ -32,6 +23,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public ImmutableList<LocalVariable> Variables { get; }
+        public List<LocalVariable> Variables { get; set; } = new List<LocalVariable>();
     }
 }

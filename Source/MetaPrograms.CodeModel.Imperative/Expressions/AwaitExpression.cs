@@ -4,30 +4,13 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class AwaitExpression : AbstractExpression
     {
-        public AwaitExpression(
-            MemberRef<TypeMember> type, 
-            AbstractExpression expression) 
-            : base(type)
-        {
-            Expression = expression;
-        }
-
-        public AwaitExpression(
-            AwaitExpression source,
-            Mutator<AbstractExpression>? expression = null, 
-            Mutator<MemberRef<TypeMember>>? type = null) 
-            : base(source, type)
-        {
-            Expression = expression.MutatedOrOriginal(source.Expression);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitAwaitExpression(this);
 
-            if (this.Type.Get() != null)
+            if (this.Type != null)
             {
-                visitor.VisitReferenceToTypeMember(this.Type.Get());
+                visitor.VisitReferenceToTypeMember(this.Type);
             }
 
             if (Expression != null)
@@ -36,6 +19,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public AbstractExpression Expression { get; }
+        public AbstractExpression Expression { get; set; }
     }
 }

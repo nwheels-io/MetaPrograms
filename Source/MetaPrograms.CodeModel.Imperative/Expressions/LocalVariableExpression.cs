@@ -4,23 +4,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class LocalVariableExpression : AbstractExpression, IAssignable
     {
-        public LocalVariableExpression(
-            MemberRef<TypeMember> type, 
-            LocalVariable variable) 
-            : base(type)
-        {
-            Variable = variable;
-        }
-
-        public LocalVariableExpression(
-            LocalVariableExpression source,
-            Mutator<LocalVariable>? variable = null, 
-            Mutator<MemberRef<TypeMember>>? type = null) 
-            : base(source, type)
-        {
-            Variable = variable.MutatedOrOriginal(source.Variable);
-        }
-
         public AbstractExpression AsExpression()
         {
             return this;
@@ -36,6 +19,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public LocalVariable Variable { get; }
+        public LocalVariable Variable { get; set; }
     }
 }

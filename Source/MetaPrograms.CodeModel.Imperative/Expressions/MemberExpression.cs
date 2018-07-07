@@ -5,30 +5,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class MemberExpression : AbstractExpression, IAssignable
     {
-        public MemberExpression(
-            MemberRef<TypeMember> type, 
-            AbstractExpression target,
-            MemberRef<AbstractMember> member,
-            string memberName = null) : base(type)
-        {
-            Target = target;
-            Member = member;
-            MemberName = memberName;
-        }
-
-        public MemberExpression(
-            MemberExpression source,
-            Mutator<MemberRef<TypeMember>>? type = null,
-            Mutator<AbstractExpression>? target = null,
-            Mutator<MemberRef<AbstractMember>>? member = null,
-            Mutator<string>? memberName = null) 
-            : base(source, type)
-        {
-            Target = target.MutatedOrOriginal(source.Target);
-            Member = member.MutatedOrOriginal(source.Member);
-            MemberName = memberName.MutatedOrOriginal(source.MemberName);
-        }
-
         public AbstractExpression AsExpression()
         {
             return this;
@@ -44,25 +20,27 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public AbstractExpression Target { get; }
-        public MemberRef<AbstractMember> Member { get; }
-        public string MemberName { get; }
+        public AbstractExpression Target { get; set; }
+        public AbstractMember Member { get; set; }
+        public string MemberName { get; set; }
 
-        public static MemberExpression Create(AbstractExpression target, MemberRef<AbstractMember> member)
+        public static MemberExpression Create(AbstractExpression target, AbstractMember member)
         {
-            return BlockContextBase.GetBlockOrThrow().PushExpression(new MemberExpression(
-                type: target.Type, 
-                target, 
-                member));
+            return BlockContext.GetBlockOrThrow().PushExpression(new MemberExpression { 
+                Type = target.Type, 
+                Target = target, 
+                Member = member
+            });
         }
 
         public static MemberExpression Create(AbstractExpression target, string memberName)
         {
-            return BlockContextBase.GetBlockOrThrow().PushExpression(new MemberExpression(
-                type: target.Type, 
-                target, 
-                member: MemberRef<AbstractMember>.Null, 
-                memberName));
+            return BlockContext.GetBlockOrThrow().PushExpression(new MemberExpression {
+                Type = target.Type,
+                Target = target,
+                Member = null,
+                MemberName = memberName
+            });
         }
     }
 }

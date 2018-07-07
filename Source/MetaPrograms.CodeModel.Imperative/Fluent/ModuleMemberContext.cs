@@ -7,7 +7,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public class ModuleMemberContext
     {
-        private readonly List<MemberRef<AbstractMember>> _members = new List<MemberRef<AbstractMember>>();
+        private readonly List<AbstractMember> _members = new List<AbstractMember>();
 
         public ModuleMemberContext(string name)
         {
@@ -16,11 +16,11 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public string Name { get; }
 
-        public void AddMember(MemberRef<AbstractMember> member)
+        public void AddMember(AbstractMember member)
         {
             _members.Add(member);
         }
 
-        public IEnumerable<MemberRef<AbstractMember>> Members => _members;
+        public IEnumerable<AbstractMember> Members => _members;
     }
 }

@@ -43,23 +43,19 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             ATTRIBUTE(GetContextOrThrow().FindType<T>(), constructorArgumentsAndBody);
         }
 
-        public static void ATTRIBUTE(MemberRef<TypeMember> type, params object[] constructorArgumentsAndBody)
+        public static void ATTRIBUTE(TypeMember type, params object[] constructorArgumentsAndBody)
         {
             var context = GetContextOrThrow();
             var attribute = FluentHelpers.BuildAttribute(context, type, constructorArgumentsAndBody);
 
             if (context.TryPeekState<ParameterContext>(out var parameterContext))
             {
-                parameterContext.Attributes = parameterContext.Attributes.Add(attribute);
-            }
-            else if (context.TryPeekState<TypeMemberBuilder>(out var builder))
-            {
-                builder.Attributes.Add(attribute);
+                parameterContext.Parameter.Attributes.Add(attribute);
             }
             else
             {
                 var member = context.GetCurrentMember();
-                member.WithAttributes(member.Attributes.Add(attribute), shouldReplaceSource: true);
+                member.Attributes.Add(attribute);
             }
         }
 
@@ -68,9 +64,10 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             var context = GetContextOrThrow();
 
             context
-                .PeekStateOrThrow<AttributeContext>()
-                .NamedProperties
-                .Add(new NamedPropertyValue(name, context.GetConstantExpression(value)));
+                .PeekStateOrThrow<AttributeContext>().Attribute
+                .PropertyValues.Add(new NamedPropertyValue(
+                    name, 
+                    context.GetConstantExpression(value)));
         }
 
         public static void EXTENDS<T>()
@@ -80,8 +77,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static void EXTENDS(TypeMember type)
         {
-            var typeBuilder = GetContextOrThrow().PeekStateOrThrow<TypeMemberBuilder>();
-            typeBuilder.BaseType = type.GetRef();
+            var descendantType = GetContextOrThrow().PeekStateOrThrow<TypeMember>();
+            descendantType.BaseType = type;
         }
 
         public static void IMPLEMENTS<T>()
@@ -91,8 +88,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static void IMPLEMENTS(TypeMember type)
         {
-            var typeBuilder = GetContextOrThrow().PeekStateOrThrow<TypeMemberBuilder>();
-            typeBuilder.Interfaces.Add(type.GetRef());
+            var descendantType = GetContextOrThrow().PeekStateOrThrow<TypeMember>();
+            descendantType.Interfaces.Add(type);
         }
 
         public static void PARAMETER<T>(string name, out MethodParameter @ref, Action body = null)
@@ -102,44 +99,49 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static void PARAMETER(string name, out MethodParameter @ref, Action body = null)
         {
-            PARAMETER(MemberRef<TypeMember>.Null, name, out @ref, body);
+            PARAMETER(type: null, name, out @ref, body);
         }
 
         public static void PARAMETER(TypeMember type, string name, out MethodParameter @ref, Action body = null)
         {
             var context = GetContextOrThrow();
             var method = (MethodMemberBase)context.GetCurrentMember();
-            var parameterContext = new ParameterContext();
+
+            var newParameter = new MethodParameter {
+                Name = name,
+                Position = method.Signature.Parameters.Count,
+                Type = type
+            }; 
+            
+            var parameterContext = new ParameterContext(newParameter);
 
             using (context.PushState(parameterContext))
             {
                 body?.Invoke();
             }
 
-            var newParameter = new MethodParameter(
-                name,
-                method.Signature.Parameters.Count,
-                type.GetRef(),
-                parameterContext.Modifier,
-                parameterContext.Attributes);
-
-            var newSignature = method.Signature.AddParameter(newParameter);
-            method = method.WithSignature(newSignature, shouldReplaceSource: true);
-
+            method.Signature.Parameters.Add(newParameter);
             @ref = newParameter;
         }
 
         public static void LOCAL(string name, out LocalVariable @ref, AbstractExpression initialValue = null)
         {
-            LOCAL(MemberRef<TypeMember>.Null, name, out @ref, initialValue);
+            LOCAL(type: null, name, out @ref, initialValue);
         }
 
-        public static void LOCAL(MemberRef<TypeMember> type, string name, out LocalVariable @ref, AbstractExpression initialValue = null)
+        public static void LOCAL(TypeMember type, string name, out LocalVariable @ref, AbstractExpression initialValue = null)
         {
-            @ref = new LocalVariable(name, type);
-            var block = BlockContextBase.GetBlockOrThrow();
+            @ref = new LocalVariable {
+                Name = name,
+                Type = type
+            };
+            
+            var block = BlockContext.GetBlockOrThrow();
             block.AddLocal(@ref);
-            block.AppendStatement(new VariableDeclarationStatement(@ref, initialValue));
+            block.AppendStatement(new VariableDeclarationStatement {
+                Variable = @ref,
+                InitialValue = initialValue
+            });
         }
 
         public static void LOCAL<T>(string name, out LocalVariable @ref, AbstractExpression initialValue = null)
@@ -150,15 +152,23 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static void FINAL(string name, out LocalVariable @ref, AbstractExpression value)
         {
-            FINAL(MemberRef<TypeMember>.Null, name, out @ref, value);
+            FINAL(type: null, name, out @ref, value);
         }
 
-        public static void FINAL(MemberRef<TypeMember> type, string name, out LocalVariable @ref, AbstractExpression value)
+        public static void FINAL(TypeMember type, string name, out LocalVariable @ref, AbstractExpression value)
         {
-            @ref = new LocalVariable(name, type, isFinal: true);
-            var block = BlockContextBase.GetBlockOrThrow();
+            @ref = new LocalVariable {
+                Name = name,
+                Type = type,
+                IsFinal = true
+            };
+
+            var block = BlockContext.GetBlockOrThrow();
             block.AddLocal(@ref);
-            block.AppendStatement(new VariableDeclarationStatement(@ref, initialValue: value));
+            block.AppendStatement(new VariableDeclarationStatement {
+                Variable = @ref, 
+                InitialValue = value
+            });
         }
 
         public static void FINAL<T>(string name, out LocalVariable @ref, AbstractExpression value)
@@ -174,9 +184,13 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             return tuple;
         }
 
-        public static TupleExpression TUPLE(string name1, MemberRef<TypeMember> type1, out LocalVariable var1)
+        public static TupleExpression TUPLE(string name1, TypeMember type1, out LocalVariable var1)
         {
-            var tuple = MakeTuple(new[] { name1 }, types: new[] { type1 }, out var variables);
+            var tuple = MakeTuple(
+                new[] { name1 }, 
+                types: new[] { type1 }, 
+                out var variables);
+            
             var1 = variables[0];
             return tuple;
         }
@@ -195,48 +209,73 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             => GetContextOrThrow().PeekStateOrThrow<InvocationContext>().AddArgument(value, MethodParameterModifier.Out);
 
         public static AbstractExpression AWAIT(AbstractExpression promiseExpression)
-            => new AwaitExpression(promiseExpression.Type, promiseExpression);
+            => new AwaitExpression {
+                Expression = promiseExpression,
+                Type = promiseExpression.Type
+            };
 
         public static FluentStatement DO 
             => new FluentStatement();
 
         public static ThisExpression THIS 
-            => new ThisExpression(GetContextOrThrow().GetCurrentTypeBuilder().GetRef());
+            => new ThisExpression {
+                Type = GetContextOrThrow().GetCurrentType()
+            };
 
         public static AbstractExpression DOT(this AbstractExpression target, AbstractMember member)
-            => new MemberExpression(MemberRef<TypeMember>.Null, target, member.GetAbstractRef());
+            => new MemberExpression {
+                Target = target,
+                Member = member
+            };
 
         public static AbstractExpression DOT(this AbstractExpression target, string memberName)
-            => new MemberExpression(MemberRef<TypeMember>.Null, target, MemberRef<AbstractMember>.Null, memberName);
+            => new MemberExpression {
+                Target = target,
+                MemberName = memberName
+            };
 
         public static AbstractExpression DOT(this LocalVariable target, AbstractMember member) => throw new NotImplementedException();
         public static AbstractExpression DOT(this LocalVariable target, string memberName) => throw new NotImplementedException();
         public static AbstractExpression DOT(this MethodParameter target, AbstractMember member) => throw new NotImplementedException();
 
         public static AbstractExpression DOT(this MethodParameter target, string memberName)
-            => new MemberExpression(target.Type, target.AsExpression(), MemberRef<AbstractMember>.Null, memberName);
+            => new MemberExpression {
+                Type = target.Type,
+                Target = target.AsExpression(),
+                MemberName = memberName
+            };
 
         public static AbstractExpression NOT(AbstractExpression value)
-            => new UnaryExpression(GetContextOrThrow().FindType<bool>(), UnaryOperator.LogicalNot, PopExpression(value));
+            => new UnaryExpression {
+                Type = GetContextOrThrow().FindType<bool>(),
+                Operator = UnaryOperator.LogicalNot,
+                Operand = PopExpression(value) 
+            };
 
         public static AbstractExpression NEW<T>(params object[] constructorArguments)
         {
             var context = GetContextOrThrow();
-            return new NewObjectExpression(new MethodCallExpression(
-                context.FindType<T>(),
-                target: null,
-                method: MemberRef<MethodMemberBase>.Null,
-                constructorArguments
-                    .Select(value => new Argument(context.GetConstantExpression(value), MethodParameterModifier.None))
-                    .ToImmutableList()));
+            var type = context.FindType<T>();
+            
+            return new NewObjectExpression {
+                Type = type,
+                ConstructorCall = new MethodCallExpression {
+                    Type = type,
+                    Arguments = constructorArguments
+                        .Select(value => new Argument {
+                            Expression = context.GetConstantExpression(value) 
+                        })
+                        .ToList()
+                }
+            };
         }
 
         public static AbstractExpression NEW(TypeMember type, params object[] constructorArguments) => throw new NotImplementedException();
 
         public static AbstractExpression INITOBJECT(params (string key, AbstractExpression value)[] initializers)
-        {
-            return new ObjectInitializerExpression(initializers.Select(init => new NamedPropertyValue(init.key, init.value)));
-        }
+            => new ObjectInitializerExpression {
+                PropertyValues = initializers.Select(init => new NamedPropertyValue(init.key, init.value)).ToList() 
+            };
 
         public static AbstractExpression INITOBJECT(Action body)
         {
@@ -247,35 +286,61 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 body?.Invoke();
             }
 
-            return new ObjectInitializerExpression(initializerContext.PropertyValues);
+            return new ObjectInitializerExpression {
+                PropertyValues = initializerContext.PropertyValues
+            };
         }
 
         public static AbstractExpression ASSIGN(this AbstractExpression target, AbstractExpression value) 
-            => PushExpression(new AssignmentExpression((IAssignable)PopExpression(target), PopExpression(value)));
+            => PushExpression(new AssignmentExpression {
+                Left =(IAssignable)PopExpression(target),
+                Right = PopExpression(value) 
+            });
 
         public static AbstractExpression ASSIGN(this MemberExpression member, AbstractExpression value) 
-            => PushExpression(new AssignmentExpression(member, PopExpression(value)));
+            => PushExpression(new AssignmentExpression {
+                Left = member,
+                Right = PopExpression(value) 
+            });
 
         public static AbstractExpression ASSIGN(this FieldMember target, AbstractExpression value)
-            => PushExpression(new AssignmentExpression(target.AsThisMemberExpression(), PopExpression(value)));
+            => PushExpression(new AssignmentExpression {
+                Left = target.AsThisMemberExpression(),
+                Right = PopExpression(value) 
+            });
 
         public static AbstractExpression ASSIGN(this LocalVariable target, AbstractExpression value)
-            => PushExpression(new AssignmentExpression(target, PopExpression(value)));
+            => PushExpression(new AssignmentExpression {
+                Left = target,
+                Right = PopExpression(value) 
+            });
 
         public static AbstractExpression INVOKE(this AbstractExpression expression, params AbstractExpression[] arguments)
-            => INVOKE(expression, arguments.Select(arg => new Argument(arg, MethodParameterModifier.None)));
+            => INVOKE(expression, arguments.Select(arg => new Argument {
+                Expression = arg 
+            }));
 
         public static AbstractExpression INVOKE(this AbstractExpression expression, IEnumerable<Argument> arguments)
         {
             if (expression is MemberExpression memberExpression)
             {
                 var target = memberExpression.Target;
-                var member = memberExpression.Member.AsRef<MethodMemberBase>();
-                var returnType = (member.IsNotNull ? member.Get().ReturnType : MemberRef<TypeMember>.Null);
-                return new MethodCallExpression(returnType, target, member, arguments.ToImmutableList(), memberExpression.MemberName);
+                var method = memberExpression.Member as MethodMember;
+
+                return new MethodCallExpression {
+                    Target = target,
+                    Method = method,
+                    MethodName = memberExpression.MemberName,
+                    Type = method?.ReturnType,
+                    Arguments = arguments.ToList(),
+                };
             }
 
-            return new DelegateInvocationExpression(expression.Type, arguments.ToImmutableList(), expression);
+            return new DelegateInvocationExpression {
+                Delegate = expression,
+                Type = expression.Type,
+                Arguments = arguments.ToList()
+            };
         }
 
         public static AbstractExpression INVOKE(this AbstractExpression expression, Action body)
@@ -301,31 +366,31 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 {
                     return typeRef;
                 }
-                return MemberRef<TypeMember>.Null;
+                return null;
             });
         }
 
         public static AbstractExpression ANY(object value)
         {
-            return AbstractExpression.FromValue(value, resolveType: t => MemberRef<TypeMember>.Null);
+            return AbstractExpression.FromValue(value, resolveType: t => null);
         }
 
         private static AbstractExpression PushExpression(AbstractExpression expression)
         {
-            return BlockContextBase.Push(expression);
+            return BlockContext.Push(expression);
         }
 
         private static AbstractExpression PopExpression(AbstractExpression expression)
         {
-            return BlockContextBase.Pop(expression);
+            return BlockContext.Pop(expression);
         }
 
-        private static TupleExpression MakeTuple(string[] names, MemberRef<TypeMember>[] types, out LocalVariable[] variables)
+        private static TupleExpression MakeTuple(string[] names, TypeMember[] types, out LocalVariable[] variables)
         {
-            variables = names.Select((name, index) => new LocalVariable(
-                name,
-                types?[index] ?? MemberRef<TypeMember>.Null
-            )).ToArray();
+            variables = names.Select((name, index) => new LocalVariable {
+                Name = name,
+                Type = types?[index]
+            }).ToArray();
 
             return new TupleExpression(variables);
         }
