@@ -19,14 +19,14 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         private static readonly string GenericTypeArityBackQuote = "`";
 
         private readonly Type _clrType;
-        private readonly TypeMemberBuilder _builder;
+        private readonly TypeMember _typeMember;
         private readonly ImperativeCodeModel _codeModel;
         private readonly int _distance;
 
-        public ClrTypeReader(Type clrType, TypeMemberBuilder builder, ImperativeCodeModel codeModel, int distance)
+        public ClrTypeReader(Type clrType, TypeMember typeMember, ImperativeCodeModel codeModel, int distance)
         {
             _clrType = clrType;
-            _builder = builder;
+            _typeMember = typeMember;
             _codeModel = codeModel;
             _distance = distance;
         }
@@ -40,22 +40,22 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         {
             ReadName();
 
-            if (_builder.TypeKind != TypeMemberKind.GenericParameter)
+            if (_typeMember.TypeKind != TypeMemberKind.GenericParameter)
             {
                 ReadGenerics();
                 ReadAncestors();
                 ReadAttributes();
 
-                if (_builder.TypeKind != TypeMemberKind.Primitive)
+                if (_typeMember.TypeKind != TypeMemberKind.Primitive)
                 {
                     ReadMembers();
                 }
             }
 
-            _builder.Status = MemberStatus.Compiled;
+            _typeMember.Status = MemberStatus.Compiled;
         }
 
-        private MemberRef<TypeMember> ResolveType(Type type)
+        private TypeMember ResolveType(Type type)
         {
             return ClrTypeResolver.ResolveType(type, _codeModel, _distance + 1);
         }
@@ -67,31 +67,31 @@ namespace MetaPrograms.Adapters.Reflection.Reader
 
         private void ReadName()
         {
-            _builder.TypeKind = _clrType.GetTypeMemberKind();
-            _builder.Name = _clrType.Name.TrimEndStartingWith(GenericTypeArityBackQuote);
-            _builder.Namespace = _clrType.Namespace;
-            _builder.AssemblyName = _clrType.Assembly.GetName().Name;
-            _builder.Visibility = _clrType.GetMemberVisibility();
-            _builder.Modifier = _clrType.GetMemberModifier();
+            _typeMember.TypeKind = _clrType.GetTypeMemberKind();
+            _typeMember.Name = _clrType.Name.TrimEndStartingWith(GenericTypeArityBackQuote);
+            _typeMember.Namespace = _clrType.Namespace;
+            _typeMember.AssemblyName = _clrType.Assembly.GetName().Name;
+            _typeMember.Visibility = _clrType.GetMemberVisibility();
+            _typeMember.Modifier = _clrType.GetMemberModifier();
         }
 
         private void ReadGenerics()
         {
-            _builder.IsGenericType = _clrType.IsGenericType;
-            _builder.IsGenericDefinition = _clrType.IsGenericTypeDefinition;
-            _builder.IsGenericParameter = _clrType.IsGenericParameter;
+            _typeMember.IsGenericType = _clrType.IsGenericType;
+            _typeMember.IsGenericDefinition = _clrType.IsGenericTypeDefinition;
+            _typeMember.IsGenericParameter = _clrType.IsGenericParameter;
 
             if (_clrType.IsGenericType)
             {
                 if (_clrType.IsGenericTypeDefinition)
                 {
-                    _builder.GenericParameters.AddRange(_clrType.GetGenericArguments().Select(ResolveType));
+                    _typeMember.GenericParameters.AddRange(_clrType.GetGenericArguments().Select(ResolveType));
                 }
                 else
                 {
-                    _builder.GenericDefinition = ResolveType(_clrType.GetGenericTypeDefinition());
-                    _builder.GenericParameters.AddRange(_builder.GenericDefinition.Get().GenericParameters);
-                    _builder.GenericArguments.AddRange(_clrType.GetGenericArguments().Select(ResolveType));
+                    _typeMember.GenericTypeDefinition = ResolveType(_clrType.GetGenericTypeDefinition());
+                    _typeMember.GenericParameters.AddRange(_typeMember.GenericTypeDefinition.GenericParameters);
+                    _typeMember.GenericArguments.AddRange(_clrType.GetGenericArguments().Select(ResolveType));
                 }
             }
         }
@@ -100,12 +100,12 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         {
             if (_clrType.BaseType != null && _clrType.BaseType != typeof(object))
             {
-                _builder.BaseType = ResolveType(_clrType.BaseType);
+                _typeMember.BaseType = ResolveType(_clrType.BaseType);
             }
 
             foreach (var clrInterface in _clrType.GetInterfaces())
             {
-                _builder.Interfaces.Add(ResolveType(clrInterface));
+                _typeMember.Interfaces.Add(ResolveType(clrInterface));
             }
         }
 
@@ -113,16 +113,16 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         {
             foreach (var clrAttribute in _clrType.GetCustomAttributesData())
             {
-                _builder.Attributes.Add(ReadAttribute(clrAttribute));
+                _typeMember.Attributes.Add(ReadAttribute(clrAttribute));
             }
         }
 
-        private ImmutableList<AttributeDescription> ReadAttributes(MemberInfo info)
+        private List<AttributeDescription> ReadAttributes(MemberInfo info)
         {
             return ReadAttributes(info.GetCustomAttributesData());
         }
 
-        private ImmutableList<AttributeDescription> ReadAttributes(IEnumerable<CustomAttributeData> attributes)
+        private List<AttributeDescription> ReadAttributes(IEnumerable<CustomAttributeData> attributes)
         {
             var result = new List<AttributeDescription>();
             
@@ -131,7 +131,7 @@ namespace MetaPrograms.Adapters.Reflection.Reader
                 result.Add(ReadAttribute(clrAttribute));
             }
 
-            return result.ToImmutableList();
+            return result.ToList();
         }
 
         private AttributeDescription ReadAttribute(CustomAttributeData clrAttribute)
@@ -146,10 +146,11 @@ namespace MetaPrograms.Adapters.Reflection.Reader
                     arg.MemberName, 
                     GetConstantExpression(arg.TypedValue.Value)));
 
-            return new AttributeDescription(
-                attributeType,
-                constructorArguments.ToImmutableList(),
-                namedArguments.ToImmutableList());
+            return new AttributeDescription {
+                AttributeType = attributeType,
+                ConstructorArguments = constructorArguments.ToList(),
+                PropertyValues = namedArguments.ToList()
+            };
         }
 
         private void ReadMembers()
@@ -165,44 +166,41 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         {
             foreach (var info in _clrType.GetFields(LookupBindingFlags))
             {
-                _builder.Members.Add(ReadField(info).GetAbstractRef());
+                _typeMember.Members.Add(ReadField(info));
             }
         }
 
         private FieldMember ReadField(FieldInfo info)
         {
-            return new FieldMember(
-                info.Name,
-                _builder.GetTemporaryProxy().GetRef(),
-                MemberStatus.Compiled,
-                info.GetMemberVisibility(),
-                info.GetMemberModifier(),
-                ReadAttributes(info),
-                ResolveType(info.FieldType),
-                isReadOnly: false,
-                initializer: null);
+            return new FieldMember {
+                DeclaringType = _typeMember,
+                Name = info.Name,
+                Type = ResolveType(info.FieldType),
+                Status = MemberStatus.Compiled,
+                Visibility = info.GetMemberVisibility(),
+                Modifier = info.GetMemberModifier(),
+                Attributes = ReadAttributes(info)
+            };
         }
 
         private void ReadConstructors()
         {
             foreach (var info in _clrType.GetConstructors(LookupBindingFlags))
             {
-                _builder.Members.Add(ReadConstructor(info).GetAbstractRef());
+                _typeMember.Members.Add(ReadConstructor(info));
             }
         }
 
         private ConstructorMember ReadConstructor(ConstructorInfo info)
         {
-            return new ConstructorMember(
-                _builder.GetTemporaryProxy().GetRef(),
-                MemberStatus.Compiled,
-                info.GetMemberVisibility(),
-                info.GetMemberModifier(),
-                ReadAttributes(info),
-                ReadMethodSignature(info),
-                body: null,
-                callThisConstructor: null,
-                callBaseConstructor: null);
+            return new ConstructorMember {
+                DeclaringType = _typeMember,
+                Status =  MemberStatus.Compiled,
+                Visibility = info.GetMemberVisibility(),
+                Modifier = info.GetMemberModifier(),
+                Attributes = ReadAttributes(info),
+                Signature = ReadMethodSignature(info)
+            };
         }
 
         private void ReadMethods()
@@ -231,7 +229,7 @@ namespace MetaPrograms.Adapters.Reflection.Reader
         
         private MethodSignature ReadMethodSignature(MethodBase method)
         {
-            var parameters = method.GetParameters().Select(ReadParameter).ToImmutableList();
+            var parameters = method.GetParameters().Select(ReadParameter).ToList();
             MethodParameter returnParameter = null;
             
             if (method is MethodInfo nonConstructor && nonConstructor.ReturnType != typeof(void))
@@ -239,17 +237,21 @@ namespace MetaPrograms.Adapters.Reflection.Reader
                 returnParameter = ReadParameter(nonConstructor.ReturnParameter);
             }
             
-            return new MethodSignature(isAsync: false, returnParameter, parameters);
+            return new MethodSignature {
+                Parameters = parameters,
+                ReturnValue = returnParameter
+            };
         }
 
         private MethodParameter ReadParameter(ParameterInfo info)
         {
-            return new MethodParameter(
-                info.Name, 
-                info.Position, 
-                ResolveType(info.ParameterType), 
-                info.GetMethodParameterModifier(),
-                ReadAttributes(info.GetCustomAttributesData()));
+            return new MethodParameter {
+                Name = info.Name,
+                Position = info.Position,
+                Type = ResolveType(info.ParameterType),
+                Modifier = info.GetMethodParameterModifier(),
+                Attributes = ReadAttributes(info.GetCustomAttributesData())
+            };
         }
     }
 }

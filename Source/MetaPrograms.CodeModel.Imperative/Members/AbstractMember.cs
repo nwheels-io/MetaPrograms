@@ -47,6 +47,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public virtual MemberStatus Status { get; set; }
         public virtual MemberVisibility Visibility { get; set; }
         public virtual MemberModifier Modifier { get; set; }
-        public virtual List<AttributeDescription> Attributes { get; } = new List<AttributeDescription>();
+        public virtual List<AttributeDescription> Attributes { get; set; } = new List<AttributeDescription>();
     }
 }

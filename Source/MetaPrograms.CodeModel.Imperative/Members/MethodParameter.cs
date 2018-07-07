@@ -22,7 +22,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public int Position { get; set; }
         public TypeMember Type { get; set; }
         public MethodParameterModifier Modifier { get; set; }
-        public List<AttributeDescription> Attributes { get; } = new List<AttributeDescription>();
+        public List<AttributeDescription> Attributes { get; set; } = new List<AttributeDescription>();
 
         public static MethodParameter ReturnVoid => null;
 

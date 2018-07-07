@@ -8,7 +8,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     {
         public bool IsAsync { get; set; }
         public MethodParameter ReturnValue { get; set; }
-        public List<MethodParameter> Parameters { get; } = new List<MethodParameter>();
+        public List<MethodParameter> Parameters { get; set; } = new List<MethodParameter>();
 
         public bool IsVoid => (ReturnValue == null);
         public TypeMember ReturnType => (IsVoid ? TypeMember.Void : ReturnValue.Type);
