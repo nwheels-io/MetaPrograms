@@ -6,17 +6,17 @@ namespace MetaPrograms.Adapters.Reflection.Reader
 {
     public class ClrTypeResolver : IClrTypeResolver
     {
-        MemberRef<TypeMember> IClrTypeResolver.Resolve(Type clrType, ImperativeCodeModel codeModel, int distance)
+        TypeMember IClrTypeResolver.Resolve(Type clrType, ImperativeCodeModel codeModel, int distance)
         {
             return ResolveType(clrType, codeModel, distance);
         }
 
-        public static MemberRef<TypeMember> ResolveType(Type clrType, ImperativeCodeModel codeModel, int distance)
+        public static TypeMember ResolveType(Type clrType, ImperativeCodeModel codeModel, int distance)
         {
-            var builder = new TypeMemberBuilder();
-            var reader = new ClrTypeReader(clrType, builder, codeModel, distance);
+            var typeMember = new TypeMember();
+            var reader = new ClrTypeReader(clrType, typeMember, codeModel, distance);
             
-            codeModel.Add(builder.GetTemporaryProxy().GetRef(), isTopLevel: !clrType.IsNested);
+            codeModel.Add(typeMember, isTopLevel: !clrType.IsNested);
             
             if (distance > 0)
             {
@@ -27,22 +27,15 @@ namespace MetaPrograms.Adapters.Reflection.Reader
                 reader.ReadAll();
             }
 
-            var finalMember = new RealTypeMember(builder);
-            builder.GetMemberSelfReference().Reassign(finalMember);
-
-            return finalMember.GetRef();
+            return typeMember;
         }
 
-        public void Complete(MemberRef<TypeMember> existingRef, ImperativeCodeModel codeModel)
+        public void Complete(TypeMember existingType, ImperativeCodeModel codeModel)
         {
-            var clrType = existingRef.Get().Bindings.First<System.Type>();
-            var builder = existingRef.Get().CreateCompletionBuilder();
-            var reader = new ClrTypeReader(clrType, builder, codeModel, distance: 0);
+            var clrType = existingType.Bindings.First<System.Type>();
+            var reader = new ClrTypeReader(clrType, existingType, codeModel, distance: 0);
             
             reader.ReadAll();
-
-            var finalMember = new RealTypeMember(builder);
-            builder.GetMemberSelfReference().Reassign(finalMember);
         }
     }
 }
