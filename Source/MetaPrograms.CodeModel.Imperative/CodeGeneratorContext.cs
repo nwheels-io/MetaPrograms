@@ -18,7 +18,7 @@ namespace MetaPrograms.CodeModel.Imperative
 
         private readonly IClrTypeResolver _clrTypeResolver;
         private readonly Stack<object> _stateStack = new Stack<object>();
-        private readonly List<IMemberRef> _generatedMembers = new List<IMemberRef>();
+        private readonly List<AbstractMember> _generatedMembers = new List<AbstractMember>();
         
         public CodeGeneratorContext(ImperativeCodeModel codeModel, IClrTypeResolver clrTypeResolver)
         {
@@ -93,46 +93,41 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public TypeMember TryGetCurrentType()
         {
-            return TryLookupState<MemberRef<TypeMember>>().Get();
+            return TryLookupState<TypeMember>();
         }
 
         public TypeMember GetCurrentType()
         {
-            return LookupStateOrThrow<MemberRef<TypeMember>>().Get();
-        }
-
-        public TypeMemberBuilder GetCurrentTypeBuilder()
-        {
-            return LookupStateOrThrow<TypeMemberBuilder>();
+            return LookupStateOrThrow<TypeMember>();
         }
 
         public AbstractMember GetCurrentMember()
         {
-            return LookupStateOrThrow<IMemberRef>().Get();
+            return LookupStateOrThrow<AbstractMember>();
         }
 
-        public BlockContextBase GetCurrentBlock()
+        public BlockContext GetCurrentBlock()
         {
-            return PeekStateOrThrow<BlockContextBase>();
+            return PeekStateOrThrow<BlockContext>();
         }
 
-        public void AddGeneratedMember<TMember>(MemberRef<TMember> member, bool isTopLevel)
+        public void AddGeneratedMember<TMember>(TMember member, bool isTopLevel)
             where TMember : AbstractMember
         {
             _generatedMembers.Add(member);
             this.CodeModel.Add(member, isTopLevel);
         }
 
-        public bool TryFindMember<TMember>(object binding, out MemberRef<TMember> memberRef)
+        public bool TryFindMember<TMember>(object binding, out TMember member)
             where TMember : AbstractMember
         {
-            if (CodeModel.MembersByBndings.TryGetValue(binding, out var untypedMemberRef))
+            if (CodeModel.MembersByBndings.TryGetValue(binding, out var untypedMember))
             {
-                memberRef = untypedMemberRef.AsRef<TMember>();
+                member = (TMember)untypedMember;
                 return true;
             }
 
-            memberRef = default;
+            member = default;
             return false;
         }
 
@@ -147,28 +142,28 @@ namespace MetaPrograms.CodeModel.Imperative
             throw new KeyNotFoundException($"Could not find '{typeof(TMember).Name}' with binding '{binding}'.");
         }
 
-        public MemberRef<TypeMember> FindType<T>()
+        public TypeMember FindType<T>()
         {
             return FindType(typeof(T));
         }
 
-        public MemberRef<TypeMember> FindType(Type clrType)
+        public TypeMember FindType(Type clrType)
         {
-            MemberRef<TypeMember> typeRef;
+            TypeMember typeMember;
 
-            if (TryFindMember(binding: clrType, out typeRef))
+            if (TryFindMember(binding: clrType, out typeMember))
             {
-                if (typeRef.Get().Status == MemberStatus.Incomplete)
+                if (typeMember.Status == MemberStatus.Incomplete)
                 {
-                    _clrTypeResolver.Complete(typeRef, this.CodeModel);
+                    _clrTypeResolver.Complete(typeMember, this.CodeModel);
                 }
             }
             else 
             {
-                typeRef = _clrTypeResolver.Resolve(clrType, this.CodeModel, distance: 0);
+                typeMember = _clrTypeResolver.Resolve(clrType, this.CodeModel, distance: 0);
             }
 
-            return typeRef;
+            return typeMember;
         }
 
         public AbstractExpression GetConstantExpression(object value)
@@ -177,7 +172,7 @@ namespace MetaPrograms.CodeModel.Imperative
         }
 
         public ImperativeCodeModel CodeModel { get; }
-        public IEnumerable<IMemberRef> GeneratedMembers => _generatedMembers;
+        public IEnumerable<AbstractMember> GeneratedMembers => _generatedMembers;
 
         private object PopStateOrThrow(Type stateType)
         {

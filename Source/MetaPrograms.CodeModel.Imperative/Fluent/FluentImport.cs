@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 
@@ -10,19 +6,25 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public class FluentImport : IFluentImport, IFluentImportAs, IFluentImportTuple, IFluentImportFrom
     {
+        public ImportDirective Directive { get; } = new ImportDirective { };
+
         public IFluentImportTuple DEFAULT(string name, out LocalVariable @var)
         {
-            this.AsDefault = new LocalVariable(name, MemberRef<TypeMember>.Null);
+            Directive.AsDefault = new LocalVariable {
+                Name = name
+            };
 
-            @var = this.AsDefault;
+            @var = Directive.AsDefault;
             return this;
         }
 
         public IFluentImportFrom AS(string name, out LocalVariable @var)
         {
-            this.AsNamespace = new LocalVariable(name, MemberRef<TypeMember>.Null);
+            Directive.AsNamespace = new LocalVariable {
+                Name = name
+            };
 
-            @var = this.AsNamespace;
+            @var = Directive.AsNamespace;
             return this;
         }
 
@@ -30,81 +32,66 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public IFluentImportFrom TUPLE(string name1, out LocalVariable var1)
         {
-            this.AsTuple = new TupleExpression(new[] { new LocalVariable(name1, MemberRef<TypeMember>.Null) });
+            Directive.AsTuple = new TupleExpression(new LocalVariable {
+                Name = name1
+            });
 
-            var1 = this.AsTuple.Variables[0];
+            var1 = Directive.AsTuple.Variables[0];
             return this;
         }
 
         public IFluentImportFrom TUPLE(string name1, out LocalVariable var1, string name2, out LocalVariable var2)
         {
-            this.AsTuple = new TupleExpression(new[] {
-                new LocalVariable(name1, MemberRef<TypeMember>.Null),
-                new LocalVariable(name2, MemberRef<TypeMember>.Null),
-            });
+            Directive.AsTuple = new TupleExpression(
+                new LocalVariable { Name = name1 },
+                new LocalVariable { Name = name2 }
+            );
 
-            var1 = this.AsTuple.Variables[0];
-            var2 = this.AsTuple.Variables[1];
+            var1 = Directive.AsTuple.Variables[0];
+            var2 = Directive.AsTuple.Variables[1];
             return this;
         }
 
         public IFluentImportFrom TUPLE(string name1, out LocalVariable var1, string name2, out LocalVariable var2, string name3, out LocalVariable var3)
         {
-            this.AsTuple = new TupleExpression(new[] {
-                new LocalVariable(name1, MemberRef<TypeMember>.Null),
-                new LocalVariable(name2, MemberRef<TypeMember>.Null),
-                new LocalVariable(name3, MemberRef<TypeMember>.Null),
-            });
+            Directive.AsTuple = new TupleExpression(
+                new LocalVariable { Name = name1 },
+                new LocalVariable { Name = name2 },
+                new LocalVariable { Name = name3 }
+            );
 
-            var1 = this.AsTuple.Variables[0];
-            var2 = this.AsTuple.Variables[1];
-            var3 = this.AsTuple.Variables[2];
+            var1 = Directive.AsTuple.Variables[0];
+            var2 = Directive.AsTuple.Variables[1];
+            var3 = Directive.AsTuple.Variables[2];
             return this;
         }
 
         public IFluentImportFrom TUPLE(string[] names, out LocalVariable[] vars)
         {
-            this.AsTuple = new TupleExpression(names.Select(name => new LocalVariable(name, MemberRef<TypeMember>.Null)));
+            Directive.AsTuple = new TupleExpression(names.Select(name => new LocalVariable { Name = name }).ToArray());
 
-            vars = this.AsTuple.Variables.ToArray();
+            vars = Directive.AsTuple.Variables.ToArray();
             return this;
         }
 
         public void FROM(string moduleName)
         {
-            this.FromModuleName = moduleName;
+            Directive.FromModuleName = moduleName;
             FlushImportDirective();
         }
 
-        public void FROM(MemberRef<TypeMember> module)
+        public void FROM(TypeMember module)
         {
-            this.FromModule = module;
+            Directive.FromModule = module;
             FlushImportDirective();
         }
-
-        public MemberRef<TypeMember> FromModule { get; private set; }
-        public string FromModuleName { get; private set; }
-        public LocalVariable AsDefault { get; private set; }
-        public LocalVariable AsNamespace { get; private set; }
-        public TupleExpression AsTuple { get; private set; }
 
         private void FlushImportDirective()
         {
             var context = CodeGeneratorContext.GetContextOrThrow();
-            var typeBuilder = context.GetCurrentTypeBuilder();
-            var directive = CreateImportDirective();
+            var module = context.LookupStateOrThrow<ModuleMember>();
 
-            typeBuilder.Imports.Add(directive);
-        }
-
-        private ImportDirective CreateImportDirective()
-        {
-            return new ImportDirective(
-                fromModule: this.FromModule, 
-                fromModuleName: this.FromModuleName, 
-                asDefault: this.AsDefault, 
-                asTuple: this.AsTuple, 
-                asNamespace: this.AsNamespace);
+            module.Imports.Add(Directive);
         }
     }
 }

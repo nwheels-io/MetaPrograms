@@ -7,27 +7,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class IndexerExpression : AbstractExpression
     {
-        public IndexerExpression(
-        MemberRef<TypeMember> type, 
-            AbstractExpression target,
-            ImmutableList<AbstractExpression> indexArguments) 
-            : base(type)
-        {
-            Target = target;
-            IndexArguments = indexArguments;
-        }
-
-        public IndexerExpression(
-            IndexerExpression source, 
-            Mutator<MemberRef<TypeMember>>? type = null,
-            Mutator<AbstractExpression>? target = null,
-            Mutator<ImmutableList<AbstractExpression>>? indexArguments = null) 
-            : base(source, type)
-        {
-            Target = target.MutatedOrOriginal(source.Target);
-            IndexArguments = indexArguments.MutatedOrOriginal(source.IndexArguments);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitIndexerExpression(this);
@@ -43,8 +22,8 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public AbstractExpression Target { get; }
-        public ImmutableList<AbstractExpression> IndexArguments { get; }
+        public AbstractExpression Target { get; set; }
+        public List<AbstractExpression> IndexArguments { get; } = new List<AbstractExpression>();
 
         public AbstractExpression Index
         {

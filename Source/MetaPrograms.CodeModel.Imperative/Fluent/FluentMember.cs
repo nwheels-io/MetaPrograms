@@ -20,7 +20,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
             if (isReadOnly.HasValue)
             {
-                traits.IsReadonly = isReadOnly.Value;
+                traits.IsReadOnly = isReadOnly.Value;
             }
 
             if (isDefaultExport.HasValue)
@@ -33,39 +33,15 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         {
         }
 
-        public void FIELD(MemberRef<TypeMember> type, string name, out FieldMember @ref, Action body = null)
+        public void FIELD(TypeMember type, string name, out FieldMember @ref, Action body = null)
             => @ref = new FieldGenerator(GetContextOrThrow(), type, name, body).GenerateMember();
 
         public void FIELD(Type type, string name, out FieldMember @ref, Action body = null)
             => @ref = new FieldGenerator(GetContextOrThrow(), type, name, body).GenerateMember();
 
         public void FIELD(string name, out FieldMember @ref, Action body = null)
-            => @ref = new FieldGenerator(GetContextOrThrow(), MemberRef<TypeMember>.Null, name, body).GenerateMember();
+            => @ref = new FieldGenerator(GetContextOrThrow(), fieldType: (TypeMember)null, name, body).GenerateMember();
 
-        //{
-        //    var context = CodeGeneratorContext.GetContextOrThrow();
-        //    var traits = context.PopStateOrThrow<MemberTraitsContext>();
-        //    var declaringTypeRef = context.TryLookupState<MemberRef<TypeMember>>();
-        //    var member = new FieldMember(
-        //        name,
-        //        declaringTypeRef,
-        //        MemberStatus.Generator,
-        //        traits.Visibility,
-        //        traits.Modifier,
-        //        ImmutableList<AttributeDescription>.Empty,
-        //        type.GetRef(),
-        //        traits.IsReadonly,
-        //        initializer: null);
-
-        //    context.GetCurrentTypeBuilder().Members.Add(member.GetAbstractRef());
-
-        //    using (context.PushState(member.GetRef()))
-        //    {
-        //        body?.Invoke();
-        //    }
-
-        //    @ref = member;
-        //}
 
         public void FIELD<TType>(string name, out FieldMember @ref, Action body = null)
             => @ref = new FieldGenerator(GetContextOrThrow(), typeof(TType), name, body).GenerateMember();
@@ -88,7 +64,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public MethodMember FUNCTION<TReturnType>(string name, Action body)
             => new MethodGenerator(GetContextOrThrow(), typeof(TReturnType), name, body).GenerateMember();
         
-        public MethodMember FUNCTION(MemberRef<TypeMember> returnType, string name, Action body)
+        public MethodMember FUNCTION(TypeMember returnType, string name, Action body)
             => new MethodGenerator(GetContextOrThrow(), returnType, name, body).GenerateMember();
 
         public MethodMember FUNCTION(string name, Action body)
@@ -97,13 +73,13 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public MethodMember VOID(string name, Action body)
             => new MethodGenerator(GetContextOrThrow(), name, body).GenerateMember();
 
-        public MethodMember VOID(MemberRef<MethodMember> ancestorMethod, Action body)
+        public MethodMember VOID(MethodMember ancestorMethod, Action body)
             => new MethodGenerator(GetContextOrThrow(), ancestorMethod, body).GenerateMember();
 
         public void PROPERTY<T>(string name, Action body = null)
             => new PropertyGenerator(GetContextOrThrow(), typeof(T), name, body).GenerateMember();
 
-        public void PROPERTY(MemberRef<TypeMember> type, string name, Action body = null)
+        public void PROPERTY(TypeMember type, string name, Action body = null)
             => new PropertyGenerator(GetContextOrThrow(), type, name, body).GenerateMember();
     }
 }

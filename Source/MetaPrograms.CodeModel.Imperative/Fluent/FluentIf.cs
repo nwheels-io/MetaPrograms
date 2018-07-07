@@ -12,22 +12,28 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public FluentIf(AbstractExpression condition)
         {
-            var block = BlockContextBase.GetBlockOrThrow();
+            var block = BlockContext.GetBlockOrThrow();
 
-            _statement = new IfStatement(block.PopExpression(condition), thenBlock: null, elseBlock: null);
+            _statement = new IfStatement {
+                Condition = block.PopExpression(condition),
+                ThenBlock = null,
+                ElseBlock = null
+            };
+
             block.AppendStatement(_statement);
         }
 
         public FluentElse THEN(Action body)
         {
-            var block = new BlockContext();
+            _statement.ThenBlock = new BlockStatement();
 
-            using (CodeGeneratorContext.GetContextOrThrow().PushState(block))
+            var context = CodeGeneratorContext.GetContextOrThrow(); 
+            using (context.PushState(new BlockContext(_statement.ThenBlock)))
             {
                 body?.Invoke();
             }
 
-            return new FluentElse(BlockContextBase.Replace(_statement, _statement.WithThenBlock(block)));
+            return new FluentElse(_statement);
         }
     }
 }

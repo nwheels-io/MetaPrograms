@@ -4,18 +4,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
 {
     public class ExpressionStatement : AbstractStatement
     {
-        public ExpressionStatement(AbstractExpression expression)
-        {
-            Expression = expression;
-        }
-
-        public ExpressionStatement(
-            ExpressionStatement source, 
-            Mutator<AbstractExpression>? expression = null)
-        {
-            Expression = expression.MutatedOrOriginal(source.Expression);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitExpressionStatement(this);
@@ -26,6 +14,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
-        public AbstractExpression Expression { get; }
+        public AbstractExpression Expression { get; set; }
     }
 }

@@ -199,7 +199,7 @@ namespace MetaPrograms.CodeModel.Imperative
 
         protected internal virtual void VisitAbstractExpression(AbstractExpression expression)
         {
-            if (expression.Type.IsNotNull)
+            if (expression.Type != null)
             {
                 VisitReferenceToTypeMember(expression.Type);
             }

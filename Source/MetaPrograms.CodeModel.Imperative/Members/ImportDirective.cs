@@ -7,20 +7,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class ImportDirective
     {
-        public ImportDirective(
-            MemberRef<TypeMember> fromModule,
-            string fromModuleName,
-            LocalVariable asDefault = null,
-            TupleExpression asTuple = null, 
-            LocalVariable asNamespace = null)
-        {
-            FromModule = fromModule;
-            FromModuleName = fromModuleName;
-            AsDefault = asDefault;
-            AsTuple = asTuple;
-            AsNamespace = asNamespace;
-        }
-
         public IEnumerable<LocalVariable> GetLocalVariables()
         {
             var result = new List<LocalVariable>();
@@ -43,10 +29,10 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return result;
         }
 
-        public MemberRef<TypeMember> FromModule { get; }
-        public string FromModuleName { get; }
-        public LocalVariable AsDefault { get; }
-        public TupleExpression AsTuple { get; }
-        public LocalVariable AsNamespace { get; }
+        public TypeMember FromModule { get; set; }
+        public string FromModuleName { get; set; }
+        public LocalVariable AsDefault { get; set; }
+        public TupleExpression AsTuple { get; set; }
+        public LocalVariable AsNamespace { get; set; }
     }
 }

@@ -4,27 +4,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class IsExpression : AbstractExpression
     {
-        public IsExpression(
-            MemberRef<TypeMember> type, 
-            AbstractExpression expression, 
-            LocalVariable patternMatchVariable) 
-            : base(type)
-        {
-            Expression = expression;
-            PatternMatchVariable = patternMatchVariable;
-        }
-
-        public IsExpression(
-            IsExpression source,
-            Mutator<MemberRef<TypeMember>>? type = null,
-            Mutator<AbstractExpression>? expression = null,
-            Mutator<LocalVariable>? patternMatchVariable = null) 
-            : base(source, type)
-        {
-            Expression = expression.MutatedOrOriginal(source.Expression);
-            PatternMatchVariable = patternMatchVariable.MutatedOrOriginal(source.PatternMatchVariable);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitIsExpression(this);
@@ -40,7 +19,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public AbstractExpression Expression { get; }
-        public LocalVariable PatternMatchVariable { get; }
+        public AbstractExpression Expression { get; set; }
+        public LocalVariable PatternMatchVariable { get; set; }
     }
 }

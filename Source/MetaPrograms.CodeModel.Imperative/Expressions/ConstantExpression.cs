@@ -4,23 +4,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class ConstantExpression : AbstractExpression
     {
-        public ConstantExpression(
-            MemberRef<TypeMember> type, 
-            object value) 
-            : base(type)
-        {
-            Value = value;
-        }
-
-        public ConstantExpression(
-            ConstantExpression source,
-            Mutator<MemberRef<TypeMember>>? type = null,
-            Mutator<object>? value = null) 
-            : base(source, type)
-        {
-            Value = value.MutatedOrOriginal(source.Value);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitConstantExpression(this);
@@ -29,6 +12,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             {
                 visitor.VisitReferenceToTypeMember(typeMember);
             }
+
             //TODO: handle bindings
             //else if (Value is System.Type systemType)
             //{
@@ -40,6 +24,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             //}
         }
 
-        public object Value { get; }
+        public object Value { get; set; }
+
+        public static ConstantExpression Null => new ConstantExpression {
+            Type = null,
+            Value = null
+        };
     }
 }

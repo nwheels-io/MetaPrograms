@@ -13,7 +13,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public MemberVisibility Visibility { get; }
         public MemberModifier Modifier { get; set; }
         public bool IsAsync { get; set; }
-        public bool IsReadonly { get; set; }
+        public bool IsReadOnly { get; set; }
         public bool IsDefaultExport { get; set; }
     }
 }

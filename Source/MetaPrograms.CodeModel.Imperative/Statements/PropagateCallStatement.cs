@@ -5,21 +5,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
 {
     public class PropagateCallStatement : AbstractStatement
     {
-        public PropagateCallStatement(AbstractExpression target, LocalVariable returnValue)
-        {
-            Target = target;
-            ReturnValue = returnValue;
-        }
-
-        public PropagateCallStatement(
-            PropagateCallStatement source,
-            Mutator<AbstractExpression>? target = null,
-            Mutator<LocalVariable>? returnValue = null)
-        {
-            Target = target.MutatedOrOriginal(source.Target);
-            ReturnValue = returnValue.MutatedOrOriginal(source.ReturnValue);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitPropagateCallStatement(this);
@@ -35,9 +20,9 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
-        public AbstractExpression Target { get; }
+        public AbstractExpression Target { get; set; }
 
         //TODO: what is this variable for?
-        public LocalVariable ReturnValue { get; } 
+        public LocalVariable ReturnValue { get; set; } 
     }
 }

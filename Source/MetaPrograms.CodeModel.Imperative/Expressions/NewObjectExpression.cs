@@ -4,21 +4,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class NewObjectExpression : AbstractExpression
     {
-        public NewObjectExpression(
-            MethodCallExpression constructorCall) 
-            : base(constructorCall.Type)
-        {
-            ConstructorCall = constructorCall;
-        }
-
-        public NewObjectExpression(
-            NewObjectExpression source,
-            Mutator<MethodCallExpression>? constructorCall = null) 
-            : base(source, constructorCall.MutatedOrOriginal(source.ConstructorCall).Type)
-        {
-            ConstructorCall = constructorCall.MutatedOrOriginal(source.ConstructorCall);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitNewObjectExpression(this);
@@ -29,6 +14,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public MethodCallExpression ConstructorCall { get; }
+        public MethodCallExpression ConstructorCall { get; set; }
     }
 }

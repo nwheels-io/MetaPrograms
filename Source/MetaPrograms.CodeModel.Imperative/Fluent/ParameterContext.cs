@@ -8,13 +8,11 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public class ParameterContext
     {
-        public ParameterContext()
+        public ParameterContext(MethodParameter parameter)
         {
-            Modifier = MethodParameterModifier.None;
-            Attributes = ImmutableList<AttributeDescription>.Empty;
+            this.Parameter = parameter;
         }
 
-        public MethodParameterModifier Modifier { get; set; }
-        public ImmutableList<AttributeDescription> Attributes { get; set; }
+        public MethodParameter Parameter { get; }
     }
 }

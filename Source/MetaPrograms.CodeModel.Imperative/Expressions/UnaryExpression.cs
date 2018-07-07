@@ -4,27 +4,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class UnaryExpression : AbstractExpression
     {
-        public UnaryExpression(
-            MemberRef<TypeMember> type, 
-            UnaryOperator @operator, 
-            AbstractExpression operand) 
-            : base(type)
-        {
-            Operator = @operator;
-            Operand = operand;
-        }
-
-        public UnaryExpression(
-            UnaryExpression source,
-            Mutator<AbstractExpression>? operand = null,
-            Mutator<UnaryOperator>? @operator = null, 
-            Mutator<MemberRef<TypeMember>>? type = null) 
-            : base(source, type)
-        {
-            Operator = @operator.MutatedOrOriginal(source.Operator);
-            Operand = operand.MutatedOrOriginal(source.Operand);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitUnaryExpression(this);
@@ -35,7 +14,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public UnaryOperator Operator { get; }
-        public AbstractExpression Operand { get; }
+        public UnaryOperator Operator { get; set; }
+        public AbstractExpression Operand { get; set; }
     }
 }

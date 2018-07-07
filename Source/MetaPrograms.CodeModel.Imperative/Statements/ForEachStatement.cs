@@ -5,27 +5,6 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
 {
     public class ForEachStatement : AbstractStatement
     {
-        public ForEachStatement(
-            AbstractExpression enumerable, 
-            BlockStatement body, 
-            LocalVariable currentItem)
-        {
-            Enumerable = enumerable;
-            Body = body;
-            CurrentItem = currentItem;
-        }
-
-        public ForEachStatement(
-            ForEachStatement source,
-            Mutator<AbstractExpression>? enumerable = null,
-            Mutator<BlockStatement>? body = null,
-            Mutator<LocalVariable>? currentItem = null)
-        {
-            Enumerable = enumerable.MutatedOrOriginal(source.Enumerable);
-            Body = body.MutatedOrOriginal(source.Body);
-            CurrentItem = currentItem.MutatedOrOriginal(source.CurrentItem);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitForEachStatement(this);
@@ -43,8 +22,8 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
-        public AbstractExpression Enumerable { get; }
-        public BlockStatement Body { get; }
-        public LocalVariable CurrentItem { get; }
+        public AbstractExpression Enumerable { get; set; }
+        public BlockStatement Body { get; set; }
+        public LocalVariable CurrentItem { get; set; }
     }
 }

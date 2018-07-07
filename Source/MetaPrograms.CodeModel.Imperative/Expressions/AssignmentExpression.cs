@@ -4,25 +4,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
     public class AssignmentExpression : AbstractExpression
     {
-        public AssignmentExpression(
-            IAssignable left, 
-            AbstractExpression right) 
-            : base(right.Type)
-        {
-            this.Left = left;
-            this.Right = right;
-        }
-
-        public AssignmentExpression(
-            AssignmentExpression expression,
-            Mutator<IAssignable>? left = null,
-            Mutator<AbstractExpression>? right = null) 
-            : base(expression, right.MutatedOrOriginal(expression.Right).Type)
-        {
-            this.Left = left.MutatedOrOriginal(expression.Left);
-            this.Right = right.MutatedOrOriginal(expression.Right);
-        }
-
         public override void AcceptVisitor(StatementVisitor visitor)
         {
             visitor.VisitAssignmentExpression(this);
@@ -38,7 +19,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
-        public IAssignable Left { get; }
-        public AbstractExpression Right { get; }
+        public IAssignable Left { get; set; }
+        public AbstractExpression Right { get; set; }
     }
 }
