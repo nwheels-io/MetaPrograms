@@ -70,6 +70,32 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
             return 17 ^ base.GetHashCode();
         }
+        
+        public override void AcceptVisitor(MemberVisitor visitor)
+        {
+            base.AcceptVisitor(visitor);
+
+            switch (this.TypeKind)
+            {
+                case TypeMemberKind.Class:
+                    visitor.VisitClassType(this);
+                    break;
+                case TypeMemberKind.Struct:
+                    visitor.VisitStructType(this);
+                    break;
+                case TypeMemberKind.Interface:
+                    visitor.VisitInterfaceType(this);
+                    break;
+                case TypeMemberKind.Enum:
+                    visitor.VisitEnumType(this);
+                    break;
+            }
+        
+            foreach (var member in this.Members)
+            {
+                member.AcceptVisitor(visitor);
+            }
+        }
 
         public TypeMember MakeGenericType(params TypeMember[] typeArguments)
         {
