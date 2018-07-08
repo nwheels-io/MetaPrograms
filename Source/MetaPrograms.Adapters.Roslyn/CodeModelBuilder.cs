@@ -9,8 +9,8 @@ namespace MetaPrograms.CodeModel.Imperative
 {
     public class CodeModelBuilder
     {
-        private readonly Dictionary<object, MemberRef<AbstractMember>> _memberByBinding = new Dictionary<object, MemberRef<AbstractMember>>();
-        private readonly HashSet<MemberRef<AbstractMember>> _topLevelMembers = new HashSet<MemberRef<AbstractMember>>();
+        private readonly Dictionary<object, AbstractMember> _memberByBinding = new Dictionary<object, AbstractMember>();
+        private readonly HashSet<AbstractMember> _topLevelMembers = new HashSet<AbstractMember>();
         private readonly ImmutableArray<Compilation> _compilations;
         private readonly ImmutableDictionary<SyntaxTree, Compilation> _compilationBySyntaxTree;
 
@@ -37,9 +37,9 @@ namespace MetaPrograms.CodeModel.Imperative
         //    _memberByBinding[binding] = member;
         //}
 
-        public void RegisterMember(MemberRef<AbstractMember> member, bool isTopLevel)
+        public void RegisterMember(AbstractMember member, bool isTopLevel)
         {
-            foreach (var binding in member.Get().Bindings)
+            foreach (var binding in member.Bindings)
             {
                 _memberByBinding[binding] = member;
             }
@@ -78,15 +78,16 @@ namespace MetaPrograms.CodeModel.Imperative
         //     //     $"{typeof(TMember).Name} with binding '{typeof(TBinding).Name}={binding}' could not be found.");
         // }
 
-        public MemberRef<TMember> TryGetMember<TMember>(object binding)
+        public TMember TryGetMember<TMember>(object binding)
             where TMember : AbstractMember
         {
-            if (_memberByBinding.TryGetValue(binding, out MemberRef<AbstractMember> existingMember))
+            if (_memberByBinding.TryGetValue(binding, out var existingMember))
             {
-                return existingMember.AsRef<TMember>();
+                return (TMember)existingMember;
             }
 
-            return MemberRef<TMember>.Null;
+            return null;
+
             // throw new KeyNotFoundException(
             //     $"{typeof(TMember).Name} with binding '{typeof(TBinding).Name}={binding}' could not be found.");
         }
@@ -117,15 +118,15 @@ namespace MetaPrograms.CodeModel.Imperative
         //    return newMember;
         //}
 
-        public IEnumerable<MemberRef<AbstractMember>> GetRgisteredMembers() => new HashSet<MemberRef<AbstractMember>>(_memberByBinding.Values);
+        public IEnumerable<AbstractMember> GetRgisteredMembers() => new HashSet<AbstractMember>(_memberByBinding.Values);
 
-        public IEnumerable<MemberRef<AbstractMember>> GetTopLevelMembers() => _topLevelMembers;
+        public IEnumerable<AbstractMember> GetTopLevelMembers() => _topLevelMembers;
 
         public ImmutableArray<Compilation> GetCompilations() => _compilations;
 
         public ImperativeCodeModel GetCodeModel()
         {
-            return new ImperativeCodeModel(_topLevelMembers.Select(m => m.Get()), _memberByBinding);
+            return new ImperativeCodeModel(_topLevelMembers, _memberByBinding);
         }
 
         private static IEnumerable<Compilation> WithReferencedCompilations(Compilation[] knownCompilations)

@@ -96,7 +96,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
                 return MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     EmitSyntax(member.Target),
-                    IdentifierName(member.Member.Get()?.Name ?? member.MemberName));
+                    IdentifierName(member.Member?.Name ?? member.MemberName));
             }
             if (expression is NewArrayExpression newArray)
             {
@@ -182,7 +182,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         private static ExpressionSyntax EmitMethodCallSyntax(MethodCallExpression call)
         {
             InvocationExpressionSyntax syntax;
-            var methodIdentifier = IdentifierName(call.MethodName ?? call.Method.Get().Name);
+            var methodIdentifier = IdentifierName(call.MethodName ?? call.Method.Name);
 
             if (call.Target != null)
             {

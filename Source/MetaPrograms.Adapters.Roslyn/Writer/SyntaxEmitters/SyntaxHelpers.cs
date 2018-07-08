@@ -109,13 +109,6 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             throw new NotSupportedException($"Literals of type {value.GetType().Name} are not supported");
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public static TypeSyntax GetTypeNameSyntax(this MemberRef<TypeMember> type)
-        {
-            return GetTypeNameSyntax(type.Get());
-        }
-
         public static TypeSyntax GetTypeNameSyntax(this TypeMember type)
         {
             var clrBinding = type.Bindings.FirstOrDefault<System.Type>();
@@ -216,7 +209,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         private static NameSyntax QualifyTypeNameSyntax(TypeMember type, SimpleNameSyntax simpleName)
         {
-            if (type.DeclaringType.IsNotNull)
+            if (type.DeclaringType != null)
             {
                 return QualifiedName(GetTypeFullNameSyntax(type.DeclaringType), simpleName);
             }
@@ -245,7 +238,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
                 return true;
             }
 
-            if (type.IsGenericType && type.GenericTypeDefinition.IsNotNull)
+            if (type.IsGenericType && type.GenericTypeDefinition != null)
             {
                 return importContext.IsTypeImported(type.GenericTypeDefinition);
             }

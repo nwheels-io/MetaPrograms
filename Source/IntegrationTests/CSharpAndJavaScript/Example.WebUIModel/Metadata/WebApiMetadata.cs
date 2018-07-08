@@ -23,7 +23,6 @@ namespace Example.WebUIModel.Metadata
         private ImmutableList<MethodMember> DiscoverApiMethods()
         {
             return InterfaceType.Members
-                .Select(m => m.Get())
                 .OfType<MethodMember>()
                 .ToImmutableList();
         }

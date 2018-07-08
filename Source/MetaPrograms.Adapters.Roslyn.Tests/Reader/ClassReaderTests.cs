@@ -69,8 +69,8 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             var c1Base = reader.TypeMember;
             c1Base.IsGenericType.ShouldBeTrue();
             c1Base.IsGenericDefinition.ShouldBeFalse();
-            c1Base.GenericParameters.Select(arg => arg.Get().Name).ShouldBe(new[] { "T1", "T2" });
-            c1Base.GenericArguments.Select(arg => arg.Get().Name).ShouldBe(new[] { "IService1", "IService2" });
+            c1Base.GenericParameters.Select(arg => arg.Name).ShouldBe(new[] { "T1", "T2" });
+            c1Base.GenericArguments.Select(arg => arg.Name).ShouldBe(new[] { "IService1", "IService2" });
         }
         
         [Test]
@@ -94,7 +94,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             // assert
 
             var type = reader.TypeMember;
-            type.BaseType.Get().ShouldNotBeNull();
+            type.BaseType.ShouldNotBeNull();
             GetSymbolName(type.BaseType).ShouldBe("MyBase");
         }
         
@@ -149,11 +149,11 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             // assert
 
             var type = reader.TypeMember;
-            type.Members.Select(m => m.Get()).OfType<ConstructorMember>().Select(GetSymbolName).ShouldBe(new[] { ".ctor" });
-            type.Members.Select(m => m.Get()).OfType<FieldMember>().Select(GetSymbolName).ShouldBe(new[] { "f1" });
-            type.Members.Select(m => m.Get()).OfType<MethodMember>().Select(GetSymbolName).ShouldBe(new[] { "M1" });
-            type.Members.Select(m => m.Get()).OfType<PropertyMember>().Select(GetSymbolName).ShouldBe(new[] { "P1" });
-            type.Members.Select(m => m.Get()).OfType<EventMember>().Select(GetSymbolName).ShouldBe(new[] { "E1" });
+            type.Members.OfType<ConstructorMember>().Select(GetSymbolName).ShouldBe(new[] { ".ctor" });
+            type.Members.OfType<FieldMember>().Select(GetSymbolName).ShouldBe(new[] { "f1" });
+            type.Members.OfType<MethodMember>().Select(GetSymbolName).ShouldBe(new[] { "M1" });
+            type.Members.OfType<PropertyMember>().Select(GetSymbolName).ShouldBe(new[] { "P1" });
+            type.Members.OfType<EventMember>().Select(GetSymbolName).ShouldBe(new[] { "E1" });
         }
 
         [Test]
@@ -188,17 +188,16 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             var type = reader.TypeMember;
             var property = type.Members
-                .Select(m => m.Get())
                 .OfType<PropertyMember>()
                 .Single(p => p.Name == "Callback");
 
-            var propertyType = property.PropertyType.Get();
+            var propertyType = property.PropertyType;
             
             propertyType.IsGenericType.ShouldBe(true);
             propertyType.IsGenericDefinition.ShouldBe(false);
             propertyType.GenericParameters.Count.ShouldBe(1);
             propertyType.GenericArguments.Count.ShouldBe(1);
-            propertyType.GenericArguments[0].Get().Name.ShouldBe("C1");
+            propertyType.GenericArguments[0].Name.ShouldBe("C1");
         }
         
         [Test]
@@ -227,7 +226,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             var type = reader.TypeMember;
             type.Attributes
-                .Select(a => a.AttributeType.Get().Name)
+                .Select(a => a.AttributeType.Name)
                 .ShouldBe(new[] { "SerializableAttribute", "SeventhAttribute" }, ignoreOrder: true);
         }
 
@@ -235,10 +234,6 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
         {
             return member.Bindings.OfType<ISymbol>().Single().Name;
         }
-
-        private string GetSymbolName<T>(MemberRef<T> member)
-            where T : AbstractMember
-            => GetSymbolName(member.Get());
 
         private (ClassReader, CodeModelBuilder) GetClassReaderFromCode(
             string csharpCode, 

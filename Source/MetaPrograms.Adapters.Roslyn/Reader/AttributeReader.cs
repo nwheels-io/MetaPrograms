@@ -16,16 +16,17 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             var constructorArguments = data.ConstructorArguments
                 .Select(arg => ExpressionReader.ReadTypedConstant(modelBuilder, arg))
-                .ToImmutableList<AbstractExpression>();
+                .ToList<AbstractExpression>();
 
             var propertyValues = data.NamedArguments
                 .Select(kvp => new NamedPropertyValue(kvp.Key, ExpressionReader.ReadTypedConstant(modelBuilder, kvp.Value)))
-                .ToImmutableList();
+                .ToList();
 
-            return new AttributeDescription(
-                modelBuilder.TryGetMember<TypeMember>(data.AttributeClass),
-                constructorArguments,
-                propertyValues);
+            return new AttributeDescription {
+                AttributeType = modelBuilder.TryGetMember<TypeMember>(data.AttributeClass),
+                ConstructorArguments = constructorArguments,
+                PropertyValues = propertyValues
+            };
         }
     }
 }

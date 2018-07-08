@@ -27,7 +27,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
             OutputSyntax = OutputSyntax.WithModifiers(EmitMemberModifiers());
 
-            if (Member.BaseType.IsNotNull || Member.Interfaces.Count > 0)
+            if (Member.BaseType != null || Member.Interfaces.Count > 0)
             {
                 OutputSyntax = OutputSyntax.WithBaseList(EmitBaseList());
             }

@@ -66,7 +66,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         {
             var variable = statement.Variable;
 
-            var declaration = (variable.Type.IsNotNull
+            var declaration = (variable.Type != null
                 ? VariableDeclaration(variable.Type.GetTypeNameSyntax())
                 : VariableDeclaration(IdentifierName("var")));
 

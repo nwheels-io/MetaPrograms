@@ -7,6 +7,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+//TODO: refactor following switch to mutable code model
+
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class TypeReaderMechanism
@@ -17,12 +19,11 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         public TypeReaderMechanism(CodeModelBuilder modelBuilder, INamedTypeSymbol symbol)
         {
             ModelBuilder = modelBuilder;
-            MemberBuilder = new TypeMemberBuilder();
+            MemberBuilder = new TypeMember();
             Symbol = symbol;
             FullyQualifiedMetadataName = Symbol.GetSystemTypeMetadataName();
             ClrType = Type.GetType(FullyQualifiedMetadataName, throwOnError: false);
             MemberBuilder.Status = MemberStatus.Incomplete;
-            MemberRef = MemberBuilder.GetTemporaryProxy().GetRef();
 
             MemberBuilder.Bindings.Add(Symbol);
             MemberBuilder.Bindings.Add(FullyQualifiedMetadataName);
@@ -34,25 +35,23 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         }
 
         public CodeModelBuilder ModelBuilder { get; }
-        public TypeMemberBuilder MemberBuilder { get; }
+        public TypeMember MemberBuilder { get; }
         public INamedTypeSymbol Symbol { get; }
         public string FullyQualifiedMetadataName { get; }
         public Type ClrType { get; }
         public bool IsTopLevelType => (Symbol.ContainingSymbol is INamespaceSymbol);
-        public MemberRef<TypeMember> MemberRef { get; }
-        public RealTypeMember FinalMember { get; private set; }
-        public TypeMember CurrentMember => MemberRef.Get();
+        public TypeMember MemberRef => MemberBuilder;
+        public TypeMember FinalMember => MemberBuilder;
+        public TypeMember CurrentMember => MemberRef;
 
         public void RegisterTemporaryProxy()
         {
-            ModelBuilder.RegisterMember(MemberRef.AsRef<AbstractMember>(), IsTopLevelType);
+            ModelBuilder.RegisterMember(MemberRef, IsTopLevelType);
         }
 
         public void RegisterFinalType()
         {
             MemberBuilder.Status = MemberStatus.Compiled;
-            FinalMember = new RealTypeMember(MemberBuilder);
-            MemberBuilder.GetMemberSelfReference().Reassign(FinalMember);
         }
 
         public void ReadName()
@@ -72,7 +71,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 MemberBuilder.GenericArguments.AddRange(Symbol.TypeArguments.Select(GetTypeParameterOrArgument));
             }
 
-            MemberRef<TypeMember> GetTypeParameterOrArgument(ITypeSymbol symbol)
+            TypeMember GetTypeParameterOrArgument(ITypeSymbol symbol)
             {
                 if (symbol is INamedTypeSymbol argument)
                 {
@@ -80,10 +79,10 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 }
                 else if (symbol is ITypeParameterSymbol parameter)
                 {
-                    return TypeParameterReader.Read(parameter).GetRef();
+                    return TypeParameterReader.Read(parameter);
                 }
 
-                return MemberRef<TypeMember>.Null;
+                return null;
             }
         }
 
@@ -91,7 +90,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             MemberBuilder.BaseType = (
                 Symbol.BaseType == null || Symbol.BaseType.SpecialType == SpecialType.System_Object
-                    ? MemberRef<TypeMember>.Null
+                    ? null
                     : ModelBuilder.TryGetMember<TypeMember>(Symbol.BaseType));
         }
 
@@ -117,7 +116,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _memberReaders.ForEach(reader => {
                 reader.ReadDeclaration();
                 reader.Member.Bindings.Add(reader.Symbol);
-                MemberBuilder.Members.Add(reader.Member.GetAbstractRef());
+                MemberBuilder.Members.Add(reader.Member);
             });
         }
 

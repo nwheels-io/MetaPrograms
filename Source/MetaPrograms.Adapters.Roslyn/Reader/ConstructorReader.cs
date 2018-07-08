@@ -23,16 +23,13 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadDeclaration()
         {
-            _member = new ConstructorMember(
-                declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
-                status: MemberStatus.Incomplete,
-                visibility: _symbol.GetMemberVisibility(),
-                modifier: _symbol.GetMemberModifier(),
-                attributes: ImmutableList<AttributeDescription>.Empty,
-                signature: MethodReaderMechanism.ReadSignature(_modelBuilder, _symbol),
-                body: null,
-                callBaseConstructor: null,
-                callThisConstructor: null);        
+            _member = new ConstructorMember {
+                DeclaringType = _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
+                Status = MemberStatus.Incomplete,
+                Visibility = _symbol.GetMemberVisibility(),
+                Modifier = _symbol.GetMemberModifier(),
+                Signature = MethodReaderMechanism.ReadSignature(_modelBuilder, _symbol),
+            };        
         }
 
         public void ReadAttributes()

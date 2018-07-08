@@ -23,16 +23,15 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadDeclaration()
         {
-            _member = new FieldMember(
-                name: _symbol.Name,
-                declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
-                status: MemberStatus.Incomplete,
-                visibility: _symbol.GetMemberVisibility(),
-                modifier: _symbol.GetMemberModifier(),
-                attributes: ImmutableList<AttributeDescription>.Empty,
-                type: _modelBuilder.TryGetMember<TypeMember>(_symbol.Type),
-                isReadOnly: _symbol.IsReadOnly,
-                initializer: null);
+            _member = new FieldMember {
+                Name = _symbol.Name,
+                DeclaringType = _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
+                Status = MemberStatus.Incomplete,
+                Visibility = _symbol.GetMemberVisibility(),
+                Modifier = _symbol.GetMemberModifier(),
+                Type = _modelBuilder.TryGetMember<TypeMember>(_symbol.Type),
+                IsReadOnly = _symbol.IsReadOnly,
+            };
         }
 
         public void ReadAttributes()

@@ -28,16 +28,16 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _getterReader = MethodReaderMechanism.CreateAccessorMethodReader(_modelBuilder, _symbol.GetMethod);
             _setterReader = MethodReaderMechanism.CreateAccessorMethodReader(_modelBuilder, _symbol.SetMethod);
 
-            _member = new PropertyMember(
-                name: _symbol.Name,
-                declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
-                status: MemberStatus.Incomplete,
-                visibility: _symbol.GetMemberVisibility(),
-                modifier: _symbol.GetMemberModifier(),
-                attributes: ImmutableList<AttributeDescription>.Empty,
-                propertyType: _modelBuilder.TryGetMember<TypeMember>(_symbol.Type),
-                getter: MethodReader.GetMemberRef(_getterReader),
-                setter: MethodReader.GetMemberRef(_setterReader));
+            _member = new PropertyMember {
+                Name = _symbol.Name,
+                DeclaringType = _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
+                Status = MemberStatus.Incomplete,
+                Visibility = _symbol.GetMemberVisibility(),
+                Modifier = _symbol.GetMemberModifier(),
+                PropertyType = _modelBuilder.TryGetMember<TypeMember>(_symbol.Type),
+                Getter = _getterReader?.Member as MethodMember,
+                Setter = _setterReader?.Member as MethodMember
+            };
         }
 
         public void ReadAttributes()

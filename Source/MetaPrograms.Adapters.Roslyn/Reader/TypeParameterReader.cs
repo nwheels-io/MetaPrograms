@@ -11,12 +11,10 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     {
         public static TypeMember Read(ITypeParameterSymbol symbol)
         {
-            var memberBuilder  = new TypeMemberBuilder();
-
-            memberBuilder.Name = symbol.Name;
-            memberBuilder.IsGenericParameter = true;
-
-            return new RealTypeMember(memberBuilder);
+            return new TypeMember {
+                Name = symbol.Name,
+                IsGenericParameter = true
+            };
         }
     }
 }

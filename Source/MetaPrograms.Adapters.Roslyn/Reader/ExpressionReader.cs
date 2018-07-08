@@ -12,7 +12,10 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     {
         public static ConstantExpression ReadTypedConstant(CodeModelBuilder modelBuilder, TypedConstant constant)
         {
-            return new ConstantExpression(modelBuilder.TryGetMember<TypeMember>(constant.Type), constant.Value);
+            return new ConstantExpression {
+                Type =modelBuilder.TryGetMember<TypeMember>(constant.Type),
+                Value = constant.Value 
+            };
         }
     }
 }
