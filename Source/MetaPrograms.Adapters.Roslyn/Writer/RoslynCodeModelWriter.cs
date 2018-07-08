@@ -12,7 +12,7 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
     {
         private readonly ImperativeCodeModel _codeModel;
         private readonly ICodeGeneratorOutput _output;
-        private readonly List<IMemberRef> _members = new List<IMemberRef>();
+        private readonly List<AbstractMember> _members = new List<AbstractMember>();
 
         public RoslynCodeModelWriter(ImperativeCodeModel codeModel, ICodeGeneratorOutput output)
         {
@@ -20,7 +20,7 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
             _output = output;
         }
 
-        public void AddMembers(IEnumerable<IMemberRef> members)
+        public void AddMembers(IEnumerable<AbstractMember> members)
         {
             _members.AddRange(members);
         }
@@ -29,7 +29,7 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
         {
             var commonNamespaceParts = FindCommonNamespace();
 
-            foreach (var type in _members.Select(m => m.Get()).OfType<TypeMember>())
+            foreach (var type in _members.OfType<TypeMember>())
             {
                 WriteType(type, commonNamespaceParts);
             }
@@ -38,7 +38,6 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
         private IList<string> FindCommonNamespace()
         {
             return _members
-                .Select(m => m.Get())
                 .OfType<TypeMember>()
                 .Where(t => t.Namespace != null)
                 .Select(m => m.Namespace.Split('.'))

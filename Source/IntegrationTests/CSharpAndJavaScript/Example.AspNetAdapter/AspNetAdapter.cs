@@ -14,7 +14,7 @@ namespace Example.AspNetAdapter
         private readonly ImperativeCodeModel _codeModel;
         private readonly ICodeGeneratorOutput _output;
         private CodeGeneratorContext _context;
-        private MemberRef<TypeMember> _middlewareType;
+        private TypeMember _middlewareType;
 
         public AspNetAdapter(ImperativeCodeModel codeModel, ICodeGeneratorOutput output)
         {
@@ -38,7 +38,7 @@ namespace Example.AspNetAdapter
         private void GenerateInfrastructureTypes()
         {
             NAMESPACE(typeof(AspNetMiddlewareGenerator).Namespace, () => {
-                _middlewareType = AspNetMiddlewareGenerator.InvalidModelAutoResponderAttribute().GetRef();
+                _middlewareType = AspNetMiddlewareGenerator.InvalidModelAutoResponderAttribute();
             });
         }
 

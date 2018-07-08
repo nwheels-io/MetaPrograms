@@ -19,7 +19,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         public override ConstructorDeclarationSyntax EmitSyntax()
         {
-            OutputSyntax = ConstructorDeclaration(Identifier(Member.DeclaringType.Get().Name));
+            OutputSyntax = ConstructorDeclaration(Identifier(Member.DeclaringType.Name));
 
             if (Member.Modifier != MemberModifier.Static)
             {

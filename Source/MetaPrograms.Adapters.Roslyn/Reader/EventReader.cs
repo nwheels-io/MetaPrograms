@@ -28,16 +28,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _adderReader = MethodReaderMechanism.CreateAccessorMethodReader(_modelBuilder, _symbol.AddMethod);
             _removerReader = MethodReaderMechanism.CreateAccessorMethodReader(_modelBuilder, _symbol.RemoveMethod);
 
-            _member = new EventMember(
-                name: _symbol.Name,
-                declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
-                status: MemberStatus.Incomplete,
-                visibility: _symbol.GetMemberVisibility(),
-                modifier: _symbol.GetMemberModifier(),
-                attributes: ImmutableList<AttributeDescription>.Empty,
-                delegateType: _modelBuilder.TryGetMember<TypeMember>(_symbol.Type),
-                adder: MethodReader.GetMemberRef(_adderReader),
-                remover: MethodReader.GetMemberRef(_removerReader));
+            _member = new EventMember {
+                Name = _symbol.Name,
+                DeclaringType = _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
+                Status = MemberStatus.Incomplete,
+                Visibility = _symbol.GetMemberVisibility(),
+                Modifier = _symbol.GetMemberModifier(),
+                DelegateType = _modelBuilder.TryGetMember<TypeMember>(_symbol.Type),
+            };
         }
 
         public void ReadAttributes()

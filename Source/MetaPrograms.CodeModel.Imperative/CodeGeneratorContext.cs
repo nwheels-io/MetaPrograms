@@ -121,7 +121,7 @@ namespace MetaPrograms.CodeModel.Imperative
         public bool TryFindMember<TMember>(object binding, out TMember member)
             where TMember : AbstractMember
         {
-            if (CodeModel.MembersByBndings.TryGetValue(binding, out var untypedMember))
+            if (binding != null && CodeModel.MembersByBndings.TryGetValue(binding, out var untypedMember))
             {
                 member = (TMember)untypedMember;
                 return true;
@@ -149,6 +149,11 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public TypeMember FindType(Type clrType)
         {
+            if (clrType == null)
+            {
+                return null;
+            }
+            
             TypeMember typeMember;
 
             if (TryFindMember(binding: clrType, out typeMember))
@@ -158,7 +163,7 @@ namespace MetaPrograms.CodeModel.Imperative
                     _clrTypeResolver.Complete(typeMember, this.CodeModel);
                 }
             }
-            else 
+            else
             {
                 typeMember = _clrTypeResolver.Resolve(clrType, this.CodeModel, distance: 0);
             }

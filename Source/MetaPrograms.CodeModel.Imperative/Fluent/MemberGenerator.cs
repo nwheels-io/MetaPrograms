@@ -123,7 +123,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public MethodMember AncestorMethod { get; }
         
         public MethodGenerator(CodeGeneratorContext context, string name, Action body)
-            : this(context, (Type)null, name, body)
+            : this(context, returnType: (Type)null, name, body)
         {
         }
 

@@ -23,15 +23,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadDeclaration()
         {
-            _member = new MethodMember(
-                name: _symbol.Name, 
-                declaringType: _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
-                status: MemberStatus.Incomplete,
-                visibility: _symbol.GetMemberVisibility(),
-                modifier: _symbol.GetMemberModifier(),
-                attributes: ImmutableList<AttributeDescription>.Empty,
-                signature: MethodReaderMechanism.ReadSignature(_modelBuilder, _symbol),
-                body: null);
+            _member = new MethodMember {
+                Name = _symbol.Name,
+                DeclaringType = _modelBuilder.TryGetMember<TypeMember>(_symbol.ContainingType),
+                Status = MemberStatus.Incomplete,
+                Visibility = _symbol.GetMemberVisibility(),
+                Modifier = _symbol.GetMemberModifier(),
+                Signature = MethodReaderMechanism.ReadSignature(_modelBuilder, _symbol),
+            };
         }
 
         public void ReadAttributes()
@@ -46,15 +45,5 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public ISymbol Symbol => _symbol;
         public AbstractMember Member => _member;
-
-        public static MemberRef<MethodMember> GetMemberRef(MethodReader reader)
-        {
-            if (reader?.Member != null)
-            {
-                return reader._member.GetRef();
-            }
-
-            return new MemberRef<MethodMember>(null);
-        }
     }
 }

@@ -17,7 +17,7 @@ namespace Example.WebUIModel.Metadata
             _apiRegistry = apiRegistry;
 
             this.PageClass = pageClass;
-            this.StateClass = pageClass.BaseType.Get().GenericArguments[0];
+            this.StateClass = pageClass.BaseType.GenericArguments[0];
 
             this.Components = DiscoverComponents();
             this.BackendApis = DiscoverBackendApis();
@@ -34,7 +34,6 @@ namespace Example.WebUIModel.Metadata
         {
             //TODO: add TypeMember.Properties : IEnumerable<PropertyMember>
             return PageClass.Members
-                .Select(m => m.Get())
                 .OfType<PropertyMember>()
                 .Where(IsComponentProperty)
                 .Select(property => new WebComponentMetadata(_imperativeCodeModel, property))
@@ -45,8 +44,8 @@ namespace Example.WebUIModel.Metadata
                 //TODO: add PropertyMember.IsGetOnly
                 return (
                     (property.Modifier & MemberModifier.Static) == 0 && //TODO: add PropertyMember.IsStatic / IsInstance
-                    property.Getter.IsNotNull &&
-                    property.Setter.IsNull &&
+                    property.Getter != null &&
+                    property.Setter != null &&
                     IsComponentClass(property.PropertyType));
             }
             
@@ -58,7 +57,7 @@ namespace Example.WebUIModel.Metadata
                 }
                 
                 //TODO: add TypeMember.IsA()
-                for (var baseType = type.BaseType.Get(); baseType != null; baseType = baseType.BaseType.Get())
+                for (var baseType = type.BaseType; baseType != null; baseType = baseType.BaseType)
                 {
                     if (baseType.Bindings.FirstOrDefault<Type>() == typeof(AbstractComponent))
                     {
@@ -74,7 +73,6 @@ namespace Example.WebUIModel.Metadata
         {
             //TODO: add TypeMember.Properties : IEnumerable<PropertyMember>
             return PageClass.Members
-                .Select(m => m.Get())
                 .OfType<PropertyMember>()
                 .Select(TryGetApiType)
                 .Where(t => t != null)
@@ -83,7 +81,7 @@ namespace Example.WebUIModel.Metadata
             
             TypeMember TryGetApiType(PropertyMember property)
             {
-                var type = property.PropertyType.Get();
+                var type = property.PropertyType;
 
                 //TODO: add TypeMember.IsA(System.Type) + support open generic System.Type
                 if (type?.TypeKind == TypeMemberKind.Class && type.IsGenericType)
@@ -103,7 +101,6 @@ namespace Example.WebUIModel.Metadata
         {
             //TODO: add TypeMember.Methods : IEnumerable<MethodMember> + Fields, Properties, Events, NestedTypes
             return PageClass.Members
-                .Select(m => m.Get())
                 .OfType<MethodMember>()
                 .FirstOrDefault(IsControllerMethod);            
             

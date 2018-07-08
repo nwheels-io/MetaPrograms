@@ -50,12 +50,12 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         {
             var baseList = new List<BaseTypeSyntax>();
 
-            if (Member.BaseType.IsNotNull)
+            if (Member.BaseType != null)
             {
                 baseList.Add(ToBaseTypeSyntax(Member.BaseType));
             }
 
-            baseList.AddRange(Member.Interfaces.Select(mref => ToBaseTypeSyntax(mref.Get())));
+            baseList.AddRange(Member.Interfaces.Select(ToBaseTypeSyntax));
 
             return BaseList(SeparatedList<BaseTypeSyntax>(baseList));
         }
@@ -74,14 +74,14 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             return TypeParameterList(
                 SeparatedList<TypeParameterSyntax>(
                     Member.GenericParameters
-                        .Select(t => TypeParameter(Identifier(t.Get().Name)))));
+                        .Select(t => TypeParameter(Identifier(t.Name)))));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         protected SyntaxList<MemberDeclarationSyntax> EmitMembers()
         {
-            var orderedMembers = new List<AbstractMember>(Member.Members.Select(m => m.Get()));
+            var orderedMembers = new List<AbstractMember>(Member.Members);
             orderedMembers.Sort(new MemberOrderComparer());
 
             return List<MemberDeclarationSyntax>(orderedMembers

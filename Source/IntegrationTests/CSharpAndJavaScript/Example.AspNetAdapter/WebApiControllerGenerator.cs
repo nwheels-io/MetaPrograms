@@ -18,12 +18,12 @@ namespace Example.AspNetAdapter
     public static class WebApiControllerGenerator
     {
         //TODO: add detection & resolution of duplicate names
-        public static TypeMember WebApiController(MemberRef<TypeMember> middlewareType, WebApiMetadata api) =>
+        public static TypeMember WebApiController(TypeMember middlewareType, WebApiMetadata api) =>
             PUBLIC.CLASS($"{api.InterfaceType.Name.TrimPrefix("I")}Controller", () => {
                 EXTENDS<Controller>();
                 ATTRIBUTE<RouteAttribute>("api/[controller]");
 
-                PRIVATE.READONLY.FIELD(api.InterfaceType.GetRef(), "_service", out var @serviceField);
+                PRIVATE.READONLY.FIELD(api.InterfaceType, "_service", out var @serviceField);
 
                 PUBLIC.CONSTRUCTOR(() => {
                     PARAMETER(api.InterfaceType, "service", out var @service);
@@ -40,7 +40,7 @@ namespace Example.AspNetAdapter
                             ATTRIBUTE<FromBodyAttribute>();
                         });
 
-                        LOCAL(apiMethod.ReturnType.Get().GenericArguments[0], "resultValue", out LocalVariable resultValueLocal);
+                        LOCAL(apiMethod.ReturnType.GenericArguments[0], "resultValue", out LocalVariable resultValueLocal);
 
                         resultValueLocal.ASSIGN(
                             AWAIT(THIS.DOT(@serviceField).DOT(apiMethod).INVOKE(() => {

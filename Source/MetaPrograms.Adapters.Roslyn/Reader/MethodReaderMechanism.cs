@@ -13,30 +13,34 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     {
         public static MethodSignature ReadSignature(CodeModelBuilder modelBuilder, IMethodSymbol symbol)
         {
-            var parameters = symbol.Parameters.Select((p, index) => new MethodParameter(
-                name: p.Name,
-                position: index + 1,
-                type: modelBuilder.TryGetMember<TypeMember>(p.Type),
-                modifier: p.GetParameterModifier(),
-                attributes: ImmutableList<AttributeDescription>.Empty
-            ));
+            var parameters = symbol.Parameters.Select((p, index) => new MethodParameter {
+                Name = p.Name,
+                Position = index + 1,
+                Type = modelBuilder.TryGetMember<TypeMember>(p.Type),
+                Modifier = p.GetParameterModifier(),
+            });
 
             var hasReturnType = (
                 symbol.MethodKind != MethodKind.Constructor &&
                 symbol.MethodKind != MethodKind.StaticConstructor &&
                 !symbol.ReturnsVoid);
-            
-            var returnValue = (
-                hasReturnType 
-                ? new MethodParameter(
-                    name: "$retVal", 
-                    position: 0,
-                    type: modelBuilder.TryGetMember<TypeMember>(symbol.ReturnType),
-                    modifier: symbol.GetReturnValueModifier(),
-                    attributes: ImmutableList<AttributeDescription>.Empty)
-                : null);
 
-            return new MethodSignature(symbol.IsAsync, returnValue, parameters.ToImmutableList());
+            var returnValue = (
+                hasReturnType
+                    ? new MethodParameter {
+                        Name = "$retVal",
+                        Position = 0,
+                        Type = modelBuilder.TryGetMember<TypeMember>(symbol.ReturnType),
+                        Modifier = symbol.GetReturnValueModifier(),
+                    }
+                    : null
+            );
+
+            return new MethodSignature {
+                IsAsync = symbol.IsAsync, 
+                ReturnValue = returnValue, 
+                Parameters = parameters.ToList()
+            };
         }
 
         public static MethodReader CreateAccessorMethodReader(CodeModelBuilder modelBuilder, IMethodSymbol accessorSymbol)

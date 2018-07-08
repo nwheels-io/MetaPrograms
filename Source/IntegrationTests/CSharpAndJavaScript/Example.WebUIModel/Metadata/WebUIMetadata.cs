@@ -38,7 +38,6 @@ namespace Example.WebUIModel.Metadata
         private ImmutableArray<WebPageMetadata> DiscoverWebPages()
         {
             var webPageClasses = _imperativeCodeModel.TopLevelMembers
-                .Select(m => m.Get())
                 .OfType<TypeMember>()
                 .Where(t => t.TypeKind == TypeMemberKind.Class)
                 .Where(IsWebPageClass)
@@ -56,7 +55,7 @@ namespace Example.WebUIModel.Metadata
 
         private bool IsWebPageClass(TypeMember type)
         {
-            var baseTypeMember = type.BaseType.Get();
+            var baseTypeMember = type.BaseType;
             if (baseTypeMember == null)
             {
                 return false;
