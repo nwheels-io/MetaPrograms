@@ -28,7 +28,9 @@ namespace MetaPrograms.IntegrationTests
 
             SourceFiles = SourceFiles.Add(filePath, stream);
         }
-        
+
+        public CodeTextOptions TextOptions => CodeTextOptions.Default;
+
         public ImmutableDictionary<string, Stream> SourceFiles { get; private set; }
     }
 }

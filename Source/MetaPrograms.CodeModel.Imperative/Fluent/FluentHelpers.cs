@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 using static MetaPrograms.CodeModel.Imperative.CodeGeneratorContext;
@@ -12,20 +13,25 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public static TypeMember BuildTypeMember(TypeMemberKind typeKind, string name, Action body)
         {
             var context = CodeGeneratorContext.GetContextOrThrow();
-            var traits = context.PopStateOrThrow<MemberTraitsContext>();
+            var module = context.TryLookupState<ModuleMember>();
             var namespaceContext = context.TryLookupState<NamespaceContext>();
-            var moduleContext = context.TryLookupState<ModuleMemberContext>();
+            var traits = context.PopStateOrThrow<MemberTraitsContext>();
             var containingType = context.TryLookupState<TypeMember>();
 
             var type = new TypeMember();
             type.Namespace = namespaceContext?.Name;
             type.Name = name;
             type.TypeKind = typeKind;
+            type.DeclaringModule = module;
             type.DeclaringType = containingType;
             type.Modifier = traits.Modifier;
             type.Visibility = traits.Visibility;
 
             context.AddGeneratedMember(type, isTopLevel: containingType == null);
+            if (module != null)
+            {
+                module.Members.Add(type);
+            }
 
             using (context.PushState(type))
             {

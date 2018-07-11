@@ -4,6 +4,9 @@ using System.Linq;
 using System.Xml.Linq;
 using CommonExtensions;
 using Example.WebUIModel.Metadata;
+using MetaPrograms.Adapters.JavaScript;
+using MetaPrograms.Adapters.JavaScript.Writer;
+using MetaPrograms.Adapters.Reflection.Reader;
 using MetaPrograms.CodeModel.Imperative;
 
 namespace Example.HyperappAdapter
@@ -13,18 +16,26 @@ namespace Example.HyperappAdapter
         private static readonly string ClientSideFolderPath = 
             Path.Combine(Path.GetDirectoryName(typeof(HyperappAdapter).Assembly.Location), "ClientSide");
 
+        private readonly ImperativeCodeModel _codeModel;
         private readonly ICodeGeneratorOutput _output;
+        private readonly JavaScriptCodeWriter _codeWriter;
 
-        public HyperappAdapter(ICodeGeneratorOutput output)
+        public HyperappAdapter(ImperativeCodeModel codeModel, ICodeGeneratorOutput output)
         {
+            _codeModel = codeModel;
             _output = output;
+            _codeWriter = new JavaScriptCodeWriter(output);
         }
 
         public void GenerateImplementations(WebUIMetadata metadata)
         {
             CopyFrameworkFiles();
-            GenerateIndexHtml(metadata);
-            GenerateBackendApiServices(metadata);
+
+            using (new CodeGeneratorContext(_codeModel, new ClrTypeResolver()))
+            {
+                GenerateIndexHtml(metadata);
+                GenerateBackendApiServices(metadata);
+            }
         }
 
         private void CopyFrameworkFiles()
@@ -42,9 +53,8 @@ namespace Example.HyperappAdapter
 
         private void GenerateBackendApiService(WebApiMetadata api)
         {
-            var apiName = api.InterfaceType.Name.TrimPrefix("I").ToCamelCase();
-
-
+            var module = BackendApiServiceGenerator.BackendApiService(api);
+            _codeWriter.WriteModule(module);
         }
 
         private void GenerateIndexHtml(WebUIMetadata metadata)
