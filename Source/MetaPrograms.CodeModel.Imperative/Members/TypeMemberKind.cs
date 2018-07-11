@@ -8,7 +8,6 @@
         Enum,
         Struct,
         Class,
-        Interface,
-        Module
+        Interface
     }
 }

@@ -23,11 +23,28 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             }
         }
 
-        public static TypeMember MODULE(string name, Action body)
+        public static ModuleMember MODULE(string name, Action body)
         {
-            var visibilityContext = PUBLIC;
-            var modifierContext = visibilityContext.STATIC;
-            return FluentHelpers.BuildTypeMember(TypeMemberKind.Module, name, body);
+            return MODULE(folderPath: null, name, body);
+        }
+
+        public static ModuleMember MODULE(string[] folderPath, string name, Action body)
+        {
+            var context = GetContextOrThrow();
+            var module = new ModuleMember() {
+                FolderPath = folderPath ?? new string[0],
+                Name = name,
+                Status = MemberStatus.Incomplete,
+                Visibility = MemberVisibility.Public
+            };
+
+            using (context.PushState(module))
+            {
+                body?.Invoke();
+            }
+
+            module.Status = MemberStatus.Generator;
+            return module;
         }
 
         public static IFluentImport IMPORT => new FluentImport();
@@ -149,7 +166,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             var type = GetContextOrThrow().FindType<T>();
             LOCAL(type, name, out @ref, initialValue);
         }
-
+        
         public static void FINAL(string name, out LocalVariable @ref, AbstractExpression value)
         {
             FINAL(type: null, name, out @ref, value);
@@ -175,6 +192,13 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         {
             var type = GetContextOrThrow().FindType<T>();
             FINAL(type, name, out @ref, value);
+        }
+
+        public static LocalVariableExpression USE(string name)
+        {
+            return new LocalVariableExpression {
+                VariableName = name
+            };
         }
 
         public static TupleExpression TUPLE(string name1, out LocalVariable var1)
@@ -235,7 +259,15 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             };
 
         public static AbstractExpression DOT(this LocalVariable target, AbstractMember member) => throw new NotImplementedException();
-        public static AbstractExpression DOT(this LocalVariable target, string memberName) => throw new NotImplementedException();
+        
+        public static AbstractExpression DOT(this LocalVariable target, string memberName) 
+            => new MemberExpression {
+                Type = target.Type,
+                Target = target.AsExpression(),
+                MemberName = memberName
+            };
+
+        
         public static AbstractExpression DOT(this MethodParameter target, AbstractMember member) => throw new NotImplementedException();
 
         public static AbstractExpression DOT(this MethodParameter target, string memberName)
@@ -355,8 +387,48 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             return INVOKE(expression, invocation.GetArguments());
         }
 
-        //public static AnonymousDelegateExpression LAMBDA()
+        public static AnonymousDelegateExpression LAMBDA(Action bodyNoArgs)
+            => CreateAnonymousDelegate(
+                bodyNoArgs,
+                parameters => bodyNoArgs?.Invoke());
 
+        public static AnonymousDelegateExpression LAMBDA(Action<MethodParameter> body1Arg)
+            => CreateAnonymousDelegate(
+                body1Arg,
+                parameters => body1Arg?.Invoke(parameters[0]));
+
+        public static AnonymousDelegateExpression LAMBDA(Action<MethodParameter, MethodParameter> body2Args)
+            => CreateAnonymousDelegate(
+                body2Args,
+                parameters => body2Args?.Invoke(parameters[0], parameters[1]));
+
+        public static AnonymousDelegateExpression LAMBDA(Action<MethodParameter, MethodParameter, MethodParameter> body3Args)
+            => CreateAnonymousDelegate(
+                body3Args,
+                parameters => body3Args?.Invoke(parameters[0], parameters[1], parameters[2]));
+
+        private static AnonymousDelegateExpression CreateAnonymousDelegate(Delegate body, Action<MethodParameter[]> invokeBody)
+        {
+            var context = GetContextOrThrow();
+            
+            var parameters = body.Method.GetParameters().Select((info, index) => new MethodParameter {
+                Position = index,
+                Name = info.Name,
+                Type = context.FindType(info.ParameterType)
+            }).ToArray();
+
+            var lambda = new AnonymousDelegateExpression {
+                Body = new BlockStatement()
+            };
+
+            using (context.PushState(new BlockContext(lambda.Body)))
+            {
+                invokeBody(parameters);
+            }
+
+            return lambda;
+        }
+        
         public static AbstractExpression TYPED(object value)
         {
             var context = GetContextOrThrow();

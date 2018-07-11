@@ -20,5 +20,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         }
 
         public LocalVariable Variable { get; set; }
+        public string VariableName { get; set; }
     }
 }

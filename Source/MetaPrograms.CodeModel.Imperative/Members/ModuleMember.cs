@@ -5,8 +5,11 @@ using System.Text;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
-    public class ModuleMember : TypeMember
+    public class ModuleMember : AbstractMember
     {
-        public List<ImportDirective> Imports { get; } = new List<ImportDirective>();
+        public string[] FolderPath { get; set; }
+        public List<ImportDirective> Imports { get; set; } = new List<ImportDirective>();
+        public List<AbstractMember> Members { get; set; } = new List<AbstractMember>();
+        public override bool IsTopLevel => true;
     }
 }

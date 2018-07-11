@@ -96,6 +96,11 @@ namespace MetaPrograms.CodeModel.Imperative
             return TryLookupState<TypeMember>();
         }
 
+        public ModuleMember TryGetCurrentModule()
+        {
+            return TryLookupState<ModuleMember>();
+        }
+
         public TypeMember GetCurrentType()
         {
             return LookupStateOrThrow<TypeMember>();

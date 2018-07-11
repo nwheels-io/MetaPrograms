@@ -9,20 +9,6 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public abstract class AbstractMember
     {
-        //public bool HasAttribute<TAttribute>()
-        //    where TAttribute : Attribute
-        //{
-        //    return TryGetAttribute<TAttribute>(out TAttribute attribute);
-        //}
-
-        //public bool TryGetAttribute<TAttribute>(out TAttribute attribute)
-        //    where TAttribute : Attribute
-        //{
-        //    var description = this.Attributes.FirstOrDefault(a => a.Binding is TAttribute);
-        //    attribute = (description?.Binding as TAttribute);
-        //    return (attribute != null);
-        //}
-
         public virtual void AcceptVisitor(MemberVisitor visitor)
         {
             if (this.Attributes != null)
@@ -42,11 +28,12 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public BindingCollection Bindings { get; } = new BindingCollection();
 
         public virtual string Name { get; set; }
-        public virtual string Url { get; set; }
+        public virtual ModuleMember DeclaringModule { get; set; }
         public virtual TypeMember DeclaringType { get; set; }
         public virtual MemberStatus Status { get; set; }
         public virtual MemberVisibility Visibility { get; set; }
         public virtual MemberModifier Modifier { get; set; }
         public virtual List<AttributeDescription> Attributes { get; set; } = new List<AttributeDescription>();
+        public virtual bool IsTopLevel => (DeclaringType == null && DeclaringModule == null);
     }
 }

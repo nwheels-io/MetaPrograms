@@ -9,6 +9,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
     {
         public CodeGeneratorContext Context { get; }
         public MemberTraitsContext Traits { get; }
+        public ModuleMember DeclaringModule { get; }
         public TypeMember DeclaringType { get; }
         public string Name { get; }
         public Action Body { get; }
@@ -19,7 +20,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             this.Name = name;
             this.Body = body;
             this.Traits = context.PopStateOrThrow<MemberTraitsContext>();;
-            this.DeclaringType = context.GetCurrentType();
+            this.DeclaringModule = context.TryGetCurrentModule();
+            this.DeclaringType = context.TryGetCurrentType();
         }
 
         public TMember GenerateMember()
@@ -27,7 +29,14 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             var member = new TMember();
             InitializeMember(member);
 
-            this.DeclaringType.Members.Add(member);
+            if (DeclaringType != null)
+            {
+                this.DeclaringType.Members.Add(member);
+            }
+            else if (DeclaringModule != null)
+            {
+                this.DeclaringModule.Members.Add(member);
+            }
 
             using (Context.PushState(member))
             {

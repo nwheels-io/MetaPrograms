@@ -43,7 +43,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             var uiMetadata = new WebUIMetadata(codeModel);
             
             var output = new TestCodeGeneratorOutput();
-            var adapter = new HyperappAdapter(output);
+            var adapter = new HyperappAdapter(codeModel, output);
             adapter.GenerateImplementations(uiMetadata);
 
             // assert

@@ -55,8 +55,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public TypeMember INTERFACE(string name, Action body) 
             => FluentHelpers.BuildTypeMember(TypeMemberKind.Interface, name, body);
 
-        public TypeMember MODULE(string name, Action body)
-            => FluentHelpers.BuildTypeMember(TypeMemberKind.Module, name, body);
+        // public TypeMember MODULE(string name, Action body)
+        //     => FluentHelpers.BuildTypeMember(TypeMemberKind.Module, name, body);
 
         public ConstructorMember CONSTRUCTOR(Action body)
             => new ConstructorGenerator(GetContextOrThrow(), body).GenerateMember();
