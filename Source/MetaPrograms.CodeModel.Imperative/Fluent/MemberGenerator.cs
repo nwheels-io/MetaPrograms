@@ -56,6 +56,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             member.Status = MemberStatus.Generator;
             member.Visibility = Traits.Visibility;
             member.Modifier = Traits.Modifier;
+            member.IsDefaultExport = Traits.IsDefaultExport;
         }
 
         protected virtual IDisposable CreateStateAroundBody(TMember member) => null;

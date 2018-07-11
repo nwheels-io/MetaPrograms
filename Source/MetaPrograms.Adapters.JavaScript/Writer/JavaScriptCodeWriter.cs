@@ -24,11 +24,13 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             _output.AddSourceFile(module.FolderPath, $"{module.Name}.js", _code.ToString());
         }
 
+        public CodeTextBuilder Code => _code;
+
         private void WriteImports(ModuleMember module)
         {
             foreach (var import in module.Imports)
             {
-                Write(import);
+                JavaScriptImportWriter.WriteImport(_code, import);
             }
         }
 
@@ -37,61 +39,8 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             foreach (var member in module.Members)
             {
                 _code.WriteLine();
-                WriteMember(member);
+                JavaScriptMemberWriter.WriteMember(_code, member);
             }
-        }
-
-        private void WriteMember(AbstractMember member)
-        {
-            if (member is TypeMember type)
-            {
-                WriteType(type);
-            }
-            else if (member is MethodMember method)
-            {
-                WriteMethod(method);
-            }
-            else if (member is FieldMember field)
-            {
-                WriteField(field);
-            }
-        }
-
-        private void WriteType(TypeMember type)
-        {
-            
-            _code.WriteLine("");
-        }
-
-        private void WriteMethod(MethodMember method)
-        {
-            _code.WriteLine($"/* FUNCTION: {method.Name}  */");
-        }
-
-        private void WriteField(FieldMember field)
-        {
-            _code.WriteLine($"/* FIELD: {field.Name}  */");
-        }
-
-        private void Write(ImportDirective import)
-        {
-            var fromName = import.FromModuleName ?? import.FromModule.Name;
-
-            if (import.AsDefault != null)
-            {
-                _code.Write($"import {import.AsDefault.Name}");
-            }
-            else if (import.AsNamespace != null)
-            {
-                _code.Write($"import * as {import.AsNamespace.Name}");
-            }
-            else if (import.AsTuple != null)
-            {
-                var variableListText = string.Join(", ", import.AsTuple.Variables.Select(v => v.Name));
-                _code.Write($"import {{{variableListText}}}");
-            }
-            
-            _code.WriteLine($" from '{fromName}';");
         }
     }
 }

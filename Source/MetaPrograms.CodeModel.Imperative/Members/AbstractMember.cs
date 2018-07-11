@@ -34,6 +34,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public virtual MemberVisibility Visibility { get; set; }
         public virtual MemberModifier Modifier { get; set; }
         public virtual List<AttributeDescription> Attributes { get; set; } = new List<AttributeDescription>();
+        public virtual bool IsDefaultExport { get; set; }
         public virtual bool IsTopLevel => (DeclaringType == null && DeclaringModule == null);
     }
 }

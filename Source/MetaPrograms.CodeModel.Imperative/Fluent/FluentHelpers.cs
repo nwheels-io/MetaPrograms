@@ -19,13 +19,14 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             var containingType = context.TryLookupState<TypeMember>();
 
             var type = new TypeMember();
-            type.Namespace = namespaceContext?.Name;
             type.Name = name;
+            type.Namespace = namespaceContext?.Name;
             type.TypeKind = typeKind;
             type.DeclaringModule = module;
             type.DeclaringType = containingType;
             type.Modifier = traits.Modifier;
             type.Visibility = traits.Visibility;
+            type.IsDefaultExport = traits.IsDefaultExport;
 
             context.AddGeneratedMember(type, isTopLevel: containingType == null);
             if (module != null)

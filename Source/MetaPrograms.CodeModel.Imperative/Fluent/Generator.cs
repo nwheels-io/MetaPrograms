@@ -119,13 +119,19 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             PARAMETER(type: null, name, out @ref, body);
         }
 
-        public static void PARAMETER(TypeMember type, string name, out MethodParameter @ref, Action body = null)
+        public static void PARAMETER(TupleExpression tuple, Action body = null)
+        {
+            PARAMETER(type: null, name: null, out var @ref, body, tuple);
+        }
+
+        public static void PARAMETER(TypeMember type, string name, out MethodParameter @ref, Action body = null, TupleExpression tuple = null)
         {
             var context = GetContextOrThrow();
             var method = (MethodMemberBase)context.GetCurrentMember();
 
             var newParameter = new MethodParameter {
                 Name = name,
+                Tuple = tuple,
                 Position = method.Signature.Parameters.Count,
                 Type = type
             }; 
@@ -194,12 +200,10 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             FINAL(type, name, out @ref, value);
         }
 
-        public static LocalVariableExpression USE(string name)
-        {
-            return new LocalVariableExpression {
+        public static LocalVariableExpression USE(string name) 
+            => PushExpression(new LocalVariableExpression {
                 VariableName = name
-            };
-        }
+            });
 
         public static TupleExpression TUPLE(string name1, out LocalVariable var1)
         {
@@ -233,10 +237,10 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             => GetContextOrThrow().PeekStateOrThrow<InvocationContext>().AddArgument(value, MethodParameterModifier.Out);
 
         public static AbstractExpression AWAIT(AbstractExpression promiseExpression)
-            => new AwaitExpression {
+            => PushExpression(new AwaitExpression {
                 Expression = promiseExpression,
                 Type = promiseExpression.Type
-            };
+            });
 
         public static FluentStatement DO 
             => new FluentStatement();
@@ -247,49 +251,48 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             };
 
         public static AbstractExpression DOT(this AbstractExpression target, AbstractMember member)
-            => new MemberExpression {
-                Target = target,
+            => PushExpression(new MemberExpression {
+                Target = PopExpression(target),
                 Member = member
-            };
+            });
 
         public static AbstractExpression DOT(this AbstractExpression target, string memberName)
-            => new MemberExpression {
-                Target = target,
+            => PushExpression(new MemberExpression {
+                Target = PopExpression(target),
                 MemberName = memberName
-            };
+            });
 
         public static AbstractExpression DOT(this LocalVariable target, AbstractMember member) => throw new NotImplementedException();
         
         public static AbstractExpression DOT(this LocalVariable target, string memberName) 
-            => new MemberExpression {
+            => PushExpression(new MemberExpression {
                 Type = target.Type,
-                Target = target.AsExpression(),
+                Target = PopExpression(target.AsExpression()),
                 MemberName = memberName
-            };
+            });
 
-        
         public static AbstractExpression DOT(this MethodParameter target, AbstractMember member) => throw new NotImplementedException();
 
         public static AbstractExpression DOT(this MethodParameter target, string memberName)
-            => new MemberExpression {
+            => PushExpression(new MemberExpression {
                 Type = target.Type,
                 Target = target.AsExpression(),
                 MemberName = memberName
-            };
+            });
 
         public static AbstractExpression NOT(AbstractExpression value)
-            => new UnaryExpression {
+            => PushExpression(new UnaryExpression {
                 Type = GetContextOrThrow().FindType<bool>(),
                 Operator = UnaryOperator.LogicalNot,
                 Operand = PopExpression(value) 
-            };
+            });
 
         public static AbstractExpression NEW<T>(params object[] constructorArguments)
         {
             var context = GetContextOrThrow();
             var type = context.FindType<T>();
             
-            return new NewObjectExpression {
+            return PushExpression(new NewObjectExpression {
                 Type = type,
                 ConstructorCall = new MethodCallExpression {
                     Type = type,
@@ -299,15 +302,17 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                         })
                         .ToList()
                 }
-            };
+            });
         }
 
         public static AbstractExpression NEW(TypeMember type, params object[] constructorArguments) => throw new NotImplementedException();
 
         public static AbstractExpression INITOBJECT(params (string key, AbstractExpression value)[] initializers)
-            => new ObjectInitializerExpression {
-                PropertyValues = initializers.Select(init => new NamedPropertyValue(init.key, init.value)).ToList() 
-            };
+            => PushExpression(new ObjectInitializerExpression {
+                PropertyValues = initializers.Select(init => 
+                    new NamedPropertyValue(init.key, PopExpression(init.value))
+                ).ToList() 
+            });
 
         public static AbstractExpression INITOBJECT(Action body)
         {
@@ -318,9 +323,9 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 body?.Invoke();
             }
 
-            return new ObjectInitializerExpression {
+            return PushExpression(new ObjectInitializerExpression {
                 PropertyValues = initializerContext.PropertyValues
-            };
+            });
         }
 
         public static AbstractExpression ASSIGN(this AbstractExpression target, AbstractExpression value) 
@@ -354,25 +359,33 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static AbstractExpression INVOKE(this AbstractExpression expression, IEnumerable<Argument> arguments)
         {
+            PopExpression(expression);
+            
             if (expression is MemberExpression memberExpression)
             {
                 var target = memberExpression.Target;
                 var method = memberExpression.Member as MethodMember;
 
-                return new MethodCallExpression {
+                return PushExpression(new MethodCallExpression {
                     Target = target,
                     Method = method,
                     MethodName = memberExpression.MemberName,
                     Type = method?.ReturnType,
-                    Arguments = arguments.ToList(),
-                };
+                    Arguments = PopArguments().ToList(),
+                });
             }
 
-            return new DelegateInvocationExpression {
+            return PushExpression(new DelegateInvocationExpression {
                 Delegate = expression,
                 Type = expression.Type,
-                Arguments = arguments.ToList()
-            };
+                Arguments = PopArguments().ToList()
+            });
+
+            IEnumerable<Argument> PopArguments() => 
+                arguments.Select(arg => {
+                    PopExpression(arg.Expression);
+                    return arg;
+                });
         }
 
         public static AbstractExpression INVOKE(this AbstractExpression expression, Action body)
@@ -388,9 +401,9 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         }
 
         public static AnonymousDelegateExpression LAMBDA(Action bodyNoArgs)
-            => CreateAnonymousDelegate(
+            => PushExpression(CreateAnonymousDelegate(
                 bodyNoArgs,
-                parameters => bodyNoArgs?.Invoke());
+                parameters => bodyNoArgs?.Invoke()));
 
         public static AnonymousDelegateExpression LAMBDA(Action<MethodParameter> body1Arg)
             => CreateAnonymousDelegate(
@@ -418,8 +431,10 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             }).ToArray();
 
             var lambda = new AnonymousDelegateExpression {
+                Signature = new MethodSignature(),
                 Body = new BlockStatement()
             };
+            lambda.Signature.Parameters.AddRange(parameters);
 
             using (context.PushState(new BlockContext(lambda.Body)))
             {
@@ -433,21 +448,22 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         {
             var context = GetContextOrThrow();
 
-            return AbstractExpression.FromValue(value, resolveType: type => {
+            return PushExpression(AbstractExpression.FromValue(value, resolveType: type => {
                 if (context.TryFindMember<TypeMember>(type, out var typeRef))
                 {
                     return typeRef;
                 }
                 return null;
-            });
+            }));
         }
 
         public static AbstractExpression ANY(object value)
         {
-            return AbstractExpression.FromValue(value, resolveType: t => null);
+            return PushExpression(AbstractExpression.FromValue(value, resolveType: t => null));
         }
 
-        private static AbstractExpression PushExpression(AbstractExpression expression)
+        private static T PushExpression<T>(T expression) 
+            where T : AbstractExpression
         {
             return BlockContext.Push(expression);
         }

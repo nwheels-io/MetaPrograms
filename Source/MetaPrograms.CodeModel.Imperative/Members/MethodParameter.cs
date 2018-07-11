@@ -19,6 +19,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         }
 
         public string Name { get; set; }
+        public TupleExpression Tuple { get; set; }
         public int Position { get; set; }
         public TypeMember Type { get; set; }
         public MethodParameterModifier Modifier { get; set; }
