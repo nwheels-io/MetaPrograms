@@ -18,7 +18,7 @@ namespace Example.HyperappAdapter
             return MODULE(new[] { "src", "services" }, serviceName, () => {
                 IMPORT.DEFAULT("axios", out var @axios).FROM("axios");
 
-                EXPORT.DEFAULT.CLASS(serviceName, () => {
+                EXPORT.CLASS(serviceName, () => {
                     api.ApiMethods.ForEach(apiMethod => {
 
                         var methodUrl = api.GetMethodUrl(apiMethod);

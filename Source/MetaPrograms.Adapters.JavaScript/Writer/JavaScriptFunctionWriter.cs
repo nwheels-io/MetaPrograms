@@ -33,17 +33,24 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
 
             code.Write("=> ");
 
-            if (body.Statements.Count == 0)
+            switch (body.Statements.Count)
             {
-                code.Write("{ }");
-            }
-            else if (body.Statements.Count == 1 && body.Statements[0] is ReturnStatement @return)
-            {
-                JavaScriptExpressionWriter.WriteExpression(code, @return.Expression);
-            }
-            else
-            {
-                WriteBody(code, body);
+                case 0:
+                    code.Write("{ }");
+                    break;
+                case 1:
+                    if (body.Statements[0] is ReturnStatement @return)
+                    {
+                        JavaScriptExpressionWriter.WriteExpression(code, @return.Expression);
+                    }
+                    else
+                    {
+                        JavaScriptStatementWriter.WriteStatement(code, body.Statements[0]);                        
+                    }
+                    break;
+                default:
+                    WriteBody(code, body);
+                    break;
             }
         }
 
@@ -92,7 +99,7 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
 
             foreach (var statement in body.Statements)
             {
-                JavaScriptStatementWriter.WriteStatement(code, statement);
+                JavaScriptStatementWriter.WriteStatementLine(code, statement);
             }
 
             code.Indent(-1);
