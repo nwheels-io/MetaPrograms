@@ -11,22 +11,31 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
     {
         public static void WriteImport(CodeTextBuilder code, ImportDirective import)
         {
-            var fromName = import.FromModuleName ?? import.FromModule.Name;
-
+            code.Write("import ");
+            
             if (import.AsDefault != null)
             {
-                code.Write($"import {import.AsDefault.Name}");
+                code.Write(import.AsDefault.Name);
             }
             else if (import.AsNamespace != null)
             {
-                code.Write($"import * as {import.AsNamespace.Name}");
+                code.Write($"* as {import.AsNamespace.Name}");
             }
             else if (import.AsTuple != null)
             {
                 JavaScriptExpressionWriter.WriteTuple(code, import.AsTuple);
             }
 
-            code.WriteLine($" from '{fromName}';");
+            if (import.From != null)
+            {
+                code.Write($" from '{import.From.GetModulePath()}'");
+            }
+            else if (import.What != null)
+            {
+                code.Write($"'{import.What.GetModulePath()}'");
+            }            
+
+            code.WriteLine(";");
         }
     }
 }

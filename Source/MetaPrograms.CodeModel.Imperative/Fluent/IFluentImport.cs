@@ -9,6 +9,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public interface IFluentImport : IFluentImportTuple
     {
+        void MODULE(string moduleName);
+        void MODULE(ModuleMember module);
         IFluentImportAs ALL { get; }
         IFluentImportTuple DEFAULT(string name, out LocalVariable @var);
     }
@@ -29,6 +31,6 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
     public interface IFluentImportFrom
     {
         void FROM(string moduleName);
-        void FROM(TypeMember module);
+        void FROM(ModuleMember module);
     }
 }

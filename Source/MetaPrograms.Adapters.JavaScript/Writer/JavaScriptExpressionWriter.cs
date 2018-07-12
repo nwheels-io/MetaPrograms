@@ -41,7 +41,7 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
         public static void WriteTuple(CodeTextBuilder code, TupleExpression tuple)
         {
             var variableListText = string.Join(", ", tuple.Variables.Select(v => v.Name));
-            code.Write($"import {{ {variableListText} }}");
+            code.Write($"{{ {variableListText} }}");
         }
 
         public static void WriteVariable(CodeTextBuilder code, LocalVariableExpression variable)

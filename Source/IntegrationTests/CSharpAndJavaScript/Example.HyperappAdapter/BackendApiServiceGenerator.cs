@@ -9,7 +9,7 @@ using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
 
 namespace Example.HyperappAdapter
 {
-    public class BackendApiServiceGenerator
+    public static class BackendApiServiceGenerator
     {
         public static ModuleMember BackendApiService(WebApiMetadata api)
         {

@@ -74,15 +74,39 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             return this;
         }
 
-        public void FROM(string moduleName)
+        public void MODULE(string moduleName)
         {
-            Directive.FromModuleName = moduleName;
+            Directive.What = new ImportDirective.ModuleSpecifier {
+                ModulePath = moduleName
+            };
+            
             FlushImportDirective();
         }
 
-        public void FROM(TypeMember module)
+        public void MODULE(ModuleMember module)
         {
-            Directive.FromModule = module;
+            Directive.What = new ImportDirective.ModuleSpecifier {
+                Module = module
+            };
+            
+            FlushImportDirective();
+        }
+
+        public void FROM(string moduleName)
+        {
+            Directive.From = new ImportDirective.ModuleSpecifier {
+                ModulePath = moduleName
+            };
+            
+            FlushImportDirective();
+        }
+
+        public void FROM(ModuleMember module)
+        {
+            Directive.From = new ImportDirective.ModuleSpecifier {
+                Module = module
+            };
+
             FlushImportDirective();
         }
 

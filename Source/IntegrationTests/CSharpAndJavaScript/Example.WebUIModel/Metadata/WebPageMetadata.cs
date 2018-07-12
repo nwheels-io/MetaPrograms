@@ -22,10 +22,14 @@ namespace Example.WebUIModel.Metadata
             this.Components = DiscoverComponents();
             this.BackendApis = DiscoverBackendApis();
             this.ControllerMethod = TryFindControllerMethod();
+
+            var pageClassClrType = pageClass.Bindings.OfType<Type>().First();
+            this.IsIndex = pageClassClrType.IsDefined(typeof(WebUI.Semantic.IndexPageAttribute), inherit: true);
         }
 
         public TypeMember PageClass { get; }
         public TypeMember StateClass { get; }
+        public bool IsIndex { get; }
         public ImmutableArray<WebComponentMetadata> Components { get; } 
         public ImmutableArray<WebApiMetadata> BackendApis { get; } 
         public MethodMember ControllerMethod { get; } 

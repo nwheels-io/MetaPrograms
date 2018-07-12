@@ -1,8 +1,7 @@
 import "babel-polyfill";
 import { app, h } from 'hyperapp';
-import axios from 'axios';
-import { Form } from './form';
-import { GreetingService } from './greetingService';
+import { Form } from './components/form';
+import { GreetingService } from './services/greetingService';
 
 const PageState = {
     model: {

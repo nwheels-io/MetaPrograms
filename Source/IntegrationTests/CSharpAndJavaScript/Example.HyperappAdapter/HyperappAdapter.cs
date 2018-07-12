@@ -34,6 +34,7 @@ namespace Example.HyperappAdapter
             using (new CodeGeneratorContext(_codeModel, new ClrTypeResolver()))
             {
                 GenerateIndexHtml(metadata);
+                GeneratePageModules(metadata);
                 GenerateBackendApiServices(metadata);
             }
         }
@@ -41,6 +42,20 @@ namespace Example.HyperappAdapter
         private void CopyFrameworkFiles()
         {
             _output.AddSourceFile(new[] {"src", "components"}, "form.js", GetFrameworkFileContents("Components", "form.js"));
+        }
+
+        private void GeneratePageModules(WebUIMetadata metadata)
+        {
+            foreach (var page in metadata.Pages)
+            {
+                GeneratePageModule(page);
+            }
+        }
+
+        private void GeneratePageModule(WebPageMetadata page)
+        {
+            var module = PageModuleGenerator.PageModule(page);
+            _codeWriter.WriteModule(module);
         }
 
         private void GenerateBackendApiServices(WebUIMetadata metadata)
