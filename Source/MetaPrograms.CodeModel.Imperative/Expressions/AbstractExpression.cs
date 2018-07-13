@@ -23,10 +23,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         {
             if (value == null)
             {
-                return new ConstantExpression {
-                    Type = null,
-                    Value = null
-                };
+                return new NullExpression();
             }
 
             if (value is AbstractExpression expr)

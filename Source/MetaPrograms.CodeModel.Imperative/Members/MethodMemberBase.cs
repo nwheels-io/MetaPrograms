@@ -6,7 +6,7 @@ using MetaPrograms.CodeModel.Imperative.Statements;
 
 namespace MetaPrograms.CodeModel.Imperative.Members
 {
-    public abstract class MethodMemberBase : AbstractMember
+    public abstract class MethodMemberBase : AbstractMember, IFunctionContext
     {
         public override void AcceptVisitor(MemberVisitor visitor)
         {

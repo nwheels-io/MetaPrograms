@@ -4,7 +4,7 @@ using MetaPrograms.CodeModel.Imperative.Statements;
 
 namespace MetaPrograms.CodeModel.Imperative.Expressions
 {
-    public class AnonymousDelegateExpression : AbstractExpression
+    public class AnonymousDelegateExpression : AbstractExpression, IFunctionContext
     {
         public override void AcceptVisitor(StatementVisitor visitor)
         {

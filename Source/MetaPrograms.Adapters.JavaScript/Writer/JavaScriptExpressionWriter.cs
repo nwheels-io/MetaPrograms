@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 
@@ -11,13 +12,17 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
     {
         private static readonly Dictionary<Type, Action<CodeTextBuilder, AbstractExpression>> WriterByExpressionType =
             new Dictionary<Type, Action<CodeTextBuilder, AbstractExpression>> {
+                [typeof(NullExpression)] = (c, e) => WriteNull(c, (NullExpression)e),
                 [typeof(ConstantExpression)] = (c, e) => WriteConstant(c, (ConstantExpression)e),
                 [typeof(TupleExpression)] = (c, e) => WriteTuple(c, (TupleExpression)e),
                 [typeof(LocalVariableExpression)] = (c, e) => WriteVariable(c, (LocalVariableExpression)e),
                 [typeof(ParameterExpression)] = (c, e) => WriteParameter(c, (ParameterExpression)e),
                 [typeof(MemberExpression)] = (c, e) => WriteMember(c, (MemberExpression)e),
+                [typeof(DelegateInvocationExpression)] = (c, e) => WriteDelegateInvocation(c, (DelegateInvocationExpression)e),
                 [typeof(AnonymousDelegateExpression)] = (c, e) => WriteLambda(c, (AnonymousDelegateExpression)e),
-                [typeof(MethodCallExpression)] = (c, e) => WriteMethodCall(c, (MethodCallExpression)e)
+                [typeof(MethodCallExpression)] = (c, e) => WriteMethodCall(c, (MethodCallExpression)e),
+                [typeof(ObjectInitializerExpression)] = (c, e) => WriteObjectInitializer(c, (ObjectInitializerExpression)e),
+                [typeof(XmlExpression)] = (c, e) => WriteJsx(c, (XmlExpression)e)
             };
 
         public static void WriteExpression(CodeTextBuilder code, AbstractExpression expression)
@@ -31,6 +36,11 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
                 throw new NotSupportedException(
                     $"Expression of type '{expression.GetType().Name}' is not supported by {nameof(JavaScriptExpressionWriter)}.");
             }
+        }
+
+        private static void WriteNull(CodeTextBuilder code, NullExpression expression)
+        {
+            JavaScriptLiteralWriter.WriteLiteral(code, null);
         }
 
         public static void WriteConstant(CodeTextBuilder code, ConstantExpression constant)
@@ -77,6 +87,21 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             JavaScriptFunctionWriter.WriteArrowFunction(code, expression.Signature, expression.Body);
         }
 
+        private static void WriteDelegateInvocation(CodeTextBuilder code, DelegateInvocationExpression expression)
+        {
+            WriteExpression(code, expression.Delegate);
+            
+            code.WriteListStart(opener: "(", separator: ", ", closer: ")");
+
+            foreach (var argument in expression.Arguments)
+            {
+                code.WriteListItem();
+                WriteExpression(code, argument.Expression);
+            }
+            
+            code.WriteListEnd();
+        }
+
         private static void WriteMethodCall(CodeTextBuilder code, MethodCallExpression call)
         {
             if (call.Target != null)
@@ -94,6 +119,49 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
                 WriteExpression(code, argument.Expression);
             }
 
+            code.WriteListEnd();
+        }
+        
+        private static void WriteObjectInitializer(CodeTextBuilder code, ObjectInitializerExpression expression)
+        {
+            if (expression.PropertyValues == null || expression.PropertyValues.Count == 0)
+            {
+                code.Write("{ }");
+                return;
+            }
+            
+            code.WriteListStart(opener: "{", closer: "}", separator: ",", newLine: true);
+
+            foreach (var keyValue in expression.PropertyValues)
+            {
+                code.WriteListItem();
+                code.Write(keyValue.Name);
+                code.Write(": ");
+                WriteExpression(code, keyValue.Value);
+            }
+            
+            code.WriteListEnd();
+        }
+
+        private static void WriteJsx(CodeTextBuilder code, XmlExpression expression)
+        {
+            if (expression.Xml == null)
+            {
+                code.Write("null");
+                return;
+            }
+            
+            var xmlTextLines = expression.Xml
+                .ToString(SaveOptions.None)
+                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            code.WriteListStart(opener: "(", separator: "", closer: ")", newLine: true);
+
+            foreach (var line in xmlTextLines)
+            {
+                code.WriteListItem(line);
+            }
+            
             code.WriteListEnd();
         }
     }

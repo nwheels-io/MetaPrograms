@@ -54,7 +54,8 @@ namespace Example.HyperappAdapter
 
         private void GeneratePageModule(WebPageMetadata page)
         {
-            var module = PageModuleGenerator.PageModule(page);
+            var pageGenerator = new PageModuleGenerator(page);
+            var module = pageGenerator.GenerateModule();
             _codeWriter.WriteModule(module);
         }
 

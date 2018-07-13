@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
+using System.Xml.Linq;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 using MetaPrograms.CodeModel.Imperative.Statements;
@@ -35,12 +36,16 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 FolderPath = folderPath ?? new string[0],
                 Name = name,
                 Status = MemberStatus.Incomplete,
-                Visibility = MemberVisibility.Public
+                Visibility = MemberVisibility.Public,
+                GloalBlock = new BlockStatement()
             };
 
             using (context.PushState(module))
             {
-                body?.Invoke();
+                using (context.PushState(new BlockContext(module.GloalBlock)))
+                {
+                    body?.Invoke();
+                }
             }
 
             module.Status = MemberStatus.Generator;
@@ -127,12 +132,12 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public static void PARAMETER(TypeMember type, string name, out MethodParameter @ref, Action body = null, TupleExpression tuple = null)
         {
             var context = GetContextOrThrow();
-            var method = (MethodMemberBase)context.GetCurrentMember();
+            var function = context.LookupStateOrThrow<IFunctionContext>();// (MethodMemberBase)context.GetCurrentMember();
 
             var newParameter = new MethodParameter {
                 Name = name,
                 Tuple = tuple,
-                Position = method.Signature.Parameters.Count,
+                Position = function.Signature.Parameters.Count,
                 Type = type
             }; 
             
@@ -143,7 +148,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 body?.Invoke();
             }
 
-            method.Signature.Parameters.Add(newParameter);
+            function.Signature.Parameters.Add(newParameter);
             @ref = newParameter;
         }
 
@@ -163,7 +168,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             block.AddLocal(@ref);
             block.AppendStatement(new VariableDeclarationStatement {
                 Variable = @ref,
-                InitialValue = initialValue
+                InitialValue = PopExpression(initialValue)
             });
         }
 
@@ -190,7 +195,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             block.AddLocal(@ref);
             block.AppendStatement(new VariableDeclarationStatement {
                 Variable = @ref, 
-                InitialValue = value
+                InitialValue = PopExpression(value)
             });
         }
 
@@ -203,6 +208,18 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public static LocalVariableExpression USE(string name) 
             => PushExpression(new LocalVariableExpression {
                 VariableName = name
+            });
+
+        public static LocalVariableExpression USE(LocalVariable variable) 
+            => PushExpression(new LocalVariableExpression {
+                Type = variable.Type,
+                Variable = variable
+            });
+
+        public static LocalVariableExpression USE(MethodParameter parameter) 
+            => PushExpression(new LocalVariableExpression {
+                Type = parameter.Type,
+                VariableName = parameter.Name
             });
 
         public static TupleExpression TUPLE(string name1, out LocalVariable var1)
@@ -307,14 +324,14 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static AbstractExpression NEW(TypeMember type, params object[] constructorArguments) => throw new NotImplementedException();
 
-        public static AbstractExpression INITOBJECT(params (string key, AbstractExpression value)[] initializers)
+        public static ObjectInitializerExpression INITOBJECT(params (string key, AbstractExpression value)[] initializers)
             => PushExpression(new ObjectInitializerExpression {
                 PropertyValues = initializers.Select(init => 
                     new NamedPropertyValue(init.key, PopExpression(init.value))
                 ).ToList() 
             });
 
-        public static AbstractExpression INITOBJECT(Action body)
+        public static ObjectInitializerExpression INITOBJECT(Action body)
         {
             var initializerContext = new ObjectInitializerContext();
 
@@ -328,6 +345,20 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             });
         }
 
+        public static void KEY(string name, AbstractExpression value)
+        {
+            var initializerContext = GetContextOrThrow().PeekStateOrThrow<ObjectInitializerContext>();
+            initializerContext.Add(name, PopExpression(value));
+        }
+
+        public static XmlExpression XML(XElement xml)
+            => PushExpression(new XmlExpression {
+                Xml = xml
+            });
+        
+        public static NullExpression NULL
+            => new NullExpression();
+        
         public static AbstractExpression ASSIGN(this AbstractExpression target, AbstractExpression value) 
             => PushExpression(new AssignmentExpression {
                 Left =(IAssignable)PopExpression(target),
@@ -436,9 +467,12 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             };
             lambda.Signature.Parameters.AddRange(parameters);
 
-            using (context.PushState(new BlockContext(lambda.Body)))
+            using (context.PushState(lambda))
             {
-                invokeBody(parameters);
+                using (context.PushState(new BlockContext(lambda.Body)))
+                {
+                    invokeBody(parameters);
+                }
             }
 
             return lambda;
@@ -470,6 +504,11 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         private static AbstractExpression PopExpression(AbstractExpression expression)
         {
+            if (expression == null)
+            {
+                return null;
+            }
+
             return BlockContext.Pop(expression);
         }
 

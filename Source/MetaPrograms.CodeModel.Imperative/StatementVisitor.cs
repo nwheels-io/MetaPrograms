@@ -181,6 +181,11 @@ namespace MetaPrograms.CodeModel.Imperative
             VisitAbstractExpression(expression);
         }
 
+        public virtual void VisitXmlExpression(XmlExpression expression)
+        {
+            VisitAbstractExpression(expression);
+        }
+
         public virtual void VisitReferenceToLocalVariable(LocalVariable variable)
         {
         }

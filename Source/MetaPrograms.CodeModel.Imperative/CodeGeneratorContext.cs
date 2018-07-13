@@ -113,7 +113,7 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public BlockContext GetCurrentBlock()
         {
-            return PeekStateOrThrow<BlockContext>();
+            return LookupStateOrThrow<BlockContext>();
         }
 
         public void AddGeneratedMember<TMember>(TMember member, bool isTopLevel)

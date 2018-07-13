@@ -12,13 +12,10 @@ namespace Example.HyperappAdapter
     public static class BackendApiServiceGenerator
     {
         public static ModuleMember BackendApiService(WebApiMetadata api)
-        {
-            var serviceName = $"{api.InterfaceType.Name.TrimPrefix("I")}";
-
-            return MODULE(new[] { "src", "services" }, serviceName, () => {
+            => MODULE(new[] { "src", "services" }, $"{api.ServiceName}Service", () => {
                 IMPORT.DEFAULT("axios", out var @axios).FROM("axios");
 
-                EXPORT.CLASS(serviceName, () => {
+                EXPORT.CLASS($"{api.ServiceName}Service", () => {
                     api.ApiMethods.ForEach(apiMethod => {
 
                         var methodUrl = api.GetMethodUrl(apiMethod);
@@ -42,6 +39,5 @@ namespace Example.HyperappAdapter
                     });
                 });
             });
-        }
     }
 }

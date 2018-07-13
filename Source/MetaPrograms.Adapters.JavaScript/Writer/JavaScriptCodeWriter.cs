@@ -20,6 +20,7 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
 
             WriteImports(module);
             WriteMembers(module);
+            WriteGlobalBlock(module);
             
             _output.AddSourceFile(module.FolderPath, $"{module.Name}.js", _code.ToString());
         }
@@ -42,5 +43,14 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
                 JavaScriptMemberWriter.WriteMember(_code, member);
             }
         }
+
+        private void WriteGlobalBlock(ModuleMember module)
+        {
+            if (module.GloalBlock != null)
+            {
+                JavaScriptStatementWriter.WriteStatementLine(_code, module.GloalBlock);
+            }
+        }
+
     }
 }
