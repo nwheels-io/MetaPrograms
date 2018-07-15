@@ -7,7 +7,7 @@ namespace Example.App
     public class HelloPage : WebPage<HelloPage.HelloModel>
     {
         public BackendApi<IGreetingService> GreetingService { get; }
-        public FormComponent<HelloModel> Form { get; }
+        public FormComponent<HelloModel> Form { get; } 
 
         public override void Controller()
         {

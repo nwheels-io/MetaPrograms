@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using CommonExtensions;
+using Example.HyperappAdapter.Components;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
@@ -14,18 +16,23 @@ namespace Example.HyperappAdapter
     public class PageModuleGenerator
     {
         private readonly WebPageMetadata _metadata;
+        private readonly IComponentAdapterFactory _componentAdapterFactory;
         private readonly Dictionary<TypeMember, LocalVariable> _serviceVarByType;
+        private readonly List<IComponentAdapter> _components;
         private LocalVariable _appVariable;
         private LocalVariable _formVariable;
 
-        public PageModuleGenerator(WebPageMetadata metadata)
+        public PageModuleGenerator(WebPageMetadata metadata, IComponentAdapterFactory componentAdapterFactory)
         {
             _metadata = metadata;
+            _componentAdapterFactory = componentAdapterFactory;
             _serviceVarByType = new Dictionary<TypeMember, LocalVariable>();
+            _components = new List<IComponentAdapter>();
         }
 
         public ModuleMember GenerateModule()
         {
+            CreateComponentAdapters();
             DetermineModulePath(_metadata, out string[] folderPath, out string moduleName);
             
             return MODULE(folderPath, moduleName, () => {
@@ -35,6 +42,14 @@ namespace Example.HyperappAdapter
                 WritePageView();
                 WriteControllerInitializer();
             });
+        }
+
+        private void CreateComponentAdapters()
+        {
+            foreach (var component in _metadata.Components)
+            {
+                _components.Add(_componentAdapterFactory.CreateComponentAdapter(component));
+            }
         }
 
         private void WriteImports()
@@ -59,7 +74,8 @@ namespace Example.HyperappAdapter
                         KEY(property.Name, NULL);
                     }
                 }));
-                KEY("form", USE(_formVariable).DOT("createState").INVOKE());
+
+                _components.ForEach(c => c.GenerateStateKey());
             }));
         }
 
@@ -75,9 +91,8 @@ namespace Example.HyperappAdapter
                         => DO.RETURN(INITOBJECT(("model", @newModel)))
                     ))
                 ));
-                
-                //KEY("form", USE("Form").DOT("createActions").INVOKE());
-                
+
+                _components.ForEach(c => c.GenerateActionsKey());
             }));
         }
 
@@ -87,15 +102,15 @@ namespace Example.HyperappAdapter
                 PARAMETER(TUPLE("model", out var @model));
                 PARAMETER("actions", out var @actions);
 
-                DO.RETURN(XML(BuildViewXml(@model, @actions)));
+                var viewJsx = BuildViewJsx(@model, @actions);
+                DO.RETURN(viewJsx != null ? XML(viewJsx) : (AbstractExpression)NULL);
             }));
         }
 
-        private XElement BuildViewXml(AbstractExpression @model, AbstractExpression @actions)
+        private XElement BuildViewJsx(AbstractExpression @model, AbstractExpression @actions)
         {
-            return new XElement("Form.component", 
-                new XElement("Form.submit")
-            );
+            var rootComponent = _components.FirstOrDefault();
+            return rootComponent?.GenerateViewMarkup();
         }
 
         private void WriteControllerInitializer()

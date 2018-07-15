@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using MetaPrograms.CodeModel.Imperative;
@@ -16,7 +17,8 @@ namespace Example.WebUIModel.Metadata
 
             this.DeclaredProperty = declaredProperty;
             this.ComponentClass = declaredProperty.PropertyType;
-            
+            this.ModelClass = ComponentClass.GenericArguments.FirstOrDefault();
+
             //TODO: add AbstractMember.HasAttribute<T>()/TryGetAttribute<T>()
             this.IsPredefined = (
                 ComponentClass.Bindings.FirstOrDefault<Type>()?.GetCustomAttribute<ProgrammingModelAttribute>() != null);
@@ -24,6 +26,7 @@ namespace Example.WebUIModel.Metadata
 
         public PropertyMember DeclaredProperty { get; }
         public TypeMember ComponentClass { get; }
+        public TypeMember ModelClass { get; }
         public bool IsPredefined { get; }
     }
 }

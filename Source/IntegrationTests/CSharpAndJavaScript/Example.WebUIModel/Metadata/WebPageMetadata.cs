@@ -49,7 +49,6 @@ namespace Example.WebUIModel.Metadata
                 return (
                     (property.Modifier & MemberModifier.Static) == 0 && //TODO: add PropertyMember.IsStatic / IsInstance
                     property.Getter != null &&
-                    property.Setter != null &&
                     IsComponentClass(property.PropertyType));
             }
             

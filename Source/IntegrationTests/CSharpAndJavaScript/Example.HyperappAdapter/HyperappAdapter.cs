@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using CommonExtensions;
+using Example.HyperappAdapter.Components;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.JavaScript;
 using MetaPrograms.Adapters.JavaScript.Writer;
@@ -17,12 +18,14 @@ namespace Example.HyperappAdapter
             Path.Combine(Path.GetDirectoryName(typeof(HyperappAdapter).Assembly.Location), "ClientSide");
 
         private readonly ImperativeCodeModel _codeModel;
+        private readonly IComponentAdapterFactory _componentAdapterFactory;
         private readonly ICodeGeneratorOutput _output;
         private readonly JavaScriptCodeWriter _codeWriter;
 
-        public HyperappAdapter(ImperativeCodeModel codeModel, ICodeGeneratorOutput output)
+        public HyperappAdapter(ImperativeCodeModel codeModel, IComponentAdapterFactory componentAdapterFactory, ICodeGeneratorOutput output)
         {
             _codeModel = codeModel;
+            _componentAdapterFactory = componentAdapterFactory;
             _output = output;
             _codeWriter = new JavaScriptCodeWriter(output);
         }
@@ -54,7 +57,7 @@ namespace Example.HyperappAdapter
 
         private void GeneratePageModule(WebPageMetadata page)
         {
-            var pageGenerator = new PageModuleGenerator(page);
+            var pageGenerator = new PageModuleGenerator(page, _componentAdapterFactory);
             var module = pageGenerator.GenerateModule();
             _codeWriter.WriteModule(module);
         }

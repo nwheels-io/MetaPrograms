@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Example.AspNetAdapter;
 using Example.HyperappAdapter;
+using Example.HyperappAdapter.Components;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.Roslyn;
@@ -43,7 +44,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             var uiMetadata = new WebUIMetadata(codeModel);
             
             var output = new TestCodeGeneratorOutput();
-            var adapter = new HyperappAdapter(codeModel, output);
+            var adapter = new HyperappAdapter(codeModel, new ComponentAdapterFactory(), output);
             adapter.GenerateImplementations(uiMetadata);
 
             // assert
