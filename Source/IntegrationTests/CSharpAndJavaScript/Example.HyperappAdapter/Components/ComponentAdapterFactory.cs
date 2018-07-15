@@ -9,7 +9,7 @@ namespace Example.HyperappAdapter.Components
     {
         public IComponentAdapter CreateComponentAdapter(WebComponentMetadata metadata)
         {
-            var componentClrType = metadata.DeclaredProperty.PropertyType.Bindings.First<PropertyInfo>().PropertyType;
+            var componentClrType = metadata.DeclaredProperty.PropertyType.Bindings.First<Type>();
 
             if (componentClrType.IsGenericType && componentClrType.GetGenericTypeDefinition() == typeof(FormComponent<>))
             {
