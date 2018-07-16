@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -150,17 +151,14 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
                 code.Write("null");
                 return;
             }
-            
-            var xmlTextLines = expression.Xml
-                .ToString(SaveOptions.None)
-                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            var xmlText = new StringBuilder();
+            var jsxWriter = new JsxCodeWriter(code);
             
             code.WriteListStart(opener: "(", separator: "", closer: ")", newLine: true);
+            code.WriteListItem();
 
-            foreach (var line in xmlTextLines)
-            {
-                code.WriteListItem(line);
-            }
+            jsxWriter.Write(expression.Xml);
             
             code.WriteListEnd();
         }
