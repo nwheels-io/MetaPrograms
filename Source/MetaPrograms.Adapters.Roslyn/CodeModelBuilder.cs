@@ -103,6 +103,17 @@ namespace MetaPrograms.CodeModel.Imperative
                 $"Syntax tree with path '{syntax.FilePath}' could not be found in any of the compilations.");
         }
 
+        public SemanticModel GetSemanticModel(SyntaxTree syntaxTree)
+        {
+            var compilation = GetCompilation(syntaxTree);
+            return compilation.GetSemanticModel(syntaxTree, ignoreAccessibility: true);
+        }
+
+        public SemanticModel GetSemanticModel(SyntaxNode syntax)
+        {
+            return GetSemanticModel(syntax.SyntaxTree);
+        }
+
         //public TMember GetOrAddMember<TMember, TBinding>(TBinding binding, Func<TMember> memberFactory)
         //    where TMember : AbstractMember
         //    where TBinding : class

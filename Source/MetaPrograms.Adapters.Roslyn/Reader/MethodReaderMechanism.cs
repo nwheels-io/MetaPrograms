@@ -5,7 +5,10 @@ using System.Linq;
 using System.Text;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.CodeModel.Imperative.Statements;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {
@@ -43,6 +46,35 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             };
         }
 
+        public static void ReadBody(CodeModelBuilder model, IMethodSymbol symbol, IFunctionContext destination)
+        {
+            var syntax = symbol.DeclaringSyntaxReferences
+                .Select(syntaxRef => syntaxRef.GetSyntax())
+                .OfType<MethodDeclarationSyntax>().FirstOrDefault();
+
+            if (syntax != null)
+            {
+                var reader = new OperationReader(model, destination, syntax);
+                reader.ReadMethodBody();
+
+                // destination.Body = new BlockStatement();
+                //
+                // if (syntax.ExpressionBody != null)
+                // {
+                //     destination.Body.Statements.Add(new ReturnStatement {
+                //         Expression = ExpressionReader.ReadExpression(model, syntax.ExpressionBody.Expression)
+                //     });
+                // }
+                // else if (syntax.Body != null)
+                // {
+                //     foreach (var statementSyntax in syntax.Body.Statements)
+                //     {
+                //         destination.Body.Statements.Add(StatementReader.ReadStatement(model, statementSyntax));
+                //     }
+                // }
+            }
+        }
+
         public static MethodReader CreateAccessorMethodReader(CodeModelBuilder modelBuilder, IMethodSymbol accessorSymbol)
         {
             if (accessorSymbol != null)
@@ -54,6 +86,5 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
             return null;
         }
-
     }
 }

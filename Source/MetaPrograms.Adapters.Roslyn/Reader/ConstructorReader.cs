@@ -34,12 +34,13 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadAttributes()
         {
-            throw new NotImplementedException();
+            //TODO: implement this
+            //throw new NotImplementedException();
         }
 
         public void ReadImplementation()
         {
-            throw new NotImplementedException();
+            MethodReaderMechanism.ReadBody(_modelBuilder, _symbol, _member);
         }
 
         public ISymbol Symbol => _symbol;

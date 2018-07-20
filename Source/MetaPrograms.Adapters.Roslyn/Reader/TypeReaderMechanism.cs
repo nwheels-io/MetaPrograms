@@ -125,11 +125,13 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             MemberBuilder.Attributes.AddRange(Symbol
                 .GetAttributes()
                 .Select(attr => AttributeReader.ReadAttribute(ModelBuilder, attr)));
+
+            _memberReaders.ForEach(reader => reader.ReadAttributes());
         }
 
         public void ReadMemberImplementations()
         {
-            //throw new NotImplementedException();
+            _memberReaders.ForEach(reader => reader.ReadImplementation());
         }
 
         public void ReadEnumMembers()

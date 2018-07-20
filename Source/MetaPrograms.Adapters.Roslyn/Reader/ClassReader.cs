@@ -51,8 +51,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadMemberImplementations()
         {
-            //throw new NotImplementedException();
-
+            _mechanism.ReadMemberImplementations();
         }
 
         public void RegisterReal()
