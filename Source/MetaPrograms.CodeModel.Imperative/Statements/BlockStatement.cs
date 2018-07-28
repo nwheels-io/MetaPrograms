@@ -16,7 +16,7 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
-        public List<LocalVariable> Locals { get; } = new List<LocalVariable>();
-        public List<AbstractStatement> Statements { get; } = new List<AbstractStatement>();
+        public List<LocalVariable> Locals { get; set; } = new List<LocalVariable>();
+        public List<AbstractStatement> Statements { get; set; } = new List<AbstractStatement>();
     }
 }

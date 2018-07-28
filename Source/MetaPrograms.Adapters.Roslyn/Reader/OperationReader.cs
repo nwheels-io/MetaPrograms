@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Expressions;
+using MetaPrograms.CodeModel.Imperative.Fluent;
 using MetaPrograms.CodeModel.Imperative.Members;
 using MetaPrograms.CodeModel.Imperative.Statements;
 using Microsoft.CodeAnalysis;
@@ -12,14 +13,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 {
     public class OperationReader
     {
-        private static readonly IReadOnlyDictionary<Type, Func<IOperation, AbstractExpression>> ExpressionReaderByOperationType =
-            new Dictionary<Type, Func<IOperation, AbstractExpression>> {
-                [typeof(IAssignmentOperation)] = op => ReadAssignment((IAssignmentOperation)op)
+        private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractExpression>> ExpressionReaderByOperationKind =
+            new Dictionary<OperationKind, Func<IOperation, AbstractExpression>> {
+                [OperationKind.SimpleAssignment] = op => ReadAssignment((IAssignmentOperation)op)
             };
 
-        private static readonly IReadOnlyDictionary<Type, Func<IOperation, AbstractStatement>> StatementReaderByOperationType =
-            new Dictionary<Type, Func<IOperation, AbstractStatement>> {
-                [typeof(IBlockOperation)] = op => ReadBlock((IBlockOperation)op)
+        private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractStatement>> StatementReaderByOperationKind =
+            new Dictionary<OperationKind, Func<IOperation, AbstractStatement>> {
+                [OperationKind.Block] = op => ReadBlock((IBlockOperation)op)
             };
 
         private readonly CodeModelBuilder _codeModel;
@@ -43,15 +44,20 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             {
                 _destination.Body = (BlockStatement)ReadStatement(rootOperation);
             }
+            else if (rootOperation is IMethodBodyBaseOperation methodBodyOperation)
+            {
+                _destination.Body = (BlockStatement)ReadStatement(methodBodyOperation.ExpressionBody ?? methodBodyOperation.BlockBody);
+            }
             else
             {
-                //TODO: identify expression-bodied method (arrow function)
+                throw new NotSupportedException(
+                    $"Statement '{rootOperation.GetType().Name}' cannot be read as ${nameof(BlockStatement)}.");
             }
         }
 
-        private AbstractStatement ReadStatement(IOperation operation)
+        private static AbstractStatement ReadStatement(IOperation operation)
         {
-            if (StatementReaderByOperationType.TryGetValue(operation.GetType(), out var reader))
+            if (StatementReaderByOperationKind.TryGetValue(operation.Kind, out var reader))
             {
                 return reader(operation);
             }
@@ -59,9 +65,9 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             throw new NotSupportedException($"Operation type {operation.GetType().Name} is not supported.");
         }
         
-        private AbstractExpression ReadExpression(IOperation operation)
+        private static AbstractExpression ReadExpression(IOperation operation)
         {
-            if (ExpressionReaderByOperationType.TryGetValue(operation.GetType(), out var reader))
+            if (ExpressionReaderByOperationKind.TryGetValue(operation.Kind, out var reader))
             {
                 return reader(operation);
             }
@@ -174,12 +180,37 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         private static AbstractStatement ReadBlock(IBlockOperation op)
         {
-            throw new NotImplementedException();
+            var context = CodeGeneratorContext.GetContextOrThrow();
+            var result = new BlockStatement();
+
+            using (context.PushState(new BlockContext(result)))
+            {
+                foreach (var childOp in op.Operations)
+                {
+                    result.Statements.Add(ReadStatement(childOp));
+                }
+            }
+
+            return result;
         }
 
         private static AbstractExpression ReadAssignment(IAssignmentOperation op)
         {
-            throw new NotImplementedException();
+            var context = CodeGeneratorContext.GetContextOrThrow();
+            var result = new AssignmentExpression();
+
+            result.Left = (IAssignable)ReadExpression(op.Target);
+
+            if (op.ConstantValue.HasValue)
+            {
+                result.Right = context.GetConstantExpression(op.ConstantValue.Value);
+            }
+            else
+            {
+                result.Right = ReadExpression(op.Value);
+            }
+
+            return result;
         }
     }
 }
