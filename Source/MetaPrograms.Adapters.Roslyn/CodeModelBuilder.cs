@@ -9,8 +9,7 @@ namespace MetaPrograms.CodeModel.Imperative
 {
     public class CodeModelBuilder
     {
-        private readonly Dictionary<object, AbstractMember> _memberByBinding = new Dictionary<object, AbstractMember>();
-        private readonly HashSet<AbstractMember> _topLevelMembers = new HashSet<AbstractMember>();
+        private readonly ImperativeCodeModel _codeModel;
         private readonly ImmutableArray<Compilation> _compilations;
         private readonly ImmutableDictionary<SyntaxTree, Compilation> _compilationBySyntaxTree;
 
@@ -21,6 +20,7 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public CodeModelBuilder(IEnumerable<Compilation> knownCompilations)
         {
+            _codeModel = new ImperativeCodeModel();
             _compilations = WithReferencedCompilations(knownCompilations.ToArray()).ToImmutableArray();
 
             _compilationBySyntaxTree = _compilations
@@ -39,15 +39,7 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public void RegisterMember(AbstractMember member, bool isTopLevel)
         {
-            foreach (var binding in member.Bindings)
-            {
-                _memberByBinding[binding] = member;
-            }
-
-            if (isTopLevel)
-            {
-                _topLevelMembers.Add(member);
-            }
+            _codeModel.Add(member, isTopLevel);
         }
 
         //public bool TryGetMember<TMember, TBinding>(TBinding binding, out TMember member)
@@ -81,7 +73,7 @@ namespace MetaPrograms.CodeModel.Imperative
         public TMember TryGetMember<TMember>(object binding)
             where TMember : AbstractMember
         {
-            if (_memberByBinding.TryGetValue(binding, out var existingMember))
+            if (_codeModel.MembersByBndings.TryGetValue(binding, out var existingMember))
             {
                 return (TMember)existingMember;
             }
@@ -129,16 +121,13 @@ namespace MetaPrograms.CodeModel.Imperative
         //    return newMember;
         //}
 
-        public IEnumerable<AbstractMember> GetRgisteredMembers() => new HashSet<AbstractMember>(_memberByBinding.Values);
+        public IEnumerable<AbstractMember> GetRgisteredMembers() => new HashSet<AbstractMember>(_codeModel.MembersByBndings.Values);
 
-        public IEnumerable<AbstractMember> GetTopLevelMembers() => _topLevelMembers;
+        public IEnumerable<AbstractMember> GetTopLevelMembers() => _codeModel.TopLevelMembers;
 
         public ImmutableArray<Compilation> GetCompilations() => _compilations;
 
-        public ImperativeCodeModel GetCodeModel()
-        {
-            return new ImperativeCodeModel(_topLevelMembers, _memberByBinding);
-        }
+        public ImperativeCodeModel GetCodeModel() => _codeModel;
 
         private static IEnumerable<Compilation> WithReferencedCompilations(Compilation[] knownCompilations)
         {

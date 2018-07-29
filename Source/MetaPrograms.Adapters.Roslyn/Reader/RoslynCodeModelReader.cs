@@ -14,9 +14,12 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     public class RoslynCodeModelReader
     {
         private readonly List<IPhasedTypeReader> _phasedTypeReaders = new List<IPhasedTypeReader>();
+        private readonly IClrTypeResolver _clrTypeResolver;
 
-        public RoslynCodeModelReader(Workspace workspace)
+        public RoslynCodeModelReader(Workspace workspace, IClrTypeResolver clrTypeResolver)
         {
+            _clrTypeResolver = clrTypeResolver;
+            
             var compilations = CompileAllProjects(workspace);
 
             this.Workspace = workspace;
@@ -25,8 +28,11 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void Read()
         {
-            DiscoverAllTypes();
-            ReadAllTypes();
+            using (var context = new CodeReaderContext(ModelBuilder.GetCodeModel(), _clrTypeResolver))
+            {
+                DiscoverAllTypes();
+                ReadAllTypes();
+            }
         }
 
         public CodeModel.Imperative.ImperativeCodeModel GetCodeModel() => ModelBuilder.GetCodeModel();

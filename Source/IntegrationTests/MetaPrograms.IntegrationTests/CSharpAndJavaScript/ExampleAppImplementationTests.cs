@@ -7,6 +7,7 @@ using Example.HyperappAdapter;
 using Example.HyperappAdapter.Components;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
+using MetaPrograms.Adapters.Reflection.Reader;
 using MetaPrograms.Adapters.Roslyn;
 using MetaPrograms.Adapters.Roslyn.Reader;
 using MetaPrograms.CodeModel.Imperative;
@@ -100,7 +101,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
 
         private ImperativeCodeModel ReadCodeModel(Workspace workspace)
         {
-            var reader = new RoslynCodeModelReader(workspace);
+            var reader = new RoslynCodeModelReader(workspace, new ClrTypeResolver());
             reader.Read();
 
             var codeModel = reader.GetCodeModel();
