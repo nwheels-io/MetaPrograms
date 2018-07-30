@@ -22,6 +22,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteForEachStatement(this);
+        }
+
         public AbstractExpression Enumerable { get; set; }
         public BlockStatement Body { get; set; }
         public LocalVariable CurrentItem { get; set; }

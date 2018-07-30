@@ -15,6 +15,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteSwitchStatement(this);
+        }
+
         public List<SwitchCaseBlock> CaseBlocks { get; } = new List<SwitchCaseBlock>();
     }
 }

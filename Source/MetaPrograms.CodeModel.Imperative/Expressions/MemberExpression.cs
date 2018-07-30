@@ -20,6 +20,16 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteMemberExpression(this);
+        }
+
+        IAssignable IAssignable.AcceptRewriter(StatementRewriter rewriter)
+        {
+            return (IAssignable)this.AcceptRewriter(rewriter);
+        }
+
         public AbstractExpression Target { get; set; }
         public AbstractMember Member { get; set; }
         public string MemberName { get; set; }

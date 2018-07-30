@@ -12,6 +12,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             Body.AcceptVisitor(visitor);
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteAnonymousDelegateExpression(this);
+        }
+
         public MethodSignature Signature { get; set; }
         public BlockStatement Body { get; set; }
     }

@@ -23,6 +23,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteTupleExpression(this);
+        }
+
         public List<LocalVariable> Variables { get; set; } = new List<LocalVariable>();
     }
 }

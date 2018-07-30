@@ -24,6 +24,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             //}
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteConstantExpression(this);
+        }
+
         public object Value { get; set; }
 
         public static ConstantExpression Null => new ConstantExpression {

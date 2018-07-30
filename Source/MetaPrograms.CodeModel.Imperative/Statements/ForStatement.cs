@@ -28,6 +28,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             Body.AcceptVisitor(visitor);
         }
 
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteForStatement(this);
+        }
+
         public List<AbstractStatement> Initializers { get; } = new List<AbstractStatement>();
         public AbstractExpression Condition { get; set; }
         public List<AbstractStatement> Iterators { get; } = new List<AbstractStatement>();

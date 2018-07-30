@@ -75,7 +75,7 @@ namespace Example.HyperappAdapter
                     }
                 }));
 
-                _components.ForEach(c => c.GenerateStateKey());
+                _components.ForEach(c => c.GenerateStateKeys());
             }));
         }
 
@@ -92,7 +92,7 @@ namespace Example.HyperappAdapter
                     ))
                 ));
 
-                _components.ForEach(c => c.GenerateActionsKey());
+                _components.ForEach(c => c.GenerateActionKeys());
             }));
         }
 

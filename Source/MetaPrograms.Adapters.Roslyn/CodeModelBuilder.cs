@@ -73,15 +73,7 @@ namespace MetaPrograms.CodeModel.Imperative
         public TMember TryGetMember<TMember>(object binding)
             where TMember : AbstractMember
         {
-            if (_codeModel.MembersByBndings.TryGetValue(binding, out var existingMember))
-            {
-                return (TMember)existingMember;
-            }
-
-            return null;
-
-            // throw new KeyNotFoundException(
-            //     $"{typeof(TMember).Name} with binding '{typeof(TBinding).Name}={binding}' could not be found.");
+            return _codeModel.TryGet<TMember>(binding);
         }
 
         public Compilation GetCompilation(SyntaxTree syntax)

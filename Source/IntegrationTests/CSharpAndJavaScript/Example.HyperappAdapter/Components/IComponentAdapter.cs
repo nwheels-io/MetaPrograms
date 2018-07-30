@@ -5,8 +5,8 @@ namespace Example.HyperappAdapter.Components
 {
     public interface IComponentAdapter
     {
-        void GenerateStateKey();
-        void GenerateActionsKey();
+        void GenerateStateKeys();
+        void GenerateActionKeys();
         XElement GenerateViewMarkup();
         WebComponentMetadata Metadata { get; }
     }

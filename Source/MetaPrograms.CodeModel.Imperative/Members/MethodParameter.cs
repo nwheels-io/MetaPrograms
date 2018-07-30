@@ -18,6 +18,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             visitor.VisitReferenceToMethodParameter(this);
         }
 
+        IAssignable IAssignable.AcceptRewriter(StatementRewriter rewriter)
+        {
+            return this;
+        }
+
         public string Name { get; set; }
         public TupleExpression Tuple { get; set; }
         public int Position { get; set; }

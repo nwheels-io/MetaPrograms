@@ -35,6 +35,17 @@ namespace MetaPrograms.CodeModel.Imperative
             return (TMember)MembersByBndings[binding];
         }
 
+        public TMember TryGet<TMember>(object binding)
+            where TMember : AbstractMember
+        {
+            if (_membersByBndings.TryGetValue(binding, out var member))
+            {
+                return (TMember)member;
+            }
+
+            return null;
+        }
+
         public void Add<TMember>(TMember member, bool isTopLevel = false)
             where TMember : AbstractMember
         {

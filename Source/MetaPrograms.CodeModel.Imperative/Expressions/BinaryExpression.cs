@@ -20,6 +20,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteBinaryExpression(this);
+        }
+
         public AbstractExpression Left { get; set; }
         public BinaryOperator Operator { get; set; }
         public AbstractExpression Right { get; set; }

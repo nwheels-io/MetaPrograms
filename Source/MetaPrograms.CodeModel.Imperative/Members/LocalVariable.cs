@@ -21,6 +21,11 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             visitor.VisitReferenceToLocalVariable(this);
         }
 
+        IAssignable IAssignable.AcceptRewriter(StatementRewriter rewriter)
+        {
+            return this;
+        }
+
         public static implicit operator LocalVariableExpression(LocalVariable source)
         {
             return new LocalVariableExpression {

@@ -18,14 +18,15 @@ namespace Example.HyperappAdapter.Components
         {
         }
 
-        public override void GenerateStateKey()
+        public override void GenerateStateKeys()
         {
             KEY(Metadata.DeclaredProperty.Name, USE("Form").DOT("createState").INVOKE());
         }
 
-        public override void GenerateActionsKey()
+        public override void GenerateActionKeys()
         {
             KEY(Metadata.DeclaredProperty.Name, USE("Form").DOT("createActions").INVOKE());
+            GenerateEventHandlerActionKeys();
         }
 
         public override XElement GenerateViewMarkup()

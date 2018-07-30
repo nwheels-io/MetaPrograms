@@ -18,10 +18,9 @@ namespace Example.WebUIModel.Metadata
 
             this.PageClass = pageClass;
             this.StateClass = pageClass.BaseType.GenericArguments[0];
-
+            this.ControllerMethod = TryFindControllerMethod();
             this.Components = DiscoverComponents();
             this.BackendApis = DiscoverBackendApis();
-            this.ControllerMethod = TryFindControllerMethod();
 
             var pageClassClrType = pageClass.Bindings.OfType<Type>().First();
             this.IsIndex = pageClassClrType.IsDefined(typeof(WebUI.Semantic.IndexPageAttribute), inherit: true);
@@ -40,7 +39,7 @@ namespace Example.WebUIModel.Metadata
             return PageClass.Members
                 .OfType<PropertyMember>()
                 .Where(IsComponentProperty)
-                .Select(property => new WebComponentMetadata(_imperativeCodeModel, property))
+                .Select(property => new WebComponentMetadata(_imperativeCodeModel, property, this.ControllerMethod))
                 .ToImmutableArray();
 
             bool IsComponentProperty(PropertyMember property)

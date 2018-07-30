@@ -20,6 +20,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewritePropagateCallStatement(this);
+        }
+
         public AbstractExpression Target { get; set; }
 
         //TODO: what is this variable for?

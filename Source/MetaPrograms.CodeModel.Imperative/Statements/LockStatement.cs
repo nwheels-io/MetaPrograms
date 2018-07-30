@@ -24,6 +24,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteLockStatement(this);
+        }
+
         public AbstractExpression SyncRoot { get; set; }
         public AbstractExpression EnterTimeout { get; set; }
         public BlockStatement Body { get; set; }

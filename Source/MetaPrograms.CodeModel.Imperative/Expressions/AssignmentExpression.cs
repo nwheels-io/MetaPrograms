@@ -19,7 +19,13 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteAssignmentExpression(this);
+        }
+
         public IAssignable Left { get; set; }
         public AbstractExpression Right { get; set; }
+        public CompoundAssignmentOperator CompoundOperator { get; set; }
     }
 }

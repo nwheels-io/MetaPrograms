@@ -14,6 +14,16 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             visitor.VisitParameterExpression(this);
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteParameterExpression(this);
+        }
+
+        IAssignable IAssignable.AcceptRewriter(StatementRewriter rewriter)
+        {
+            return (IAssignable)this.AcceptRewriter(rewriter);
+        }
+
         public MethodParameter Parameter { get; set; }
     }
 }

@@ -5,5 +5,10 @@
         public override void AcceptVisitor(StatementVisitor visitor)
         {
         }
+
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteNullExpression(this);
+        }
     }
 }

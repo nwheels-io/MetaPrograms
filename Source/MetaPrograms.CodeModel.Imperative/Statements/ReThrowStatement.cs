@@ -6,5 +6,10 @@
         {
             visitor.VisitReThrowStatement(this);
         }
+
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteReThrowStatement(this);
+        }
     }
 }

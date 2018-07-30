@@ -16,10 +16,15 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     {
         public static MethodSignature ReadSignature(CodeModelBuilder modelBuilder, IMethodSymbol symbol)
         {
+            return ReadSignature(modelBuilder.GetCodeModel(), symbol);
+        }
+        
+        public static MethodSignature ReadSignature(ImperativeCodeModel codeModel, IMethodSymbol symbol)
+        {
             var parameters = symbol.Parameters.Select((p, index) => new MethodParameter {
                 Name = p.Name,
                 Position = index + 1,
-                Type = modelBuilder.TryGetMember<TypeMember>(p.Type),
+                Type = codeModel.TryGet<TypeMember>(p.Type),
                 Modifier = p.GetParameterModifier(),
             });
 
@@ -33,7 +38,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                     ? new MethodParameter {
                         Name = "$retVal",
                         Position = 0,
-                        Type = modelBuilder.TryGetMember<TypeMember>(symbol.ReturnType),
+                        Type = codeModel.TryGet<TypeMember>(symbol.ReturnType),
                         Modifier = symbol.GetReturnValueModifier(),
                     }
                     : null

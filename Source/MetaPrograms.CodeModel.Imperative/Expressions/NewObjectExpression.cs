@@ -14,6 +14,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteNewObjectExpression(this);
+        }
+
         public MethodCallExpression ConstructorCall { get; set; }
     }
 }

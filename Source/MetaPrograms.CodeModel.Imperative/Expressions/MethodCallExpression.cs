@@ -21,6 +21,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteMethodCallExpression(this);
+        }
+
         public AbstractExpression Target { get; set; }
         public MethodMemberBase Method { get; set; }
         public string MethodName { get; set; }

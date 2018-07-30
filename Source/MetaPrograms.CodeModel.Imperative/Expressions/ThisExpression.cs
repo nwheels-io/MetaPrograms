@@ -8,5 +8,10 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         {
             visitor.VisitThisExpression(this);
         }
+
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteThisExpression(this);
+        }
     }
 }

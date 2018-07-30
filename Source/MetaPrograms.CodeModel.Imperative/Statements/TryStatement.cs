@@ -22,6 +22,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteTryStatement(this);
+        }
+
         public BlockStatement TryBlock { get; set; }
         public List<TryCatchBlock> CatchBlocks { get; } = new List<TryCatchBlock>();
         public BlockStatement FinallyBlock { get; set; }

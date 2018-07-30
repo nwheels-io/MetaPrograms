@@ -10,8 +10,9 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
     public abstract class AbstractExpression
     {
         public abstract void AcceptVisitor(StatementVisitor visitor);
+        public abstract AbstractExpression AcceptRewriter(StatementRewriter rewriter);
 
-        public BindingCollection Bindings { get; } = new BindingCollection();
+        public BindingCollection Bindings { get; set; } = new BindingCollection();
         public TypeMember Type { get; set; }
 
         public static AbstractExpression FromValue(object value)

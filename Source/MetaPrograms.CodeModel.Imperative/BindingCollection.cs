@@ -10,6 +10,15 @@ namespace MetaPrograms.CodeModel.Imperative
     {
         private readonly HashSet<object> _bindings = new HashSet<object>();
 
+        public BindingCollection()
+        {
+        }
+
+        public BindingCollection(BindingCollection source)
+        {
+            _bindings.UnionWith(source);
+        }
+
         public IEnumerator<object> GetEnumerator()
         {
             return _bindings.GetEnumerator();

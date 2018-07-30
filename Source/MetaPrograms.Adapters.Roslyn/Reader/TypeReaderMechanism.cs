@@ -117,6 +117,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 reader.ReadDeclaration();
                 reader.Member.Bindings.Add(reader.Symbol);
                 MemberBuilder.Members.Add(reader.Member);
+                ModelBuilder.RegisterMember(reader.Member, isTopLevel: false);
             });
         }
 

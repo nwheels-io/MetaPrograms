@@ -20,6 +20,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteVariableDeclaraitonStatement(this);
+        }
+
         public LocalVariable Variable { get; set; }
         public AbstractExpression InitialValue { get; set; }
     }

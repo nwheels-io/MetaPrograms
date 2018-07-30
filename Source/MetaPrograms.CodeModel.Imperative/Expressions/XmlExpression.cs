@@ -10,5 +10,10 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         {
             visitor.VisitXmlExpression(this);
         }
+
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteXmlExpression(this);
+        }
     }
 }

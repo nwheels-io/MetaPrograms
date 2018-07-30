@@ -12,6 +12,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             PropertyValues.ForEach(nvp => nvp.Value.AcceptVisitor(visitor));
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteObjectInitializerExpression(this);
+        }
+
         public List<NamedPropertyValue> PropertyValues { get; set; } = new List<NamedPropertyValue>();
     }
 }

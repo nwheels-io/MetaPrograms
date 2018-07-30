@@ -13,6 +13,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             this.Delegate?.AcceptVisitor(visitor);
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteDelegateInvocationExpression(this);
+        }
+
         public AbstractExpression Delegate { get; set; }
     }
 }

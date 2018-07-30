@@ -14,6 +14,11 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             }
         }
 
+        public override AbstractExpression AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteUnaryExpression(this);
+        }
+
         public UnaryOperator Operator { get; set; }
         public AbstractExpression Operand { get; set; }
     }

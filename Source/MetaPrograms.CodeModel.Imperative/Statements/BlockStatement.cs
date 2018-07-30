@@ -16,6 +16,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteBlockStatement(this);
+        }
+
         public List<LocalVariable> Locals { get; set; } = new List<LocalVariable>();
         public List<AbstractStatement> Statements { get; set; } = new List<AbstractStatement>();
     }

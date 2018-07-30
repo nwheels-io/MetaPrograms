@@ -4,5 +4,6 @@
     {
         AbstractExpression AsExpression();
         void AcceptVisitor(StatementVisitor visitor);
+        IAssignable AcceptRewriter(StatementRewriter rewriter);
     }
 }

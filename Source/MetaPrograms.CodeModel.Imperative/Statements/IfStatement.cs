@@ -24,6 +24,11 @@ namespace MetaPrograms.CodeModel.Imperative.Statements
             }
         }
 
+        public override AbstractStatement AcceptRewriter(StatementRewriter rewriter)
+        {
+            return rewriter.RewriteIfStatement(this);
+        }
+
         public AbstractExpression Condition { get; set; }
         public BlockStatement ThenBlock { get; set; }
         public BlockStatement ElseBlock { get; set; }

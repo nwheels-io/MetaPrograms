@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mime;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Fluent;
@@ -15,13 +17,23 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     {
         private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractExpression>> ExpressionReaderByOperationKind =
             new Dictionary<OperationKind, Func<IOperation, AbstractExpression>> {
-                [OperationKind.SimpleAssignment] = op => ReadAssignment((IAssignmentOperation)op)
+                [OperationKind.SimpleAssignment] = op => ReadAssignment((IAssignmentOperation)op),
+                [OperationKind.EventAssignment] = op => ReadEventAssignment((IEventAssignmentOperation)op),
+                [OperationKind.InstanceReference] = op => ReadInstanceReference(op),
+                [OperationKind.MethodReference] = op => ReadMethodReference((IMethodReferenceOperation)op),
+                [OperationKind.PropertyReference] = op => ReadPropertyReference((IPropertyReferenceOperation)op),
+                [OperationKind.EventReference] = op => ReadEventReference((IEventReferenceOperation)op),
+                [OperationKind.DelegateCreation] = op => ReadDelegateCreation((IDelegateCreationOperation)op),
+                [OperationKind.AnonymousFunction] = op => ReadAnonymousFunction((IAnonymousFunctionOperation)op),
+                [OperationKind.Await] = op => ReadAwait((IAwaitOperation)op),
+                [OperationKind.Invocation] = op => ReadInvocation((IInvocationOperation)op),
             };
 
         private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractStatement>> StatementReaderByOperationKind =
             new Dictionary<OperationKind, Func<IOperation, AbstractStatement>> {
                 [OperationKind.Block] = op => ReadBlock((IBlockOperation)op),
-                [OperationKind.ExpressionStatement] = op => ReadExpressionStatement((IExpressionStatementOperation)op)
+                [OperationKind.ExpressionStatement] = op => ReadExpressionStatement((IExpressionStatementOperation)op),
+                [OperationKind.Return] = op => ReadReturn((IReturnOperation)op)
             };
 
         private readonly CodeModelBuilder _codeModel;
@@ -58,6 +70,11 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         private static AbstractStatement ReadStatement(IOperation operation)
         {
+            if (operation == null)
+            {
+                throw new ArgumentNullException(nameof(operation));
+            }
+
             if (StatementReaderByOperationKind.TryGetValue(operation.Kind, out var reader))
             {
                 return reader(operation);
@@ -68,6 +85,11 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         
         private static AbstractExpression ReadExpression(IOperation operation)
         {
+            if (operation == null)
+            {
+                return null;
+            }
+
             if (ExpressionReaderByOperationKind.TryGetValue(operation.Kind, out var reader))
             {
                 return reader(operation);
@@ -202,6 +224,13 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             };
         }
 
+        private static AbstractStatement ReadReturn(IReturnOperation op)
+        {
+            return new ReturnStatement {
+                Expression = ReadExpression(op.ReturnedValue)
+            };
+        }
+
         private static AbstractExpression ReadAssignment(IAssignmentOperation op)
         {
             var context = CodeReaderContext.GetContextOrThrow();
@@ -219,6 +248,86 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             }
 
             return result;
+        }
+        
+        private static AbstractExpression ReadEventAssignment(IEventAssignmentOperation op)
+        {
+            return new AssignmentExpression {
+                Left = (IAssignable)ReadExpression(op.EventReference),
+                Right = ReadExpression(op.HandlerValue),
+                CompoundOperator = (op.Adds ? CompoundAssignmentOperator.Addition : CompoundAssignmentOperator.Subtraction)
+            };
+        }
+        
+        private static AbstractExpression ReadInstanceReference(IOperation op)
+        {
+            return new ThisExpression();
+        }
+
+        private static AbstractExpression ReadMethodReference(IMethodReferenceOperation op)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static AbstractExpression ReadPropertyReference(IPropertyReferenceOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+
+            return new MemberExpression {
+                Target = ReadExpression(op.Instance),
+                Member = context.FindMemberOrThrow<PropertyMember>(op.Property)
+            };
+        }
+
+        private static AbstractExpression ReadEventReference(IEventReferenceOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+            
+            return new MemberExpression {
+                Target = ReadExpression(op.Instance),
+                Member = context.FindMemberOrThrow<EventMember>(op.Event)
+            };
+        }
+        
+        private static AbstractExpression ReadDelegateCreation(IDelegateCreationOperation op)
+        {
+            return ReadExpression(op.Target);
+        }
+        
+        private static AbstractExpression ReadAnonymousFunction(IAnonymousFunctionOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+
+            return new AnonymousDelegateExpression {
+                Body = (BlockStatement)ReadBlock(op.Body),
+                Signature = MethodReaderMechanism.ReadSignature(context.CodeModel, op.Symbol)
+            };
+        }
+
+        private static AbstractExpression ReadAwait(IAwaitOperation op)
+        {
+            return new AwaitExpression {
+                Expression = ReadExpression(op.Operation)
+            };
+        }
+
+        private static AbstractExpression ReadInvocation(IInvocationOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+
+            return new MethodCallExpression {
+                Target = ReadExpression(op.Instance),
+                Method = context.CodeModel.Get<MethodMember>(op.TargetMethod),
+                Arguments = op.Arguments.Select(ReadArgument).ToList()
+            };
+        }
+
+        private static Argument ReadArgument(IArgumentOperation op)
+        {
+            return new Argument {
+                Modifier = op.Parameter.GetParameterModifier(),
+                Expression = ReadExpression(op.Value)
+            };
         }
     }
 }
