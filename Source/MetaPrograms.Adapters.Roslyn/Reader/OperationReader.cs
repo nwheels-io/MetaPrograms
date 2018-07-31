@@ -210,11 +210,24 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             {
                 foreach (var childOp in op.Operations)
                 {
-                    result.Statements.Add(ReadStatement(childOp));
+                    if (!IsRedundantStatement(childOp))
+                    {
+                        result.Statements.Add(ReadStatement(childOp));
+                    }
                 }
             }
 
             return result;
+        }
+
+        private static bool IsRedundantStatement(IOperation op)
+        {
+            if (op.Kind == OperationKind.Return && op.Parent.Kind == OperationKind.Block && op.Parent.Parent.Kind == OperationKind.AnonymousFunction)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private static AbstractStatement ReadExpressionStatement(IExpressionStatementOperation op)

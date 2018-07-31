@@ -19,6 +19,7 @@ namespace Example.WebUIModel.Metadata
             this.PageClass = pageClass;
             this.StateClass = pageClass.BaseType.GenericArguments[0];
             this.ControllerMethod = TryFindControllerMethod();
+            this.ModelProperty = FindModelProperty();
             this.Components = DiscoverComponents();
             this.BackendApis = DiscoverBackendApis();
 
@@ -29,9 +30,10 @@ namespace Example.WebUIModel.Metadata
         public TypeMember PageClass { get; }
         public TypeMember StateClass { get; }
         public bool IsIndex { get; }
-        public ImmutableArray<WebComponentMetadata> Components { get; } 
-        public ImmutableArray<WebApiMetadata> BackendApis { get; } 
-        public MethodMember ControllerMethod { get; } 
+        public ImmutableArray<WebComponentMetadata> Components { get; }
+        public ImmutableArray<WebApiMetadata> BackendApis { get; }
+        public PropertyMember ModelProperty { get; }
+        public MethodMember ControllerMethod { get; }
 
         private ImmutableArray<WebComponentMetadata> DiscoverComponents()
         {
@@ -39,7 +41,7 @@ namespace Example.WebUIModel.Metadata
             return PageClass.Members
                 .OfType<PropertyMember>()
                 .Where(IsComponentProperty)
-                .Select(property => new WebComponentMetadata(_imperativeCodeModel, property, this.ControllerMethod))
+                .Select(property => new WebComponentMetadata(this, _imperativeCodeModel, property, this.ControllerMethod))
                 .ToImmutableArray();
 
             bool IsComponentProperty(PropertyMember property)
@@ -50,14 +52,14 @@ namespace Example.WebUIModel.Metadata
                     property.Getter != null &&
                     IsComponentClass(property.PropertyType));
             }
-            
+
             bool IsComponentClass(TypeMember type)
             {
                 if (type.TypeKind != TypeMemberKind.Class)
                 {
                     return false;
                 }
-                
+
                 //TODO: add TypeMember.IsA()
                 for (var baseType = type.BaseType; baseType != null; baseType = baseType.BaseType)
                 {
@@ -80,7 +82,7 @@ namespace Example.WebUIModel.Metadata
                 .Where(t => t != null)
                 .Select(t => _apiRegistry.GetApiMetadata(t))
                 .ToImmutableArray();
-            
+
             TypeMember TryGetApiType(PropertyMember property)
             {
                 var type = property.PropertyType;
@@ -94,7 +96,7 @@ namespace Example.WebUIModel.Metadata
                         return type.GenericArguments[0];
                     }
                 }
-                
+
                 return null;
             }
         }
@@ -104,8 +106,8 @@ namespace Example.WebUIModel.Metadata
             //TODO: add TypeMember.Methods : IEnumerable<MethodMember> + Fields, Properties, Events, NestedTypes
             return PageClass.Members
                 .OfType<MethodMember>()
-                .FirstOrDefault(IsControllerMethod);            
-            
+                .FirstOrDefault(IsControllerMethod);
+
             bool IsControllerMethod(MethodMember method)
             {
                 //TODO: add MethodMember.IsOverrideOf(MethodMember / MethodInfo)
@@ -114,6 +116,20 @@ namespace Example.WebUIModel.Metadata
                     method.Signature.Parameters.Count == 0 &&
                     method.Modifier == MemberModifier.Override &&
                     method.Name == "Controller");
+            }
+        }
+
+        private PropertyMember FindModelProperty()
+        {
+            return PageClass
+                .BaseType
+                .Members.OfType<PropertyMember>()
+                .FirstOrDefault(IsModelProperty);
+
+            bool IsModelProperty(PropertyMember property)
+            {
+                return (property.Name == "Model");
+                    // && property.DeclaringType.Bindings.OfType<Type>().FirstOrDefault() == typeof(WebPage<>))
             }
         }
     }

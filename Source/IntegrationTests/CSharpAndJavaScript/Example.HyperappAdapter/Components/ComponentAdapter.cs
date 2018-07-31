@@ -42,16 +42,22 @@ namespace Example.HyperappAdapter.Components
             KEY($"{Metadata.DeclaredProperty.Name}_{eventName}", LAMBDA(@model
                 => DO.RETURN(LAMBDA((@state, @actions) => {
 
-                    var block = CodeGeneratorContext.GetContextOrThrow().GetCurrentBlock();
+                    LOCAL("newModel", out var @newModel, USE("Object").DOT("assign").INVOKE(INITOBJECT(), @model));
+
+                    var modelMemberAccessRewriter = new ModelMemberAccessRewriter(Metadata.Page, @newModel);
+                    var actionBlock = CodeGeneratorContext.GetContextOrThrow().GetCurrentBlock();
 
                     foreach (var handler in handlerList)
                     {
-                        foreach (var statement in handler.Body.Statements)
+                        var rewrittenHandlerBody = modelMemberAccessRewriter.RewriteBlockStatement(handler.Body);
+
+                        foreach (var statement in rewrittenHandlerBody.Statements)
                         {
-                            block.AppendStatement(statement);
+                            actionBlock.AppendStatement(statement);
                         }
                     }
 
+                    actions.DOT("replaceModel").INVOKE(@newModel);
                 }))
             ));
         }

@@ -50,6 +50,16 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public virtual ExpressionStatement RewriteExpressionStatement(ExpressionStatement statement)
         {
+            var newExpression = statement.Expression.AcceptRewriter(this);
+
+            if (newExpression != statement.Expression)
+            {
+                return new ExpressionStatement {
+                    Bindings = new BindingCollection(statement.Bindings),
+                    Expression = newExpression
+                };
+            }
+
             return statement;
         }
 
@@ -85,7 +95,7 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public virtual ReturnStatement RewriteReturnStatement(ReturnStatement statement)
         {
-            var newExpression = statement.Expression.AcceptRewriter(this);
+            var newExpression = statement.Expression?.AcceptRewriter(this);
 
             if (newExpression != statement.Expression)
             {
@@ -129,11 +139,18 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public virtual AnonymousDelegateExpression RewriteAnonymousDelegateExpression(AnonymousDelegateExpression expression)
         {
-            return expression;
-        }
+            var newBody = (BlockStatement)expression.Body.AcceptRewriter(this);
 
-        public virtual DelegateInvocationExpression RewriteDelegateInvocationExpression(DelegateInvocationExpression expression)
-        {
+            if (newBody != expression.Body)
+            {
+                return new AnonymousDelegateExpression {
+                    Bindings = new BindingCollection(expression.Bindings),
+                    Body = newBody,
+                    Signature = expression.Signature,
+                    Type = expression.Type
+                };
+            }
+
             return expression;
         }
 
@@ -173,6 +190,17 @@ namespace MetaPrograms.CodeModel.Imperative
 
         public virtual AwaitExpression RewriteAwaitExpression(AwaitExpression expression)
         {
+            var newExpression = expression.Expression.AcceptRewriter(this);
+
+            if (newExpression != expression.Expression)
+            {
+                return new AwaitExpression {
+                    Bindings = new BindingCollection(expression.Bindings),
+                    Expression = newExpression,
+                    Type = expression.Type
+                };
+            }
+
             return expression;
         }
 
@@ -201,13 +229,59 @@ namespace MetaPrograms.CodeModel.Imperative
             return expression;
         }
 
-        public virtual MemberExpression RewriteMemberExpression(MemberExpression expression)
+        public virtual AbstractExpression RewriteMemberExpression(MemberExpression expression)
         {
+            var newTarget = expression.Target?.AcceptRewriter(this);
+
+            if (newTarget != expression.Target)
+            {
+                return new MemberExpression {
+                    Bindings = new BindingCollection(expression.Bindings),
+                    Member = expression.Member,
+                    MemberName = expression.MemberName,
+                    Type = expression.Type,
+                    Target = newTarget
+                };
+            }
+
             return expression;
         }
 
         public virtual MethodCallExpression RewriteMethodCallExpression(MethodCallExpression expression)
         {
+            var newTarget = expression.Target?.AcceptRewriter(this);
+            var newArguments = RewriteArguments(expression.Arguments);
+
+            if (newTarget != expression.Target || newArguments != expression.Arguments)
+            {
+                return new MethodCallExpression {
+                    Bindings = new BindingCollection(expression.Bindings),
+                    Target = newTarget,
+                    Method = expression.Method,
+                    MethodName = expression.MethodName,
+                    Arguments = newArguments,
+                    Type = expression.Type                    
+                };
+            }
+
+            return expression;
+        }
+
+        public virtual DelegateInvocationExpression RewriteDelegateInvocationExpression(DelegateInvocationExpression expression)
+        {
+            var newDelegate = expression.Delegate.AcceptRewriter(this);
+            var newArguments = RewriteArguments(expression.Arguments);
+
+            if (newDelegate != expression.Delegate || newArguments != expression.Arguments)
+            {
+                return new DelegateInvocationExpression {
+                    Bindings = new BindingCollection(expression.Bindings),
+                    Delegate = newDelegate,
+                    Arguments = newArguments,
+                    Type = expression.Type
+                };
+            }
+
             return expression;
         }
 
@@ -284,6 +358,31 @@ namespace MetaPrograms.CodeModel.Imperative
             }
 
             return type;
+        }
+
+        protected virtual List<Argument> RewriteArguments(List<Argument> arguments)
+        {
+            List<Argument> newArguments = null;
+
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                var newExpression = arguments[i].Expression.AcceptRewriter(this);
+
+                if (newExpression != arguments[i].Expression)
+                {
+                    if (newArguments == null)
+                    {
+                        newArguments = new List<Argument>(arguments);
+                    }
+
+                    newArguments[i] = new Argument {
+                        Modifier = arguments[i].Modifier,
+                        Expression = newExpression
+                    };
+                }
+            }
+
+            return newArguments ?? arguments;
         }
 
         protected void AddTypeMemberReplacement(TypeMember from, TypeMember to)

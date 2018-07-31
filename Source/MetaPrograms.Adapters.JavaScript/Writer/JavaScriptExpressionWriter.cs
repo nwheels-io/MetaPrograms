@@ -171,7 +171,6 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             WriteExpression(code, expression.Expression);
         }
 
-
         private static void WriteJsx(CodeTextBuilder code, XmlExpression expression)
         {
             if (expression.Xml == null)

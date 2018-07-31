@@ -14,10 +14,15 @@ namespace Example.WebUIModel.Metadata
     {
         private readonly ImperativeCodeModel _imperativeCodeModel;
 
-        public WebComponentMetadata(ImperativeCodeModel imperativeCodeModel, PropertyMember declaredProperty, MethodMember controllerMethod)
+        public WebComponentMetadata(
+            WebPageMetadata page, 
+            ImperativeCodeModel imperativeCodeModel, 
+            PropertyMember declaredProperty, 
+            MethodMember controllerMethod)
         {
             _imperativeCodeModel = imperativeCodeModel;
 
+            this.Page = page;
             this.DeclaredProperty = declaredProperty;
             this.ComponentClass = declaredProperty.PropertyType;
             this.ModelClass = ComponentClass.GenericArguments.FirstOrDefault();
@@ -30,6 +35,7 @@ namespace Example.WebUIModel.Metadata
             FindEventHandlers(controllerMethod);
         }
 
+        public WebPageMetadata Page { get; }
         public PropertyMember DeclaredProperty { get; }
         public TypeMember ComponentClass { get; }
         public TypeMember ModelClass { get; }
