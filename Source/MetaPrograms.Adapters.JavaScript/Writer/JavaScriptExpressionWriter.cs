@@ -18,11 +18,14 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
                 [typeof(TupleExpression)] = (c, e) => WriteTuple(c, (TupleExpression)e),
                 [typeof(LocalVariableExpression)] = (c, e) => WriteVariable(c, (LocalVariableExpression)e),
                 [typeof(ParameterExpression)] = (c, e) => WriteParameter(c, (ParameterExpression)e),
+                [typeof(ThisExpression)] = (c, e) => WriteThis(c, (ThisExpression)e),
                 [typeof(MemberExpression)] = (c, e) => WriteMember(c, (MemberExpression)e),
+                [typeof(AssignmentExpression)] = (c, e) => WriteAssignment(c, (AssignmentExpression)e),
                 [typeof(DelegateInvocationExpression)] = (c, e) => WriteDelegateInvocation(c, (DelegateInvocationExpression)e),
                 [typeof(AnonymousDelegateExpression)] = (c, e) => WriteLambda(c, (AnonymousDelegateExpression)e),
                 [typeof(MethodCallExpression)] = (c, e) => WriteMethodCall(c, (MethodCallExpression)e),
                 [typeof(ObjectInitializerExpression)] = (c, e) => WriteObjectInitializer(c, (ObjectInitializerExpression)e),
+                [typeof(AwaitExpression)] = (c, e) => WriteAwait(c, (AwaitExpression)e),
                 [typeof(XmlExpression)] = (c, e) => WriteJsx(c, (XmlExpression)e)
             };
 
@@ -72,6 +75,11 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             }
         }
 
+        private static void WriteThis(CodeTextBuilder code, ThisExpression expression)
+        {
+            code.Write("this");
+        }
+
         private static void WriteMember(CodeTextBuilder code, MemberExpression expression)
         {
             if (expression.Target != null)
@@ -81,6 +89,13 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             }
 
             code.Write(expression.MemberName ?? expression.Member.Name);
+        }
+
+        private static void WriteAssignment(CodeTextBuilder code, AssignmentExpression expression)
+        {
+            WriteExpression(code, expression.Left.AsExpression());
+            code.Write(" = ");
+            WriteExpression(code, expression.Right);
         }
 
         private static void WriteLambda(CodeTextBuilder code, AnonymousDelegateExpression expression)
@@ -137,12 +152,25 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             {
                 code.WriteListItem();
                 code.Write(keyValue.Name);
+
+                if (keyValue.Value is IAssignable assignable && assignable.Name == keyValue.Name)
+                {
+                    continue;
+                }
+
                 code.Write(": ");
                 WriteExpression(code, keyValue.Value);
             }
             
             code.WriteListEnd();
         }
+
+        private static void WriteAwait(CodeTextBuilder code, AwaitExpression expression)
+        {
+            code.Write("await ");
+            WriteExpression(code, expression.Expression);
+        }
+
 
         private static void WriteJsx(CodeTextBuilder code, XmlExpression expression)
         {

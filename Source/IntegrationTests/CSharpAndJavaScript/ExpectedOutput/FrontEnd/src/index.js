@@ -16,11 +16,8 @@ const PageActions = {
     replaceModel: (newModel) => (state, actions) => { return {model: newModel} },
     form: Form.createActions(),
     form_submitting: (model) => async (state, actions) => {
-        const parameters = {
-            name: model.name
-        };
         let newModel = Object.assign({}, model);
-        newModel.greeting = await GreetingService.getGreetingForName(parameters);
+        newModel.greeting = await GreetingService.getGreetingForName(newModel.name);
         actions.replaceModel(newModel);
     }
 };

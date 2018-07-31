@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CommonExtensions;
 using Example.WebUIModel.Metadata;
@@ -24,10 +25,17 @@ namespace Example.HyperappAdapter
                         //For instance, 'PUBLIC' and 'PRIVATE' have no meaning in JavaScript
                         
                         PUBLIC.STATIC.FUNCTION(apiMethod.Name, () => {
-                            PARAMETER("parameters", out var @parameters);
+                            var arguments = apiMethod.Signature.Parameters.Select((parameter, index) => {
+                                PARAMETER(parameter.Name, out var @param);
+                                return @param;
+                            }).ToList();
+
+                            LOCAL("data", out var @data, INITOBJECT(() => {
+                                arguments.ForEach(arg => KEY(arg.Name, arg));
+                            }));
 
                             DO.RETURN(@axios
-                                .DOT("post").INVOKE(ANY(methodUrl), @parameters)
+                                .DOT("post").INVOKE(ANY(methodUrl), @data)
                                 .DOT("then").INVOKE(LAMBDA(@result =>
                                     DO.RETURN(@result.DOT("data"))
                                 ))

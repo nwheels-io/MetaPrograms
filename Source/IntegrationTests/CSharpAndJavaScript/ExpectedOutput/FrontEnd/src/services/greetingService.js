@@ -1,9 +1,12 @@
 import axios from 'axios';
 
 export class GreetingService {
-    static getGreetingForName(parameters) {
+    static getGreetingForName(name) {
+        const data = {
+            name
+        };
         return axios
-            .post('http://localhost:3300/api/index/getGreetingForName', parameters)
+            .post('http://localhost:3300/api/index/getGreetingForName', data)
             .then(result => result.data)
             .catch(err => console.log(err));
     }

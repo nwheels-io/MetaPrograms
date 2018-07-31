@@ -67,8 +67,13 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
 
         private static void WriteReturn(CodeTextBuilder code, ReturnStatement statement)
         {
-            code.Write("return ");
-            JavaScriptExpressionWriter.WriteExpression(code, statement.Expression);
+            code.Write("return");
+
+            if (statement.Expression != null)
+            {
+                code.Write(" ");
+                JavaScriptExpressionWriter.WriteExpression(code, statement.Expression);
+            }
         }
     }
 }

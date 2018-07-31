@@ -25,5 +25,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         }
 
         public MethodParameter Parameter { get; set; }
+        public string Name => Parameter?.Name;
     }
 }

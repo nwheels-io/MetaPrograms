@@ -2,6 +2,7 @@
 using System.Xml.Linq;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
+using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
 
@@ -40,7 +41,17 @@ namespace Example.HyperappAdapter.Components
         {
             KEY($"{Metadata.DeclaredProperty.Name}_{eventName}", LAMBDA(@model
                 => DO.RETURN(LAMBDA((@state, @actions) => {
-                    
+
+                    var block = CodeGeneratorContext.GetContextOrThrow().GetCurrentBlock();
+
+                    foreach (var handler in handlerList)
+                    {
+                        foreach (var statement in handler.Body.Statements)
+                        {
+                            block.AppendStatement(statement);
+                        }
+                    }
+
                 }))
             ));
         }
