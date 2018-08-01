@@ -16,12 +16,12 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         private readonly List<IPhasedMemberReader> _memberReaders = new List<IPhasedMemberReader>();
         private readonly Dictionary<ISymbol, IPhasedMemberReader> _memberReaderBySymbol = new Dictionary<ISymbol, IPhasedMemberReader>();
 
-        public TypeReaderMechanism(CodeModelBuilder modelBuilder, INamedTypeSymbol symbol)
+        public TypeReaderMechanism(CodeModelBuilder modelBuilder, INamedTypeSymbol symbol, string fullyQualifiedMetadataName)
         {
             ModelBuilder = modelBuilder;
             MemberBuilder = new TypeMember();
             Symbol = symbol;
-            FullyQualifiedMetadataName = Symbol.GetSystemTypeMetadataName();
+            this.FullyQualifiedMetadataName = fullyQualifiedMetadataName;
             ClrType = Type.GetType(FullyQualifiedMetadataName, throwOnError: false);
             MemberBuilder.Status = MemberStatus.Incomplete;
 

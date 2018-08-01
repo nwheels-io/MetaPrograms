@@ -6,13 +6,13 @@ namespace Example.App
     [WebUI.Semantic.IndexPage]
     public class HelloPage : WebPage<HelloPage.HelloModel>
     {
-        public BackendApi<IGreetingService> GreetingService { get; }
-        public FormComponent<HelloModel> Form { get; } 
+        public IGreetingService GreetingService => GetBackendApiProxy<IGreetingService>();
+        public FormComponent<HelloModel> Form => new FormComponent<HelloModel>();
 
         public override void Controller()
         {
             Form.Submitting += async () => {
-                Model.Greeting = await GreetingService.Proxy.GetGreetingForName(Model.Name);
+                Model.Greeting = await GreetingService.GetGreetingForName(Model.Name);
             };
         }
 

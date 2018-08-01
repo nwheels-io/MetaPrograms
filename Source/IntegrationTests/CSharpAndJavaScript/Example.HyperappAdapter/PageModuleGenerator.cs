@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml.Linq;
 using CommonExtensions;
 using Example.HyperappAdapter.Components;
+using Example.HyperappAdapter.Metadata;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
@@ -17,7 +18,7 @@ namespace Example.HyperappAdapter
     {
         private readonly WebPageMetadata _metadata;
         private readonly IComponentAdapterFactory _componentAdapterFactory;
-        private readonly Dictionary<TypeMember, LocalVariable> _serviceVarByType;
+        private readonly HyperappPageMetadata _metaPageExtension;
         private readonly List<IComponentAdapter> _components;
         private LocalVariable _appVariable;
         private LocalVariable _formVariable;
@@ -26,8 +27,10 @@ namespace Example.HyperappAdapter
         {
             _metadata = metadata;
             _componentAdapterFactory = componentAdapterFactory;
-            _serviceVarByType = new Dictionary<TypeMember, LocalVariable>();
             _components = new List<IComponentAdapter>();
+            _metaPageExtension = new HyperappPageMetadata();
+
+            metadata.Extensions.Add(_metaPageExtension);
         }
 
         public ModuleMember GenerateModule()
@@ -61,7 +64,7 @@ namespace Example.HyperappAdapter
             foreach (var api in _metadata.BackendApis)
             {
                 IMPORT.TUPLE($"{api.ServiceName}Service", out var @service).FROM($"./services/{api.ServiceName}Service");
-                _serviceVarByType.Add(api.InterfaceType, @service);
+                _metaPageExtension.ServiceVarByType.Add(api.InterfaceType, @service);
             }
         }
 

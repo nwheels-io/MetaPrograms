@@ -16,7 +16,7 @@ namespace Example.WebUIModel.Metadata
         {
             _imperativeCodeModel = imperativeCodeModel;
             
-            this.Pages = DiscoverWebPages();
+            this.Pages = DiscoverWebPages(); // calls to GetApiMetadata made during web page discovery, populate _backendApiByType 
             this.BackendApis = _backendApiByType.Values.ToImmutableArray();
         }
 

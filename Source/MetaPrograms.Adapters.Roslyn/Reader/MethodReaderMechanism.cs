@@ -55,7 +55,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             var syntax = symbol.DeclaringSyntaxReferences
                 .Select(syntaxRef => syntaxRef.GetSyntax())
-                .OfType<MethodDeclarationSyntax>().FirstOrDefault();
+                .FirstOrDefault(node => node is MethodDeclarationSyntax || node is ArrowExpressionClauseSyntax);
 
             if (syntax != null)
             {

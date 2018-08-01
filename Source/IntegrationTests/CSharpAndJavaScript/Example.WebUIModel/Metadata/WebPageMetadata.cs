@@ -2,7 +2,9 @@
 using System.Collections.Immutable;
 using System.Linq;
 using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.CodeModel.Imperative.Statements;
 
 namespace Example.WebUIModel.Metadata
 {
@@ -34,6 +36,7 @@ namespace Example.WebUIModel.Metadata
         public ImmutableArray<WebApiMetadata> BackendApis { get; }
         public PropertyMember ModelProperty { get; }
         public MethodMember ControllerMethod { get; }
+        public MetadataExtensionMap Extensions { get; } = new MetadataExtensionMap();
 
         private ImmutableArray<WebComponentMetadata> DiscoverComponents()
         {
@@ -85,16 +88,14 @@ namespace Example.WebUIModel.Metadata
 
             TypeMember TryGetApiType(PropertyMember property)
             {
-                var type = property.PropertyType;
-
-                //TODO: add TypeMember.IsA(System.Type) + support open generic System.Type
-                if (type?.TypeKind == TypeMemberKind.Class && type.IsGenericType)
+                if (property.Getter != null &&
+                    property.Getter.Body.Statements.Count == 1 &&
+                    property.Getter.Body.Statements[0] is ReturnStatement returnStatement &&
+                    returnStatement.Expression is MethodCallExpression methodCall &&
+                    methodCall.Target is ThisExpression &&
+                    methodCall.Method?.Name == "GetBackendApiProxy")
                 {
-                    var clrType = type.Bindings.FirstOrDefault<Type>();
-                    if (clrType != null && clrType.GetGenericTypeDefinition() == typeof(BackendApi<>))
-                    {
-                        return type.GenericArguments[0];
-                    }
+                    return property.PropertyType;
                 }
 
                 return null;

@@ -45,11 +45,15 @@ namespace Example.HyperappAdapter.Components
                     LOCAL("newModel", out var @newModel, USE("Object").DOT("assign").INVOKE(INITOBJECT(), @model));
 
                     var modelMemberAccessRewriter = new ModelMemberAccessRewriter(Metadata.Page, @newModel);
+                    var apiMemberAccessRewriter = new BackendApiProxyAccessRewriter(Metadata.Page);
+
                     var actionBlock = CodeGeneratorContext.GetContextOrThrow().GetCurrentBlock();
 
                     foreach (var handler in handlerList)
                     {
-                        var rewrittenHandlerBody = modelMemberAccessRewriter.RewriteBlockStatement(handler.Body);
+                        var rewrittenHandlerBody = 
+                            apiMemberAccessRewriter.RewriteBlockStatement(
+                                modelMemberAccessRewriter.RewriteBlockStatement(handler.Body));
 
                         foreach (var statement in rewrittenHandlerBody.Statements)
                         {

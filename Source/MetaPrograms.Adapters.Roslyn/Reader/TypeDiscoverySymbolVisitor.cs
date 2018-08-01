@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
@@ -14,6 +15,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         private readonly CodeModelBuilder _modelBuilder;
         private readonly List<IPhasedTypeReader> _results;
         private readonly HashSet<INamedTypeSymbol> _includedSymbols = new HashSet<INamedTypeSymbol>();
+        private readonly HashSet<string> _includedTypeMetadataNames = new HashSet<string>();
         private int _codedTypeDescendLevel = 0;
         private int _anyTypeDescendLevel = 0;
 
@@ -55,11 +57,17 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             if (symbol != null && (force || ShouldIncludeType(symbol)) && _includedSymbols.Add(symbol))
             {
+                var systemTypeMetadataName = symbol.GetSystemTypeMetadataName();
+                if (!_includedTypeMetadataNames.Add(systemTypeMetadataName))
+                {
+                    return;
+                }
+
                 EnterType(symbol);
 
                 try
                 {
-                    RegisterTypeReader(symbol);
+                    RegisterTypeReader(symbol, systemTypeMetadataName);
                     VisitAttributes(symbol);
                     VisitGenericArguments(symbol);
 
@@ -156,10 +164,9 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             return (TypeHasSourceCode(symbol) || (referencedByIncludedType && !externalFarFromCode));
         }
 
-        private void RegisterTypeReader(INamedTypeSymbol symbol)
+        private void RegisterTypeReader(INamedTypeSymbol symbol, string systemTypeMetadataName)
         {
-            var s = symbol.ToDisplayString();
-            var readerMechanism = new TypeReaderMechanism(_modelBuilder, symbol);
+            var readerMechanism = new TypeReaderMechanism(_modelBuilder, symbol, systemTypeMetadataName);
 
             switch (symbol.TypeKind)
             {

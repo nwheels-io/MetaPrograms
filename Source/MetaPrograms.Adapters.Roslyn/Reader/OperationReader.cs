@@ -27,6 +27,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 [OperationKind.AnonymousFunction] = op => ReadAnonymousFunction((IAnonymousFunctionOperation)op),
                 [OperationKind.Await] = op => ReadAwait((IAwaitOperation)op),
                 [OperationKind.Invocation] = op => ReadInvocation((IInvocationOperation)op),
+                [OperationKind.ObjectCreation] = op => ReadObjectCreation((IObjectCreationOperation)op),
             };
 
         private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractStatement>> StatementReaderByOperationKind =
@@ -38,10 +39,10 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         private readonly CodeModelBuilder _codeModel;
         private readonly IFunctionContext _destination;
-        private readonly MethodDeclarationSyntax _syntax;
+        private readonly SyntaxNode _syntax;
         private readonly SemanticModel _semanticModel;
 
-        public OperationReader(CodeModelBuilder codeModel, IFunctionContext destination, MethodDeclarationSyntax syntax)
+        public OperationReader(CodeModelBuilder codeModel, IFunctionContext destination, SyntaxNode syntax)
         {
             _codeModel = codeModel;
             _destination = destination;
@@ -222,9 +223,15 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         private static bool IsRedundantStatement(IOperation op)
         {
-            if (op.Kind == OperationKind.Return && op.Parent.Kind == OperationKind.Block && op.Parent.Parent.Kind == OperationKind.AnonymousFunction)
+            if (op is IReturnOperation returnOp)
             {
-                return true;
+                if (returnOp.ReturnedValue == null && 
+                    !returnOp.ConstantValue.HasValue && 
+                    op.Parent?.Kind == OperationKind.Block && 
+                    op.Parent?.Parent?.Kind == OperationKind.AnonymousFunction)
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -330,8 +337,23 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
             return new MethodCallExpression {
                 Target = ReadExpression(op.Instance),
-                Method = context.CodeModel.Get<MethodMember>(op.TargetMethod),
+                Method = FindMethodMember(context, op.TargetMethod),
                 Arguments = op.Arguments.Select(ReadArgument).ToList()
+            };
+        }
+
+        private static AbstractExpression ReadObjectCreation(IObjectCreationOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+            var objectType = context.CodeModel.Get<TypeMember>(op.Type);
+
+            return new NewObjectExpression {
+                Type = objectType,
+                ConstructorCall = new MethodCallExpression {
+                    Type = objectType,
+                    Method = context.CodeModel.Get<ConstructorMember>(op.Constructor),
+                    Arguments = op.Arguments.Select(ReadArgument).ToList()
+                }
             };
         }
 
@@ -341,6 +363,22 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 Modifier = op.Parameter.GetParameterModifier(),
                 Expression = ReadExpression(op.Value)
             };
+        }
+
+        private static MethodMember FindMethodMember(CodeReaderContext context, IMethodSymbol symbol)
+        {
+            var member = context.CodeModel.TryGet<MethodMember>(symbol);
+            if (member != null)
+            {
+                return member;
+            }
+
+            if (symbol.ConstructedFrom != null)
+            {
+                return context.CodeModel.Get<MethodMember>(symbol.ConstructedFrom);
+            }
+
+            throw new InvalidCodeModelException($"Method member '{symbol}' cannot be found in code model.");
         }
     }
 }

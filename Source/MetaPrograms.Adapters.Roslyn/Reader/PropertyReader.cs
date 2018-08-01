@@ -42,12 +42,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadAttributes()
         {
-            //throw new NotImplementedException();
+            _getterReader?.ReadAttributes();
+            _setterReader?.ReadAttributes();
         }
 
         public void ReadImplementation()
         {
-            //throw new NotImplementedException();
+            _getterReader?.ReadImplementation();
+            _setterReader?.ReadImplementation();
         }
 
         public ISymbol Symbol => _symbol;

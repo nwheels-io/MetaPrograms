@@ -15,5 +15,11 @@ namespace Example.WebUIModel
         public TModel Model { get; }
 
         public abstract void Controller();
+
+        protected TService GetBackendApiProxy<TService>()
+            where TService : class
+        {
+            return null;
+        }
     }
 }
