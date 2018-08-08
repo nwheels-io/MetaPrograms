@@ -28,7 +28,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void Read()
         {
-            using (var context = new CodeReaderContext(ModelBuilder.GetCodeModel(), _clrTypeResolver))
+            using (var context = new CodeReaderContext(ModelBuilder.GetCodeModel(), _clrTypeResolver, LanguageInfo.Entries.CSharp()))
             {
                 DiscoverAllTypes();
                 ReadAllTypes();
@@ -88,4 +88,3 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         }
     }
 }
-

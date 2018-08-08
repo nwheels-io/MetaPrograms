@@ -1,15 +1,11 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Linq;
+using MetaPrograms.CodeModel.Imperative.Members;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Members;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public abstract class MemberSyntaxEmitterBase<TMember, TSyntax> : SyntaxEmitterBase<TSyntax>
         where TMember : AbstractMember
@@ -46,14 +42,14 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         protected virtual SyntaxTokenList EmitMemberModifiers()
         {
-            return TokenList(GetMemberModifierKeywords().Select(Token));
+            return SyntaxFactory.TokenList(GetMemberModifierKeywords().Select(SyntaxFactory.Token));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         protected SyntaxTokenList EmitMemberVisibility()
         {
-            return TokenList(_s_visibilityKeywords[Member.Visibility].Select(Token));
+            return SyntaxFactory.TokenList(_s_visibilityKeywords[Member.Visibility].Select(SyntaxFactory.Token));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------

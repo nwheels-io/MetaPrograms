@@ -22,7 +22,7 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             WriteMembers(module);
             WriteGlobalBlock(module);
             
-            _output.AddSourceFile(module.FolderPath, $"{module.Name}.js", _code.ToString());
+            _output.AddSourceFile(module.FolderPath, $"{module.Name.ToString(CasingStyle.Kebab)}.js", _code.ToString());
         }
 
         public CodeTextBuilder Code => _code;

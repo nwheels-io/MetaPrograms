@@ -1,10 +1,8 @@
-﻿using System;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Members;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+﻿using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public class PropertySyntaxEmitter : MemberSyntaxEmitterBase<PropertyMember, PropertyDeclarationSyntax>
     {
@@ -15,20 +13,20 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         public override PropertyDeclarationSyntax EmitSyntax()
         {
-            OutputSyntax = PropertyDeclaration(
+            OutputSyntax = SyntaxFactory.PropertyDeclaration(
                 Member.PropertyType.GetTypeNameSyntax(),
-                Identifier(Member.Name)
+                SyntaxFactory.Identifier(Member.Name)
             );
 
             OutputSyntax = OutputSyntax.WithModifiers(EmitMemberModifiers());
 
             OutputSyntax = OutputSyntax.WithAccessorList(
-                AccessorList(
-                    List<AccessorDeclarationSyntax>(new[] {
-                        AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)                    
-                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                        AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
-                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                SyntaxFactory.AccessorList(
+                    SyntaxFactory.List<AccessorDeclarationSyntax>(new[] {
+                        SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)                    
+                            .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)),
+                        SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                            .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
                     })
                 )
             );

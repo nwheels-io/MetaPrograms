@@ -1,12 +1,8 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
+﻿using MetaPrograms.CodeModel.Imperative.Members;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Members;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public class ConstructorSyntaxEmitter : MethodMemberSyntaxEmitterBase<ConstructorMember, ConstructorDeclarationSyntax>
     {
@@ -19,7 +15,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         public override ConstructorDeclarationSyntax EmitSyntax()
         {
-            OutputSyntax = ConstructorDeclaration(Identifier(Member.DeclaringType.Name));
+            OutputSyntax = SyntaxFactory.ConstructorDeclaration(SyntaxFactory.Identifier(Member.DeclaringType.Name.ToPascalCase()));
 
             if (Member.Modifier != MemberModifier.Static)
             {
@@ -32,7 +28,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             }
             else
             {
-                OutputSyntax = OutputSyntax.WithModifiers(TokenList(Token(SyntaxKind.StaticKeyword)));
+                OutputSyntax = OutputSyntax.WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.StaticKeyword)));
             }
             
             if (Member.Attributes.Count > 0)
@@ -43,14 +39,14 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             if (Member.CallThisConstructor != null)
             {
                 OutputSyntax = OutputSyntax.WithInitializer(
-                    ConstructorInitializer(
+                    SyntaxFactory.ConstructorInitializer(
                         SyntaxKind.ThisConstructorInitializer,
                         Member.CallThisConstructor.GetArgumentListSyntax()));
             }
             else if (Member.CallBaseConstructor != null)
             {
                 OutputSyntax = OutputSyntax.WithInitializer(
-                    ConstructorInitializer(
+                    SyntaxFactory.ConstructorInitializer(
                         SyntaxKind.BaseConstructorInitializer,
                         Member.CallBaseConstructor.GetArgumentListSyntax()));
             }

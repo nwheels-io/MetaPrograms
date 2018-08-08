@@ -10,7 +10,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 {
     public static class FluentHelpers
     {
-        public static TypeMember BuildTypeMember(TypeMemberKind typeKind, string name, Action body)
+        public static TypeMember BuildTypeMember(TypeMemberKind typeKind, IdentifierName name, Action body)
         {
             var context = CodeGeneratorContext.GetContextOrThrow();
             var module = context.TryLookupState<ModuleMember>();
@@ -27,6 +27,11 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             type.Modifier = traits.Modifier;
             type.Visibility = traits.Visibility;
             type.IsDefaultExport = traits.IsDefaultExport;
+
+            if (containingType != null)
+            {
+                containingType.Members.Add(type);
+            }
 
             context.AddGeneratedMember(type, isTopLevel: containingType == null);
             if (module != null)

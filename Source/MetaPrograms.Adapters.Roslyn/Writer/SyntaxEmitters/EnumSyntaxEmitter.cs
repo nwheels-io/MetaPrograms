@@ -1,14 +1,10 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System.Linq;
 using MetaPrograms.CodeModel.Imperative.Members;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public class EnumSyntaxEmitter : MemberSyntaxEmitterBase<TypeMember, EnumDeclarationSyntax>
     {
@@ -21,7 +17,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         public override EnumDeclarationSyntax EmitSyntax()
         {
-            OutputSyntax = EnumDeclaration(Member.Name);
+            OutputSyntax = SyntaxFactory.EnumDeclaration(Member.Name);
 
             if (Member.Attributes.Count > 0)
             {
@@ -38,7 +34,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         private SeparatedSyntaxList<EnumMemberDeclarationSyntax> EmitEnumMembers()
         {
-            return SeparatedList(
+            return SyntaxFactory.SeparatedList(
                 Member.Members.OfType<EnumMember>()
                     .Select(ToEnumMemberSyntax));
         }
@@ -47,11 +43,11 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         private EnumMemberDeclarationSyntax ToEnumMemberSyntax(EnumMember member)
         {
-            var syntax = EnumMemberDeclaration(Identifier(member.Name));
+            var syntax = SyntaxFactory.EnumMemberDeclaration(SyntaxFactory.Identifier(member.Name));
 
             if (member.Value != null)
             {
-                syntax = syntax.WithEqualsValue(EqualsValueClause(SyntaxHelpers.GetLiteralSyntax(member.Value)));
+                syntax = syntax.WithEqualsValue(SyntaxFactory.EqualsValueClause(SyntaxHelpers.GetLiteralSyntax(member.Value)));
             }
 
             return syntax;

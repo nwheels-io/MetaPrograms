@@ -1,13 +1,9 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Members;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     internal class MethodSyntaxEmitter : MemberSyntaxEmitterBase<MethodMember, MethodDeclarationSyntax>
     {
@@ -19,13 +15,13 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         public override MethodDeclarationSyntax EmitSyntax()
         {
             TypeSyntax returnTypeSyntax = (Member.Signature.IsVoid
-                ? PredefinedType(Token(SyntaxKind.VoidKeyword))
+                ? SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword))
                 : Member.Signature.ReturnValue.Type.GetTypeNameSyntax());
 
             OutputSyntax =
-                MethodDeclaration(
+                SyntaxFactory.MethodDeclaration(
                     returnTypeSyntax,
-                    Identifier(Member.Name)
+                    SyntaxFactory.Identifier(Member.Name)
                 );
 
             OutputSyntax = OutputSyntax.WithModifiers(EmitMemberModifiers());
@@ -51,7 +47,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
             if (Member.Signature.IsAsync)
             {
-                return baseList.Add(Token(SyntaxKind.AsyncKeyword));
+                return baseList.Add(SyntaxFactory.Token(SyntaxKind.AsyncKeyword));
             }
 
             return baseList;

@@ -67,7 +67,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                     pathParts.AddRange(module.FolderPath);
                 }
 
-                pathParts.Add(module.Name);
+                pathParts.Add(module.Name.ToString());
                 
                 return pathParts;
             }

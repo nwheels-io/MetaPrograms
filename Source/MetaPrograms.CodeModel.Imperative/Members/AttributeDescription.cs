@@ -9,7 +9,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
     {
         public override string ToString()
         {
-            return (AttributeType?.Name ?? base.ToString());
+            return (AttributeType?.Name?.ToString() ?? base.ToString());
         }
 
         public TypeMember AttributeType { get; set; }

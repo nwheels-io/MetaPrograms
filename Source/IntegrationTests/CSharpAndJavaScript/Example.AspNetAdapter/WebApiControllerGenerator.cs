@@ -19,7 +19,7 @@ namespace Example.AspNetAdapter
     {
         //TODO: add detection & resolution of duplicate names
         public static TypeMember WebApiController(TypeMember middlewareType, WebApiMetadata api) =>
-            PUBLIC.CLASS($"{api.InterfaceType.Name.TrimPrefix("I")}Controller", () => {
+            PUBLIC.CLASS(MAKENAME(api.InterfaceType.Name.TrimPrefixFragment("I"), "Controller"), () => {
                 EXTENDS<Controller>();
                 ATTRIBUTE<RouteAttribute>("api/[controller]");
 
@@ -35,7 +35,7 @@ namespace Example.AspNetAdapter
 
                     PUBLIC.ASYNC.FUNCTION<Task<IActionResult>>(apiMethod.Name, () => {
                         ATTRIBUTE(middlewareType);
-                        ATTRIBUTE<HttpPostAttribute>(apiMethod.Name.ToCamelCase());
+                        ATTRIBUTE<HttpPostAttribute>(apiMethod.Name.ToString(CasingStyle.Camel));
                         PARAMETER(requestClass, "requestData", out MethodParameter @requestData, () => {
                             ATTRIBUTE<FromBodyAttribute>();
                         });
@@ -44,7 +44,7 @@ namespace Example.AspNetAdapter
 
                         resultValueLocal.ASSIGN(
                             AWAIT(THIS.DOT(@serviceField).DOT(apiMethod).INVOKE(() => {
-                                apiMethod.Signature.Parameters.ForEach(p => ARGUMENT(@requestData.DOT(p.Name.ToPascalCase())));
+                                apiMethod.Signature.Parameters.ForEach(p => ARGUMENT(@requestData.DOT(p.Name.ToString(CasingStyle.Pascal))));
                             }))
                         );
 

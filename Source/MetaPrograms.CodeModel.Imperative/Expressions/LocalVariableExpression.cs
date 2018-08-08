@@ -30,8 +30,8 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         }
 
         public LocalVariable Variable { get; set; }
-        public string VariableName { get; set; }
+        public IdentifierName VariableName { get; set; }
 
-        public string Name => VariableName ?? Variable?.Name;
+        public IdentifierName Name => VariableName ?? Variable?.Name;
     }
 }

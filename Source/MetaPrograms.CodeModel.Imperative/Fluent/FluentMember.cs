@@ -33,26 +33,26 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         {
         }
 
-        public void FIELD(TypeMember type, string name, out FieldMember @ref, Action body = null)
+        public void FIELD(TypeMember type, IdentifierName name, out FieldMember @ref, Action body = null)
             => @ref = new FieldGenerator(GetContextOrThrow(), type, name, body).GenerateMember();
 
-        public void FIELD(Type type, string name, out FieldMember @ref, Action body = null)
+        public void FIELD(Type type, IdentifierName name, out FieldMember @ref, Action body = null)
             => @ref = new FieldGenerator(GetContextOrThrow(), type, name, body).GenerateMember();
 
-        public void FIELD(string name, out FieldMember @ref, Action body = null)
+        public void FIELD(IdentifierName name, out FieldMember @ref, Action body = null)
             => @ref = new FieldGenerator(GetContextOrThrow(), fieldType: (TypeMember)null, name, body).GenerateMember();
 
 
-        public void FIELD<TType>(string name, out FieldMember @ref, Action body = null)
+        public void FIELD<TType>(IdentifierName name, out FieldMember @ref, Action body = null)
             => @ref = new FieldGenerator(GetContextOrThrow(), typeof(TType), name, body).GenerateMember();
 
-        public TypeMember CLASS(string name, Action body) 
+        public TypeMember CLASS(IdentifierName name, Action body) 
             => FluentHelpers.BuildTypeMember(TypeMemberKind.Class, name, body);
 
-        public TypeMember STRUCT(string name, Action body) 
+        public TypeMember STRUCT(IdentifierName name, Action body) 
             => FluentHelpers.BuildTypeMember(TypeMemberKind.Struct, name, body);
 
-        public TypeMember INTERFACE(string name, Action body) 
+        public TypeMember INTERFACE(IdentifierName name, Action body) 
             => FluentHelpers.BuildTypeMember(TypeMemberKind.Interface, name, body);
 
         // public TypeMember MODULE(string name, Action body)
@@ -61,16 +61,16 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public ConstructorMember CONSTRUCTOR(Action body)
             => new ConstructorGenerator(GetContextOrThrow(), body).GenerateMember();
 
-        public MethodMember FUNCTION<TReturnType>(string name, Action body)
+        public MethodMember FUNCTION<TReturnType>(IdentifierName name, Action body)
             => new MethodGenerator(GetContextOrThrow(), typeof(TReturnType), name, body).GenerateMember();
         
         public MethodMember FUNCTION(TypeMember returnType, string name, Action body)
             => new MethodGenerator(GetContextOrThrow(), returnType, name, body).GenerateMember();
 
-        public MethodMember FUNCTION(string name, Action body)
+        public MethodMember FUNCTION(IdentifierName name, Action body)
             => new MethodGenerator(GetContextOrThrow(), name, body).GenerateMember();
 
-        public MethodMember VOID(string name, Action body)
+        public MethodMember VOID(IdentifierName name, Action body)
             => new MethodGenerator(GetContextOrThrow(), name, body).GenerateMember();
 
         public MethodMember VOID(MethodMember ancestorMethod, Action body)

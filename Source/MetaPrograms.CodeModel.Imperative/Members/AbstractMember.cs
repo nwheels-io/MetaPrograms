@@ -27,7 +27,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 
         public BindingCollection Bindings { get; } = new BindingCollection();
 
-        public virtual string Name { get; set; }
+        public virtual IdentifierName Name { get; set; }
         public virtual ModuleMember DeclaringModule { get; set; }
         public virtual TypeMember DeclaringType { get; set; }
         public virtual MemberStatus Status { get; set; }

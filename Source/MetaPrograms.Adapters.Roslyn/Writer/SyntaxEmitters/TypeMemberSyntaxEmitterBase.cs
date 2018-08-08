@@ -1,16 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MetaPrograms.CodeModel.Imperative.Members;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public abstract class TypeMemberSyntaxEmitterBase<TMember, TSyntax> : MemberSyntaxEmitterBase<TMember, TSyntax>
         where TMember : TypeMember
@@ -57,24 +53,24 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
             baseList.AddRange(Member.Interfaces.Select(ToBaseTypeSyntax));
 
-            return BaseList(SeparatedList<BaseTypeSyntax>(baseList));
+            return SyntaxFactory.BaseList(SyntaxFactory.SeparatedList<BaseTypeSyntax>(baseList));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         protected BaseTypeSyntax ToBaseTypeSyntax(TypeMember baseTypeMember)
         {
-            return SimpleBaseType(SyntaxHelpers.GetTypeFullNameSyntax(baseTypeMember));
+            return SyntaxFactory.SimpleBaseType(SyntaxHelpers.GetTypeFullNameSyntax(baseTypeMember));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
         protected TypeParameterListSyntax EmitTypeParameterList()
         {
-            return TypeParameterList(
-                SeparatedList<TypeParameterSyntax>(
+            return SyntaxFactory.TypeParameterList(
+                SyntaxFactory.SeparatedList<TypeParameterSyntax>(
                     Member.GenericParameters
-                        .Select(t => TypeParameter(Identifier(t.Name)))));
+                        .Select(t => SyntaxFactory.TypeParameter(SyntaxFactory.Identifier(t.Name)))));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,7 +80,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             var orderedMembers = new List<AbstractMember>(Member.Members);
             orderedMembers.Sort(new MemberOrderComparer());
 
-            return List<MemberDeclarationSyntax>(orderedMembers
+            return SyntaxFactory.List<MemberDeclarationSyntax>(orderedMembers
                 .Select(m => CreateMemberSyntaxEmitter(m).EmitSyntax())
                 .Cast<MemberDeclarationSyntax>());
         }
@@ -116,6 +112,11 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             if (member is EventMember @event)
             {
                 return new EventSyntaxEmitter(@event);
+            }
+
+            if (member is TypeMember type)
+            {
+                return TypeSyntaxEmitter.GetSyntaxEmitter(type);
             }
 
             throw new ArgumentException($"Syntax emitter is not supported for members of type {member.GetType().Name}");

@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Linq;
+using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Members;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using System.Linq;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public class FieldSyntaxEmitter : MemberSyntaxEmitterBase<FieldMember, FieldDeclarationSyntax>
     {
@@ -20,20 +17,20 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         public override FieldDeclarationSyntax EmitSyntax()
         {
-            var declarator = VariableDeclarator(Identifier(Member.Name));
+            var declarator = SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier(Member.Name));
 
             if (Member.Initializer != null)
             {
-                declarator = declarator.WithInitializer(EqualsValueClause(ExpressionSyntaxEmitter.EmitSyntax(Member.Initializer)));
+                declarator = declarator.WithInitializer(SyntaxFactory.EqualsValueClause(ExpressionSyntaxEmitter.EmitSyntax(Member.Initializer)));
             }
 
             OutputSyntax =
-                FieldDeclaration(
-                    VariableDeclaration(
+                SyntaxFactory.FieldDeclaration(
+                    SyntaxFactory.VariableDeclaration(
                         Member.Type.GetTypeNameSyntax()
                     )
                     .WithVariables(
-                        SingletonSeparatedList<VariableDeclaratorSyntax>(
+                        SyntaxFactory.SingletonSeparatedList<VariableDeclaratorSyntax>(
                             declarator
                         )
                     )

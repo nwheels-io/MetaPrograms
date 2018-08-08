@@ -136,7 +136,7 @@ namespace Example.HyperappAdapter
             else
             {
                 folderPath = new[] { "src", "pages" };
-                moduleName = page.PageClass.Name.TrimSuffix("Page").ToLower();
+                moduleName = page.PageClass.Name.TrimSuffixFragment("Page").ToString().ToLower();
             }
         }
     }

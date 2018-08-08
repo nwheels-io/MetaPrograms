@@ -112,7 +112,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         {
             if (!IsGenericType)
             {
-                return this.Name;
+                return this.Name.ToString();
             }
 
             if (IsGenericDefinition)
@@ -137,15 +137,15 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         {
             if (IsGenericDefinition)
             {
-                return (this.Name + aritySeparator + GenericParameters.Count);
+                return (this.Name.ToString() + aritySeparator + GenericParameters.Count);
             }
             else if (IsGenericType)
             {
-                return (this.Name + aritySeparator + GenericArguments.Count);
+                return (this.Name.ToString() + aritySeparator + GenericArguments.Count);
             }
             else
             {
-                return this.Name;
+                return this.Name.ToString();
             }
         }
 
@@ -163,7 +163,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
                     return Namespace + "." + Name;
                 }
 
-                return Name;
+                return Name.ToString();
             }
         }
 

@@ -2,7 +2,7 @@
 {
     public interface IAssignable
     {
-        string Name { get; }
+        IdentifierName Name { get; }
         AbstractExpression AsExpression();
         void AcceptVisitor(StatementVisitor visitor);
         IAssignable AcceptRewriter(StatementRewriter rewriter);

@@ -2,25 +2,46 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Fluent;
 using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace MetaPrograms.CodeModel.Imperative
 {
-    public abstract class CodeContextBase
+    public abstract class CodeContextBase : IDisposable
     {
+        protected static readonly AsyncLocal<CodeContextBase> Current = new AsyncLocal<CodeContextBase>();
+
         private readonly Stack<object> _stateStack = new Stack<object>();
 
         public ImperativeCodeModel CodeModel { get; }
         public IClrTypeResolver ClrTypeResolver { get; }
+        public LanguageInfo Language { get; }
 
-        protected CodeContextBase(ImperativeCodeModel codeModel, IClrTypeResolver typeResolver)
+        protected CodeContextBase(ImperativeCodeModel codeModel, IClrTypeResolver typeResolver, LanguageInfo language)
         {
+            if (Current.Value != null)
+            {
+                throw new InvalidOperationException(
+                    "Another instance of CodeContextBase is already associated with the current call context.");
+            }
+
+            Current.Value = this;
+
             this.CodeModel = codeModel;
             this.ClrTypeResolver = typeResolver;
+            this.Language = language;
         }
-        
+
+        public virtual void Dispose()
+        {
+            if (Current.Value == this)
+            {
+                Current.Value = null;
+            }
+        }
+
         public IDisposable PushState(object state)
         {
             if (state != null)
@@ -153,6 +174,8 @@ namespace MetaPrograms.CodeModel.Imperative
             return AbstractExpression.FromValue(value, resolveType: this.FindType);
         }
 
+        public abstract IdentifierName.OriginKind DefaultIdentifierOrigin { get; }
+
         private object PopStateOrThrow(Type stateType)
         {
             var state = PeekStateOrThrow(stateType);
@@ -187,6 +210,22 @@ namespace MetaPrograms.CodeModel.Imperative
 
             return stateOnTop;
         }
+
+        public static void Cleanup()
+        {
+            Current.Value?.Dispose();
+        }
+
+        public static IdentifierName.OriginKind GetDefaultIdentifierOrigin() => 
+            GetContextOrThrow<CodeContextBase>().DefaultIdentifierOrigin;
+
+        public static TContext GetContextOrThrow<TContext>() where TContext: CodeContextBase =>
+            (TContext)Current.Value ??
+            throw new InvalidOperationException(
+                $"No {typeof(TContext).Name} exists in the current call context. " +
+                $"Current operations require a {typeof(TContext).Name}. " +
+                $"Instantiate {(typeof(TContext).IsAbstract ? "CodeReaderContext or CodeGeneratorContext" : typeof(TContext).Name)} " +
+                $"before performing the operation, and Dispose it afterwards.");
 
         private class StackStateScope : IDisposable
         {

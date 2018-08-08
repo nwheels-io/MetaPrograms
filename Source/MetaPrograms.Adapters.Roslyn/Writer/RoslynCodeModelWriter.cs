@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using CommonExtensions;
+using MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis.CSharp;
@@ -29,7 +30,7 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
         {
             var commonNamespaceParts = FindCommonNamespace();
 
-            foreach (var type in _members.OfType<TypeMember>())
+            foreach (var type in _members.OfType<TypeMember>().Where(t => t.DeclaringType == null))
             {
                 WriteType(type, commonNamespaceParts);
             }

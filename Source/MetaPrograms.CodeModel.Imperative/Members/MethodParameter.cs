@@ -23,7 +23,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
             return this;
         }
 
-        public string Name { get; set; }
+        public IdentifierName Name { get; set; }
         public TupleExpression Tuple { get; set; }
         public int Position { get; set; }
         public TypeMember Type { get; set; }

@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Fluent;
 using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace MetaPrograms.Adapters.Roslyn.Writer
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public class UnitSyntaxEmitter
     {
@@ -31,12 +27,12 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
             using (CodeGeneratorContext.GetContextOrThrow().PushState(importContext))
             {
                 var typeSyntax = TypeSyntaxEmitter.GetSyntax(_type);
-                var unitSyntax = CompilationUnit()
-                    .WithUsings(List(usingSyntaxList))
+                var unitSyntax = SyntaxFactory.CompilationUnit()
+                    .WithUsings(SyntaxFactory.List(usingSyntaxList))
                     .WithMembers(
-                        SingletonList<MemberDeclarationSyntax>(
-                            NamespaceDeclaration(CreateQualifiedNameSyntax(_type.Namespace.Split('.')))
-                                .WithMembers(SingletonList(typeSyntax))))
+                        SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
+                            SyntaxFactory.NamespaceDeclaration(CreateQualifiedNameSyntax(_type.Namespace.Split('.')))
+                                .WithMembers(SyntaxFactory.SingletonList(typeSyntax))))
                     .NormalizeWhitespace();
 
                 return unitSyntax.SyntaxTree;
@@ -50,11 +46,11 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
                 case 0:
                     throw new ArgumentException("At least one name part must exist", nameof(parts));
                 case 1:
-                    return IdentifierName(parts[0]);
+                    return SyntaxFactory.IdentifierName(parts[0]);
                 default:
-                    return QualifiedName(
+                    return SyntaxFactory.QualifiedName(
                         CreateQualifiedNameSyntax(parts.Slice(0, parts.Length - 1)), 
-                        IdentifierName(parts[parts.Length - 1])
+                        SyntaxFactory.IdentifierName(parts[parts.Length - 1])
                     );
             }
         }
@@ -78,7 +74,7 @@ namespace MetaPrograms.Adapters.Roslyn.Writer
 
             var sortedNamespacesToImport = new List<string>(importContext.ImportedNamespaces.Where(ns => ns != _type.Namespace));
             sortedNamespacesToImport.Sort(new NamespaceImportComparer());
-            sortedUsings = sortedNamespacesToImport.Select(ns => UsingDirective(ParseName(ns))).ToArray();
+            sortedUsings = sortedNamespacesToImport.Select(ns => SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(ns))).ToArray();
         }
 
         private IReadOnlyCollection<TypeMember> GetReferencedTypes()

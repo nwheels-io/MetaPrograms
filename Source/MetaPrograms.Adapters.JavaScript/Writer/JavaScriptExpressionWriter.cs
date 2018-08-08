@@ -60,7 +60,8 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
 
         public static void WriteVariable(CodeTextBuilder code, LocalVariableExpression variable)
         {
-            code.Write(variable.VariableName ?? variable.Variable.Name);
+            var variableName = variable.VariableName ?? variable.Variable.Name;
+            code.Write(ToCamelCase(variableName));
         }
 
         public static void WriteParameter(CodeTextBuilder code, ParameterExpression expression)
@@ -71,8 +72,15 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             }
             else
             {
-                code.Write(expression.Parameter.Name);
+                code.Write(ToCamelCase(expression.Parameter.Name));
             }
+        }
+
+        public static string ToCamelCase(IdentifierName identifier)
+        {
+            return identifier.GetSealedOrCased(
+                CasingStyle.Camel, 
+                sealLanguage: LanguageInfo.Entries.JavaScript());
         }
 
         private static void WriteThis(CodeTextBuilder code, ThisExpression expression)
@@ -88,7 +96,7 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
                 code.Write(".");
             }
 
-            code.Write(expression.MemberName ?? expression.Member.Name);
+            code.Write(ToCamelCase(expression.MemberName ?? expression.Member.Name));
         }
 
         private static void WriteAssignment(CodeTextBuilder code, AssignmentExpression expression)
@@ -126,7 +134,7 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
                 code.Write(".");
             }
 
-            code.Write(call.MethodName ?? call.Method.Name);
+            code.Write(ToCamelCase(call.MethodName ?? call.Method.Name));
             code.WriteListStart(opener: "(", separator: ", ", closer: ")");
 
             foreach (var argument in call.Arguments)

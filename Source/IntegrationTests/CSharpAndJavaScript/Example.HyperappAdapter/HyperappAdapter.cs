@@ -34,7 +34,7 @@ namespace Example.HyperappAdapter
         {
             CopyFrameworkFiles();
 
-            using (new CodeGeneratorContext(_codeModel, new ClrTypeResolver()))
+            using (new CodeGeneratorContext(_codeModel, new ClrTypeResolver(), LanguageInfo.Entries.JavaScript()))
             {
                 GenerateIndexHtml(metadata);
                 GeneratePageModules(metadata);
@@ -83,7 +83,7 @@ namespace Example.HyperappAdapter
                 new XElement("html", 
                     new XElement("head",
                         new XElement("meta", new XAttribute("charset", "utf-8")),
-                        new XElement("title", metadata.Pages.First().PageClass.Name.TrimSuffix("Page")),
+                        new XElement("title", metadata.Pages.First().PageClass.Name.TrimSuffixFragment("Page").ToString()),
                         new XElement("script",
                             new XAttribute("defer", true),
                             new XAttribute("src", "bundle.js"),

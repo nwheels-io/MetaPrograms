@@ -1,12 +1,9 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System;
 using MetaPrograms.CodeModel.Imperative.Statements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public static class StatementSyntaxEmitter
     {
@@ -14,7 +11,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         {
             if (statement is ReturnStatement statementReturn)
             {
-                return ReturnStatement(ExpressionSyntaxEmitter.EmitSyntax(statementReturn.Expression));
+                return SyntaxFactory.ReturnStatement(ExpressionSyntaxEmitter.EmitSyntax(statementReturn.Expression));
             }
             if (statement is BlockStatement statementBlock)
             {
@@ -22,11 +19,11 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             }
             if (statement is ThrowStatement statementThrow)
             {
-                return ThrowStatement(ExpressionSyntaxEmitter.EmitSyntax(statementThrow.Exception));
+                return SyntaxFactory.ThrowStatement(ExpressionSyntaxEmitter.EmitSyntax(statementThrow.Exception));
             }
             if (statement is ExpressionStatement statementExpression)
             {
-                return ExpressionStatement(ExpressionSyntaxEmitter.EmitSyntax(statementExpression.Expression));
+                return SyntaxFactory.ExpressionStatement(ExpressionSyntaxEmitter.EmitSyntax(statementExpression.Expression));
             }
             if (statement is VariableDeclarationStatement statementVariable)
             {
@@ -38,7 +35,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             }
             if (statement is LockStatement statementLock)
             {
-                return LockStatement(ExpressionSyntaxEmitter.EmitSyntax(statementLock.SyncRoot), statementLock.Body.ToSyntax());
+                return SyntaxFactory.LockStatement(ExpressionSyntaxEmitter.EmitSyntax(statementLock.SyncRoot), statementLock.Body.ToSyntax());
             }
 
             //TODO: support other types of statements
@@ -50,11 +47,11 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         private static StatementSyntax EmitIfStatementSyntax(IfStatement statement)
         {
-            var syntax = IfStatement(ExpressionSyntaxEmitter.EmitSyntax(statement.Condition), statement.ThenBlock.ToSyntax());
+            var syntax = SyntaxFactory.IfStatement(ExpressionSyntaxEmitter.EmitSyntax(statement.Condition), statement.ThenBlock.ToSyntax());
             
             if (statement.ElseBlock != null)
             {
-                syntax = syntax.WithElse(ElseClause(statement.ElseBlock.ToSyntax()));
+                syntax = syntax.WithElse(SyntaxFactory.ElseClause(statement.ElseBlock.ToSyntax()));
             }
 
             return syntax;
@@ -67,17 +64,17 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             var variable = statement.Variable;
 
             var declaration = (variable.Type != null
-                ? VariableDeclaration(variable.Type.GetTypeNameSyntax())
-                : VariableDeclaration(IdentifierName("var")));
+                ? SyntaxFactory.VariableDeclaration(variable.Type.GetTypeNameSyntax())
+                : SyntaxFactory.VariableDeclaration(SyntaxFactory.IdentifierName("var")));
 
-            var declarator = VariableDeclarator(Identifier(variable.Name));
+            var declarator = SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier(variable.Name));
 
             if (statement.InitialValue != null)
             {
-                declarator = declarator.WithInitializer(EqualsValueClause(ExpressionSyntaxEmitter.EmitSyntax(statement.InitialValue)));
+                declarator = declarator.WithInitializer(SyntaxFactory.EqualsValueClause(ExpressionSyntaxEmitter.EmitSyntax(statement.InitialValue)));
             }
 
-            return LocalDeclarationStatement(declaration.WithVariables(SingletonSeparatedList(declarator)));
+            return SyntaxFactory.LocalDeclarationStatement(declaration.WithVariables(SyntaxFactory.SingletonSeparatedList(declarator)));
         }
     }
 }

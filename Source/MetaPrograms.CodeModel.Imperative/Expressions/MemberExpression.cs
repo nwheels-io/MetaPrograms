@@ -32,8 +32,8 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public AbstractExpression Target { get; set; }
         public AbstractMember Member { get; set; }
-        public string MemberName { get; set; }
-        public string Name => MemberName ?? Member?.Name;
+        public IdentifierName MemberName { get; set; }
+        public IdentifierName Name => MemberName ?? Member?.Name;
 
         public static MemberExpression Create(AbstractExpression target, AbstractMember member)
         {
@@ -44,7 +44,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
             });
         }
 
-        public static MemberExpression Create(AbstractExpression target, string memberName)
+        public static MemberExpression Create(AbstractExpression target, IdentifierName memberName)
         {
             return BlockContext.GetBlockOrThrow().PushExpression(new MemberExpression {
                 Type = target.Type,

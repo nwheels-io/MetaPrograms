@@ -11,10 +11,10 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public MemberTraitsContext Traits { get; }
         public ModuleMember DeclaringModule { get; }
         public TypeMember DeclaringType { get; }
-        public string Name { get; }
+        public IdentifierName Name { get; }
         public Action Body { get; }
 
-        protected MemberGenerator(CodeGeneratorContext context, string name, Action body)
+        protected MemberGenerator(CodeGeneratorContext context, IdentifierName name, Action body)
         {
             this.Context = context;
             this.Name = name;
@@ -66,12 +66,12 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
     {
         public TypeMember FieldType { get; }
 
-        public FieldGenerator(CodeGeneratorContext context, Type fieldType, string name, Action body)
+        public FieldGenerator(CodeGeneratorContext context, Type fieldType, IdentifierName name, Action body)
             : this(context, context.FindType(fieldType), name, body)
         {
         }
 
-        public FieldGenerator(CodeGeneratorContext context, TypeMember fieldType, string name, Action body)
+        public FieldGenerator(CodeGeneratorContext context, TypeMember fieldType, IdentifierName name, Action body)
             : base(context, name, body)
         {
             this.FieldType = fieldType;
@@ -89,13 +89,13 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
     {
         public TypeMember PropertyType { get; }
 
-        public PropertyGenerator(CodeGeneratorContext context, TypeMember propertyType, string name, Action body)
+        public PropertyGenerator(CodeGeneratorContext context, TypeMember propertyType, IdentifierName name, Action body)
             : base(context, name, body)
         {
             this.PropertyType = propertyType;
         }
 
-        public PropertyGenerator(CodeGeneratorContext context, Type propertyType, string name, Action body)
+        public PropertyGenerator(CodeGeneratorContext context, Type propertyType, IdentifierName name, Action body)
             : this(context, context.FindType(propertyType), name, body)
         {
         }
@@ -132,18 +132,18 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         public TypeMember ReturnType { get; }
         public MethodMember AncestorMethod { get; }
         
-        public MethodGenerator(CodeGeneratorContext context, string name, Action body)
+        public MethodGenerator(CodeGeneratorContext context, IdentifierName name, Action body)
             : this(context, returnType: (Type)null, name, body)
         {
         }
 
-        public MethodGenerator(CodeGeneratorContext context, Type returnType, string name, Action body)
+        public MethodGenerator(CodeGeneratorContext context, Type returnType, IdentifierName name, Action body)
             : base(context, name, body)
         {
             this.ReturnType = Context.FindType(returnType);
         }
 
-        public MethodGenerator(CodeGeneratorContext context, TypeMember returnType, string name, Action body)
+        public MethodGenerator(CodeGeneratorContext context, TypeMember returnType, IdentifierName name, Action body)
             : base(context, name, body)
         {
             this.ReturnType = returnType;

@@ -14,6 +14,12 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
     [TestFixture]
     public class ClassReaderTests
     {
+        [TearDown]
+        public void AfterEach()
+        {
+            CodeContextBase.Cleanup();
+        }
+
         [Test]
         public void CanReadNameAndNamespace()
         {
@@ -35,7 +41,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             var type = reader.TypeMember;
 
-            type.Name.ShouldBe("MyClass");
+            type.Name.ToString().ShouldBe("MyClass");
             type.Namespace.ShouldBe("MyApp.MyTest");
             type.FullName.ShouldBe("MyApp.MyTest.MyClass");
         }
@@ -69,8 +75,8 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             var c1Base = reader.TypeMember;
             c1Base.IsGenericType.ShouldBeTrue();
             c1Base.IsGenericDefinition.ShouldBeFalse();
-            c1Base.GenericParameters.Select(arg => arg.Name).ShouldBe(new[] { "T1", "T2" });
-            c1Base.GenericArguments.Select(arg => arg.Name).ShouldBe(new[] { "IService1", "IService2" });
+            c1Base.GenericParameters.Select(arg => arg.Name.ToString()).ShouldBe(new[] { "T1", "T2" });
+            c1Base.GenericArguments.Select(arg => arg.Name.ToString()).ShouldBe(new[] { "IService1", "IService2" });
         }
         
         [Test]
@@ -189,7 +195,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             var type = reader.TypeMember;
             var property = type.Members
                 .OfType<PropertyMember>()
-                .Single(p => p.Name == "Callback");
+                .Single(p => p.Name.ToString() == "Callback");
 
             var propertyType = property.PropertyType;
             
@@ -197,7 +203,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             propertyType.IsGenericDefinition.ShouldBe(false);
             propertyType.GenericParameters.Count.ShouldBe(1);
             propertyType.GenericArguments.Count.ShouldBe(1);
-            propertyType.GenericArguments[0].Name.ShouldBe("C1");
+            propertyType.GenericArguments[0].Name.ToString().ShouldBe("C1");
         }
         
         [Test]
@@ -226,7 +232,7 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
 
             var type = reader.TypeMember;
             type.Attributes
-                .Select(a => a.AttributeType.Name)
+                .Select(a => a.AttributeType.Name.ToString())
                 .ShouldBe(new[] { "SerializableAttribute", "SeventhAttribute" }, ignoreOrder: true);
         }
 
@@ -255,9 +261,11 @@ namespace MetaPrograms.Adapters.Roslyn.Tests.Reader
             var allReaders = new List<IPhasedTypeReader>();
             var discoveryVisitor = new TypeDiscoverySymbolVisitor(modelBuilder, allReaders);
 
+            var readerContext = new CodeReaderContext(modelBuilder.GetCodeModel(), null, LanguageInfo.Entries.CSharp());
+
             compilation.GlobalNamespace.Accept(discoveryVisitor);
             setupAllReaders?.Invoke(allReaders);
-            
+
             var reader = allReaders.OfType<ClassReader>().FirstOrDefault(r => r.TypeSymbol.Equals(typeSymbol));
             reader.ShouldNotBeNull($"ClassReader for '{className}' was not registered.");
 

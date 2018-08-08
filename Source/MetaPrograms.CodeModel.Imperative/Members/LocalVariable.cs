@@ -4,7 +4,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class LocalVariable : IAssignable
     {
-        public string Name { get; set; }
+        public IdentifierName Name { get; set; }
         public TypeMember Type { get; set; }
         public bool IsFinal { get; set; }
 

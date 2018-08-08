@@ -1,11 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using MetaPrograms.CodeModel.Imperative.Members;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Members;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public abstract class MethodMemberSyntaxEmitterBase<TMember, TSyntax> : MemberSyntaxEmitterBase<TMember, TSyntax>
         where TMember : MethodMemberBase

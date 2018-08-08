@@ -1,8 +1,8 @@
 ﻿using System;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using MetaPrograms.CodeModel.Imperative.Members;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public class EventSyntaxEmitter : MemberSyntaxEmitterBase<EventMember, EventDeclarationSyntax>
     {

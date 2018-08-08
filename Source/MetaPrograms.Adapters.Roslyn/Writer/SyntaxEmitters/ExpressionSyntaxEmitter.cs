@@ -1,16 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
-using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using MetaPrograms.CodeModel.Imperative.Expressions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public static class ExpressionSyntaxEmitter
     {
@@ -52,96 +48,91 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         public static ExpressionSyntax EmitSyntax(AbstractExpression expression)
         {
-            if (expression == null)
+            switch (expression)
             {
-                throw new ArgumentNullException(nameof(expression));
-            }
-            if (expression is ConstantExpression constant)
-            {
-                return SyntaxHelpers.GetLiteralSyntax(constant.Value);
-            }
-            if (expression is LocalVariableExpression local)
-            {
-                return IdentifierName(local.Variable.Name);
-            }
-            if (expression is MethodCallExpression call)
-            {
-                return EmitMethodCallSyntax(call);
-            }
-            if (expression is NewObjectExpression newObject)
-            {
-                return EmitNewObjectSyntax(newObject);
-            }
-            if (expression is ThisExpression)
-            {
-                return ThisExpression();
-            }
-            if (expression is BaseExpression)
-            {
-                return BaseExpression();
-            }
-            if (expression is ParameterExpression argument)
-            {
-                return IdentifierName(argument.Parameter.Name);
-            }
-            if (expression is AssignmentExpression assignment)
-            {
-                return AssignmentExpression(
-                    SyntaxKind.SimpleAssignmentExpression,
-                    EmitSyntax(assignment.Left.AsExpression()),
-                    EmitSyntax(assignment.Right));
-            }
-            if (expression is MemberExpression member)
-            {
-                return MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    EmitSyntax(member.Target),
-                    IdentifierName(member.Member?.Name ?? member.MemberName));
-            }
-            if (expression is NewArrayExpression newArray)
-            {
-                return EmitNewArraySyntax(newArray);
-            }
-            if (expression is IndexerExpression indexer)
-            {
-                return ElementAccessExpression(EmitSyntax(indexer.Target)).WithArgumentList(
-                    BracketedArgumentList(
-                        SeparatedList<ArgumentSyntax>(
-                            indexer.IndexArguments.Select(arg => Argument(EmitSyntax(arg))))));
-            }
-            if (expression is BinaryExpression binary)
-            {
-                return BinaryExpression(GetBinaryOperatorKeyword(binary.Operator), EmitSyntax(binary.Left), EmitSyntax(binary.Right));
-            }
-            if (expression is UnaryExpression unary)
-            {
-                return EmitUnaryExpression(unary);
-            }
-            if (expression is AwaitExpression await)
-            {
-                return AwaitExpression(EmitSyntax(await.Expression));
-            }
+                case null:
+                    throw new ArgumentNullException(nameof(expression));
 
-            //TODO: support other types of expressions
+                case ConstantExpression constant:
+                    return SyntaxHelpers.GetLiteralSyntax(constant.Value);
 
-            throw new NotSupportedException($"Syntax emitter is not supported for expression node of type '{expression.GetType().Name}'.");
+                case LocalVariableExpression local:
+                    return SyntaxFactory.IdentifierName(local.Variable.Name);
+
+                case MethodCallExpression call:
+                    return EmitMethodCallSyntax(call);
+
+                case NewObjectExpression newObject:
+                    return EmitNewObjectSyntax(newObject);
+
+                case ThisExpression @this:
+                    return SyntaxFactory.ThisExpression();
+
+                case BaseExpression @base:
+                    return SyntaxFactory.BaseExpression();
+
+                case ParameterExpression argument:
+                    return SyntaxFactory.IdentifierName(argument.Parameter.Name);
+
+                case AssignmentExpression assignment:
+                    return SyntaxFactory.AssignmentExpression(
+                        SyntaxKind.SimpleAssignmentExpression,
+                        EmitSyntax(assignment.Left.AsExpression()),
+                        EmitSyntax(assignment.Right));
+
+                case MemberExpression member:
+                    var identifierSyntax = SyntaxFactory.IdentifierName(member.Member?.Name ?? member.MemberName);
+
+                    if (member.Target is ThisExpression)
+                    {
+                        return identifierSyntax;
+                    }
+
+                    return SyntaxFactory.MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        EmitSyntax(member.Target),
+                        identifierSyntax);
+
+                case NewArrayExpression newArray:
+                    return EmitNewArraySyntax(newArray);
+
+                case IndexerExpression indexer:
+                    return SyntaxFactory.ElementAccessExpression(EmitSyntax(indexer.Target)).WithArgumentList(
+                        SyntaxFactory.BracketedArgumentList(
+                            SyntaxFactory.SeparatedList<ArgumentSyntax>(
+                                indexer.IndexArguments.Select(arg => SyntaxFactory.Argument(EmitSyntax(arg))))));
+
+                case BinaryExpression binary:
+                    return SyntaxFactory.BinaryExpression(GetBinaryOperatorKeyword(binary.Operator), EmitSyntax(binary.Left), EmitSyntax(binary.Right));
+
+                case UnaryExpression unary:
+                    return EmitUnaryExpression(unary);
+
+                case AwaitExpression @await:
+                    return SyntaxFactory.AwaitExpression(EmitSyntax(@await.Expression));
+
+                //TODO: support other types of expressions
+
+                default:
+                    throw new NotSupportedException($"Syntax emitter is not supported for expression node of type '{expression.GetType().Name}'.");
+            }
         }
 
         private static ExpressionSyntax EmitUnaryExpression(UnaryExpression unary)
         {
             if (unary.Operator.IsPrefix())
             {
-                return PrefixUnaryExpression(GetUnaryOperatorKeyword(unary.Operator), EmitSyntax(unary.Operand));
+                return SyntaxFactory.PrefixUnaryExpression(GetUnaryOperatorKeyword(unary.Operator), EmitSyntax(unary.Operand));
             }
             else
             {
-                return PostfixUnaryExpression(GetUnaryOperatorKeyword(unary.Operator), EmitSyntax(unary.Operand));
+                return SyntaxFactory.PostfixUnaryExpression(GetUnaryOperatorKeyword(unary.Operator), EmitSyntax(unary.Operand));
             }
         }
 
         private static ExpressionSyntax EmitNewObjectSyntax(NewObjectExpression newObject)
         {
-            var syntax = ObjectCreationExpression(newObject.Type.GetTypeNameSyntax());
+            var syntax = SyntaxFactory.ObjectCreationExpression(newObject.Type.GetTypeNameSyntax());
 
             if (newObject.ConstructorCall != null)
             {
@@ -149,7 +140,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             }
             else
             {
-                syntax = syntax.WithArgumentList(ArgumentList());
+                syntax = syntax.WithArgumentList(SyntaxFactory.ArgumentList());
             }
 
             return syntax;
@@ -159,21 +150,21 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         {
             SyntaxList<ArrayRankSpecifierSyntax> rankSpecifiers = (
                 newArray.DimensionLengths.Count > 0
-                ? List(newArray.DimensionLengths.Select(dimLen => ArrayRankSpecifier(SingletonSeparatedList(EmitSyntax(dimLen)))))
-                : SingletonList(ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(OmittedArraySizeExpression())))
+                ? SyntaxFactory.List(newArray.DimensionLengths.Select(dimLen => SyntaxFactory.ArrayRankSpecifier(SyntaxFactory.SingletonSeparatedList(EmitSyntax(dimLen)))))
+                : SyntaxFactory.SingletonList(SyntaxFactory.ArrayRankSpecifier(SyntaxFactory.SingletonSeparatedList<ExpressionSyntax>(SyntaxFactory.OmittedArraySizeExpression())))
             );
 
-            var syntax = ArrayCreationExpression(
-                ArrayType(newArray.ElementType.GetTypeNameSyntax()).WithRankSpecifiers(rankSpecifiers)
+            var syntax = SyntaxFactory.ArrayCreationExpression(
+                SyntaxFactory.ArrayType(newArray.ElementType.GetTypeNameSyntax()).WithRankSpecifiers(rankSpecifiers)
             );
 
             //TODO: support multi-dimensional array initializers
             if (newArray.DimensionInitializerValues.Count > 0)
             {
                 syntax = syntax.WithInitializer(
-                    InitializerExpression(
+                    SyntaxFactory.InitializerExpression(
                         SyntaxKind.ArrayInitializerExpression,
-                        SeparatedList(newArray.DimensionInitializerValues[0].Select(EmitSyntax))));
+                        SyntaxFactory.SeparatedList(newArray.DimensionInitializerValues[0].Select(EmitSyntax))));
             }
 
             return syntax;
@@ -182,19 +173,19 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         private static ExpressionSyntax EmitMethodCallSyntax(MethodCallExpression call)
         {
             InvocationExpressionSyntax syntax;
-            var methodIdentifier = IdentifierName(call.MethodName ?? call.Method.Name);
+            var methodIdentifier = SyntaxFactory.IdentifierName(call.MethodName ?? call.Method.Name);
 
             if (call.Target != null)
             {
-                syntax = InvocationExpression(
-                    MemberAccessExpression(
+                syntax = SyntaxFactory.InvocationExpression(
+                    SyntaxFactory.MemberAccessExpression(
                         SyntaxKind.SimpleMemberAccessExpression,
                         EmitSyntax(call.Target),
                         methodIdentifier));
             }
             else
             {
-                syntax = InvocationExpression(methodIdentifier);
+                syntax = SyntaxFactory.InvocationExpression(methodIdentifier);
             }
 
             if (call.Arguments.Count > 0)

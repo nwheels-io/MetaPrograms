@@ -4,13 +4,13 @@ namespace MetaPrograms.CodeModel.Imperative.Members
 {
     public class NamedPropertyValue
     {
-        public NamedPropertyValue(string name, AbstractExpression value)
+        public NamedPropertyValue(IdentifierName name, AbstractExpression value)
         {
             Name = name;
             Value = value;
         }
 
-        public string Name { get; }
+        public IdentifierName Name { get; }
         public AbstractExpression Value { get; }
     }
 }

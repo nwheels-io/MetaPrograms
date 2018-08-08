@@ -81,6 +81,12 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             }
         }
 
+        public static IdentifierName MAKENAME(params object[] namesAndFragments)
+        {
+            var context = CodeContextBase.GetContextOrThrow<CodeContextBase>();
+            return new IdentifierName(namesAndFragments, context.DefaultIdentifierOrigin, context.Language);
+        }
+
         public static void NAMED(string name, object value)
         {
             var context = GetContextOrThrow();
@@ -255,7 +261,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static AbstractExpression AWAIT(AbstractExpression promiseExpression)
             => PushExpression(new AwaitExpression {
-                Expression = promiseExpression,
+                Expression = PopExpression(promiseExpression),
                 Type = promiseExpression.Type
             });
 
@@ -273,7 +279,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 Member = member
             });
 
-        public static AbstractExpression DOT(this AbstractExpression target, string memberName)
+        public static AbstractExpression DOT(this AbstractExpression target, IdentifierName memberName)
             => PushExpression(new MemberExpression {
                 Target = PopExpression(target),
                 MemberName = memberName
@@ -281,7 +287,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static AbstractExpression DOT(this LocalVariable target, AbstractMember member) => throw new NotImplementedException();
         
-        public static AbstractExpression DOT(this LocalVariable target, string memberName) 
+        public static AbstractExpression DOT(this LocalVariable target, IdentifierName memberName) 
             => PushExpression(new MemberExpression {
                 Type = target.Type,
                 Target = PopExpression(target.AsExpression()),
@@ -290,7 +296,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static AbstractExpression DOT(this MethodParameter target, AbstractMember member) => throw new NotImplementedException();
 
-        public static AbstractExpression DOT(this MethodParameter target, string memberName)
+        public static AbstractExpression DOT(this MethodParameter target, IdentifierName memberName)
             => PushExpression(new MemberExpression {
                 Type = target.Type,
                 Target = target.AsExpression(),

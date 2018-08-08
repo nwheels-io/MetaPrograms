@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.Reflection.Reader;
+using MetaPrograms.Adapters.Roslyn;
 using MetaPrograms.Adapters.Roslyn.Writer;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
@@ -24,7 +25,7 @@ namespace Example.AspNetAdapter
 
         public void GenerateImplementations(WebUIMetadata ui)
         {
-            using (_context = new CodeGeneratorContext(_codeModel, new ClrTypeResolver()))
+            using (_context = new CodeGeneratorContext(_codeModel, new ClrTypeResolver(), LanguageInfo.Entries.CSharp()))
             {
                 GenerateInfrastructureTypes();
                 GenerateControllerTypes(ui);

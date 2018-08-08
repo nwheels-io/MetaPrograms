@@ -1,21 +1,15 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
-using MetaPrograms.CodeModel.Imperative.Statements;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text;
-using CommonExtensions;
-using MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters;
 using MetaPrograms.CodeModel.Imperative;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using MetaPrograms.CodeModel.Imperative.Expressions;
+using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.CodeModel.Imperative.Statements;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public static class SyntaxHelpers
     {
@@ -54,56 +48,56 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
             }
             if (value == null)
             {
-                return LiteralExpression(SyntaxKind.NullLiteralExpression);
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
             }
             else if (value is int intValue)
             {
-                return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(intValue));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(intValue));
             }
             else if (value is float floatValue)
             {
-                return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(floatValue));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(floatValue));
             }
             else if (value is long longValue)
             {
-                return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(longValue));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(longValue));
             }
             else if (value is decimal decimalValue)
             {
-                return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(decimalValue));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(decimalValue));
             }
             else if (value is uint uintValue)
             {
-                return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(uintValue));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(uintValue));
             }
             else if (value is double doubleValue)
             {
-                return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(doubleValue));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(doubleValue));
             }
             else if (value is ulong ulongValue)
             {
-                return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(ulongValue));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(ulongValue));
             }
             else if (value is string stringValue)
             {
-                return LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(stringValue));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(stringValue));
             }
             else if (value is char charValue)
             {
-                return LiteralExpression(SyntaxKind.CharacterLiteralExpression, Literal(charValue));
+                return SyntaxFactory.LiteralExpression(SyntaxKind.CharacterLiteralExpression, SyntaxFactory.Literal(charValue));
             }
             else if (value is bool boolValue)
             {
-                return LiteralExpression(boolValue ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
+                return SyntaxFactory.LiteralExpression(boolValue ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
             }
             else if (value is Type typeValue)
             {
                 var context = CodeGeneratorContext.GetContextOrThrow();
-                return TypeOfExpression(GetTypeNameSyntax(context.FindType(typeValue)));
+                return SyntaxFactory.TypeOfExpression(GetTypeNameSyntax(context.FindType(typeValue)));
             }
             else if (value is TypeMember typeMember)
             {
-                return TypeOfExpression(GetTypeNameSyntax(typeMember));
+                return SyntaxFactory.TypeOfExpression(GetTypeNameSyntax(typeMember));
             }
 
             throw new NotSupportedException($"Literals of type {value.GetType().Name} are not supported");
@@ -118,19 +112,19 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
                 if (clrBinding.IsArray)
                 {
                     var elementTypeSyntax = GetTypeNameSyntax(type.UnderlyingType);
-                    return ArrayType(elementTypeSyntax)
-                        .WithRankSpecifiers(SingletonList(ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(OmittedArraySizeExpression()))));
+                    return SyntaxFactory.ArrayType(elementTypeSyntax)
+                        .WithRankSpecifiers(SyntaxFactory.SingletonList(SyntaxFactory.ArrayRankSpecifier(SyntaxFactory.SingletonSeparatedList<ExpressionSyntax>(SyntaxFactory.OmittedArraySizeExpression()))));
                 }
 
                 if (_s_keywordPerType.TryGetValue(clrBinding, out SyntaxKind keyword))
                 {
-                    return PredefinedType(Token(keyword));
+                    return SyntaxFactory.PredefinedType(SyntaxFactory.Token(keyword));
                 }
 
                 if (IsNullableValueType(clrBinding.GetTypeInfo(), out Type underlyingValueType))
                 {
                     var context = CodeGeneratorContext.GetContextOrThrow();
-                    return NullableType(GetTypeNameSyntax(context.FindType(underlyingValueType)));
+                    return SyntaxFactory.NullableType(GetTypeNameSyntax(context.FindType(underlyingValueType)));
                 }
             }
 
@@ -141,17 +135,17 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         public static NameSyntax GetTypeFullNameSyntax(this TypeMember type, string stripSuffix = null)
         {
-            var nonQuialifiedName = (string.IsNullOrEmpty(stripSuffix) ? type.Name : type.Name.TrimSuffix(stripSuffix));
+            var nonQuialifiedName = (string.IsNullOrEmpty(stripSuffix) ? type.Name : type.Name.TrimSuffixFragment(stripSuffix));
 
             if (!type.IsGenericType)
             {
-                return QualifyTypeNameSyntax(type, IdentifierName(nonQuialifiedName));
+                return QualifyTypeNameSyntax(type, SyntaxFactory.IdentifierName(nonQuialifiedName.ToPascalCase()));
             }
 
-            var genericSyntax = GenericName(type.Name)
+            var genericSyntax = SyntaxFactory.GenericName(type.Name)
                 .WithTypeArgumentList(
-                    TypeArgumentList(
-                        SeparatedList<TypeSyntax>(
+                    SyntaxFactory.TypeArgumentList(
+                        SyntaxFactory.SeparatedList<TypeSyntax>(
                             type.GenericArguments.Select(GetTypeNameSyntax))));
 
             return QualifyTypeNameSyntax(type, genericSyntax);
@@ -162,7 +156,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         public static ArgumentListSyntax GetArgumentListSyntax(this MethodCallExpression call)
         {
             IEnumerable<ArgumentSyntax> argumentSyntaxes = call.Arguments.Select(EmitArgument);
-            return ArgumentList(SeparatedList(argumentSyntaxes));
+            return SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(argumentSyntaxes));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -171,10 +165,10 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         {
             if (block != null)
             {
-                return Block(block.Statements.Select(StatementSyntaxEmitter.EmitSyntax));
+                return SyntaxFactory.Block(block.Statements.Select(StatementSyntaxEmitter.EmitSyntax));
             }
 
-            return Block();
+            return SyntaxFactory.Block();
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -211,7 +205,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
         {
             if (type.DeclaringType != null)
             {
-                return QualifiedName(GetTypeFullNameSyntax(type.DeclaringType), simpleName);
+                return SyntaxFactory.QualifiedName(GetTypeFullNameSyntax(type.DeclaringType), simpleName);
             }
 
             if (!string.IsNullOrEmpty(type.Namespace))
@@ -220,7 +214,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
                 if (!isNamespaceImported)
                 {
-                    return QualifiedName(ParseName(type.Namespace), simpleName);
+                    return SyntaxFactory.QualifiedName(SyntaxFactory.ParseName(type.Namespace), simpleName);
                 }
             }
 
@@ -266,15 +260,15 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         private static ArgumentSyntax EmitArgument(Argument argument)
         {
-            var syntax = Argument(ExpressionSyntaxEmitter.EmitSyntax(argument.Expression));
+            var syntax = SyntaxFactory.Argument(ExpressionSyntaxEmitter.EmitSyntax(argument.Expression));
 
             switch (argument.Modifier)
             {
                 case MethodParameterModifier.Ref:
-                    syntax = syntax.WithRefOrOutKeyword(Token(SyntaxKind.RefKeyword));
+                    syntax = syntax.WithRefOrOutKeyword(SyntaxFactory.Token(SyntaxKind.RefKeyword));
                     break;
                 case MethodParameterModifier.Out:
-                    syntax = syntax.WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword));
+                    syntax = syntax.WithRefOrOutKeyword(SyntaxFactory.Token(SyntaxKind.OutKeyword));
                     break;
             }
 

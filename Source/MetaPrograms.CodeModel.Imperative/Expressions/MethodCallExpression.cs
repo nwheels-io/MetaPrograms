@@ -28,7 +28,7 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
 
         public AbstractExpression Target { get; set; }
         public MethodMemberBase Method { get; set; }
-        public string MethodName { get; set; }
+        public IdentifierName MethodName { get; set; }
     }
 }
 

@@ -1,13 +1,8 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+﻿using MetaPrograms.CodeModel.Imperative.Members;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
+namespace MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters
 {
     public class ClassSyntaxEmitter : TypeMemberSyntaxEmitterBase<TypeMember, ClassDeclarationSyntax>
     {
@@ -18,7 +13,7 @@ namespace NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters
 
         public override ClassDeclarationSyntax EmitSyntax()
         {
-            OutputSyntax = ClassDeclaration(Member.Name);
+            OutputSyntax = SyntaxFactory.ClassDeclaration(Member.Name.ToPascalCase());
 
             if (Member.Attributes.Count > 0)
             {
