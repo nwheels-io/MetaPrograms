@@ -59,6 +59,11 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             _mechanism.RegisterFinalType();
         }
 
+        public override string ToString()
+        {
+            return TypeSymbol.ToString();
+        }
+
         public INamedTypeSymbol TypeSymbol => _mechanism.Symbol;
         public TypeMember TypeMember => _mechanism.CurrentMember;
     }

@@ -7,6 +7,7 @@ namespace Example.App
     public class HelloPage : WebPage<HelloPage.HelloModel>
     {
         public IGreetingService GreetingService => GetBackendApiProxy<IGreetingService>();
+
         public FormComponent<HelloModel> Form => new FormComponent<HelloModel>();
 
         public override void Controller()

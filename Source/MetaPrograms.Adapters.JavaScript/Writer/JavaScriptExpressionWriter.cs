@@ -159,7 +159,7 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             foreach (var keyValue in expression.PropertyValues)
             {
                 code.WriteListItem();
-                code.Write(keyValue.Name);
+                code.Write(keyValue.Name.GetSealedOrCased(CasingStyle.Camel, sealLanguage: LanguageInfo.Entries.JavaScript()));
 
                 if (keyValue.Value is IAssignable assignable && assignable.Name == keyValue.Name)
                 {

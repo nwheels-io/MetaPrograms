@@ -30,23 +30,32 @@ namespace Example.HyperappAdapter.Components
             GenerateEventHandlerActionKeys();
         }
 
-        public override XElement GenerateViewMarkup()
+        public override XElement GenerateViewMarkup(AbstractExpression @model, AbstractExpression @actions)
         {
-            var rootElement = new XElement("Form.component");
-            Func<JsxExpressionAttribute> createScopeSelectorAttribute = () => new JsxExpressionAttribute(
-                "scopeSelector", 
+            JsxExpressionAttribute newScopeSelectorAttribute() => new JsxExpressionAttribute(
+                "scopeSelector",
                 LAMBDA(@x => @x.DOT(Metadata.DeclaredProperty.Name)));
-            
+
+            var formHtmlId = $"{Metadata.Page.PageClass.Name.ToString(CasingStyle.Camel)}_form";
+
+            var rootElement = new XElement("Form.component",
+                newScopeSelectorAttribute(),
+                new XAttribute("id", formHtmlId),
+                new JsxExpressionAttribute("data", @model));
+
             foreach (var inputProp in Metadata.ModelClass.Members.OfType<PropertyMember>())
             {
                 rootElement.Add(new XElement(
                     "Form.field",
-                    new XAttribute("propName", inputProp.Name),
-                    createScopeSelectorAttribute()
+                    newScopeSelectorAttribute(),
+                    new XAttribute("formId", formHtmlId),
+                    new XAttribute("propName", inputProp.Name.ToString(CasingStyle.Camel))
+
+                    
                 ));
             }
 
-            rootElement.Add(new XElement("Form.submit", createScopeSelectorAttribute()));
+            rootElement.Add(new XElement("Form.submit", newScopeSelectorAttribute()));
 
             return rootElement;
         }

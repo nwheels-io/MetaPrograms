@@ -80,7 +80,7 @@ namespace Example.HyperappAdapter
                 KEY("model", INITOBJECT(() => {
                     foreach (var property in _metadata.StateClass.Members.OfType<PropertyMember>())
                     {
-                        KEY(property.Name, NULL);
+                        KEY(property.Name.ToString(CasingStyle.Camel), NULL);
                     }
                 }));
 
@@ -119,7 +119,7 @@ namespace Example.HyperappAdapter
         private XElement BuildViewJsx(AbstractExpression @model, AbstractExpression @actions)
         {
             var rootComponent = _components.FirstOrDefault();
-            return rootComponent?.GenerateViewMarkup();
+            return rootComponent?.GenerateViewMarkup(model, @actions);
         }
 
         private void WriteControllerInitializer()

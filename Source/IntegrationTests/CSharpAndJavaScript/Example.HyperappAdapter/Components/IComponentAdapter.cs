@@ -1,5 +1,6 @@
 ﻿using System.Xml.Linq;
 using Example.WebUIModel.Metadata;
+using MetaPrograms.CodeModel.Imperative.Expressions;
 
 namespace Example.HyperappAdapter.Components
 {
@@ -7,7 +8,7 @@ namespace Example.HyperappAdapter.Components
     {
         void GenerateStateKeys();
         void GenerateActionKeys();
-        XElement GenerateViewMarkup();
+        XElement GenerateViewMarkup(AbstractExpression @model, AbstractExpression @actions);
         WebComponentMetadata Metadata { get; }
     }
 }

@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
 
@@ -22,7 +23,7 @@ namespace Example.HyperappAdapter.Components
 
         public abstract void GenerateStateKeys();
         public abstract void GenerateActionKeys();
-        public abstract XElement GenerateViewMarkup();
+        public abstract XElement GenerateViewMarkup(AbstractExpression @model, AbstractExpression @actions);
 
         protected void GenerateEventHandlerActionKeys()
         {
