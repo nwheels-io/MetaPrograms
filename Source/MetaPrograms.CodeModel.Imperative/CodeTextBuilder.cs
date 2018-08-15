@@ -25,6 +25,14 @@ namespace MetaPrograms.CodeModel.Imperative
             _text.Append(s);
         }
 
+        public void WriteIf(bool condition, string s)
+        {
+            if (condition)
+            {
+                _text.Append(s);
+            }
+        }
+
         public void WriteLine()
         {
             WriteLine(string.Empty);

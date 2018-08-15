@@ -8,6 +8,7 @@ using CommonExtensions;
 using Example.HyperappAdapter.Components;
 using Example.HyperappAdapter.Metadata;
 using Example.WebUIModel.Metadata;
+using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
@@ -63,7 +64,12 @@ namespace Example.HyperappAdapter
 
             foreach (var api in _metadata.BackendApis)
             {
-                IMPORT.TUPLE($"{api.ServiceName}Service", out var @service).FROM($"./services/{api.ServiceName}Service");
+                var suffixedServiceName = api.ServiceName.AppendSuffixFragments("Service");
+
+                IMPORT
+                    .TUPLE(suffixedServiceName.ToString(CasingStyle.Pascal), out var @service)
+                    .FROM($"./services/{suffixedServiceName.ToString(CasingStyle.Kebab)}");
+
                 _metaPageExtension.ServiceVarByType.Add(api.InterfaceType, @service);
             }
         }
@@ -118,7 +124,7 @@ namespace Example.HyperappAdapter
 
         private void WriteControllerInitializer()
         {
-            FINAL("controller", out var @controller, USE(_appVariable).INVOKE(
+            FINAL("PageController", out var @controller, USE(_appVariable).INVOKE(
                 USE("PageState"),
                 USE("PageActions"),
                 USE("PageView"),

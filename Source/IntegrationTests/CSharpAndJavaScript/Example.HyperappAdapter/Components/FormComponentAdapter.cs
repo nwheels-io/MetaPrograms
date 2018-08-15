@@ -5,6 +5,7 @@ using System.Xml.Linq;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.JavaScript.Writer;
+using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
@@ -20,12 +21,12 @@ namespace Example.HyperappAdapter.Components
 
         public override void GenerateStateKeys()
         {
-            KEY(Metadata.DeclaredProperty.Name, USE("Form").DOT("createState").INVOKE());
+            KEY(Metadata.DeclaredProperty.Name.ToString(CasingStyle.Camel), USE("Form").DOT("createState").INVOKE());
         }
 
         public override void GenerateActionKeys()
         {
-            KEY(Metadata.DeclaredProperty.Name, USE("Form").DOT("createActions").INVOKE());
+            KEY(Metadata.DeclaredProperty.Name.ToString(CasingStyle.Camel), USE("Form").DOT("createActions").INVOKE());
             GenerateEventHandlerActionKeys();
         }
 

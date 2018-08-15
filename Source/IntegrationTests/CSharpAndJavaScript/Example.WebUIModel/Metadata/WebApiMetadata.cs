@@ -15,15 +15,15 @@ namespace Example.WebUIModel.Metadata
             _imperativeCodeModel = imperativeCodeModel;
 
             this.InterfaceType = interfaceType;
-            this.ServiceName = interfaceType.Name.TrimPrefixFragment("I").TrimSuffixFragment("Service").ToString();
+            this.ServiceName = interfaceType.Name.TrimPrefixFragment("I").TrimSuffixFragment("Service");
             this.ApiMethods = DiscoverApiMethods();
         }
 
-        public string GetMethodUrl(MethodMember method) => $"api/{ServiceName.ToLower()}/{method.Name.ToString(CasingStyle.Kebab)}";
+        public string GetMethodUrl(MethodMember method) => $"api/{ServiceName.ToString(CasingStyle.Camel)}/{method.Name.ToString(CasingStyle.Kebab)}";
 
         public TypeMember InterfaceType { get; }
         public ImmutableList<MethodMember> ApiMethods { get; }
-        public string ServiceName { get; }
+        public IdentifierName ServiceName { get; }
 
         private ImmutableList<MethodMember> DiscoverApiMethods()
         {

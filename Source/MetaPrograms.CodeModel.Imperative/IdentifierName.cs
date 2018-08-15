@@ -37,20 +37,20 @@ namespace MetaPrograms.CodeModel.Imperative
         public IdentifierName(IEnumerable<Fragment> fragments, OriginKind origin = OriginKind.Generator, LanguageInfo language = null)
         {
             this.Fragments = fragments.ToImmutableList();
+
             this.OriginalName = string.Join("", this.Fragments.Select(f => f.OriginalText));
             this.OriginalLanguage = language ?? LanguageInfo.Current;
             this.Origin = origin;
         }
 
-        public IdentifierName(object[] namesAndFragments, OriginKind origin, LanguageInfo language)
+        public IdentifierName(object[] anyFragments)
         {
-            var fragmentList = GetFlatListOfFragments(namesAndFragments);
-
-            this.Origin = origin;
-            this.OriginalName = string.Join("", fragmentList.Select(f => f.OriginalText));
-            this.OriginalLanguage = language;
-
+            var fragmentList = GetFlatListOfFragments(anyFragments);
             this.Fragments = fragmentList.ToImmutableList();
+
+            this.Origin = OriginKind.Generator;
+            this.OriginalName = string.Join("", fragmentList.Select(f => f.OriginalText));
+            this.OriginalLanguage = null;
         }
 
         public override string ToString()
@@ -66,6 +66,16 @@ namespace MetaPrograms.CodeModel.Imperative
             }
 
             return ToString(casing);
+        }
+
+        public IdentifierName AppendPrefixFragments(params string[] fragments)
+        {
+            return new IdentifierName(new object[] { fragments, this });
+        }
+
+        public IdentifierName AppendSuffixFragments(params string[] fragments)
+        {
+            return new IdentifierName(new object[] { this, fragments });
         }
 
         public IdentifierName TrimPrefixFragment(string fragment)
@@ -97,7 +107,7 @@ namespace MetaPrograms.CodeModel.Imperative
             {
                 result.Append(Fragments[i].ToString(style, first: i == 0));
 
-                if (i > 0 && i < Fragments.Count - 1)
+                if (i < Fragments.Count - 1)
                 {
                     result.Append(separator);
                 }
@@ -137,10 +147,7 @@ namespace MetaPrograms.CodeModel.Imperative
             }
 
             var context = CodeContextBase.GetContextOrThrow<CodeContextBase>();
-            var language = context.Language;
-            var origin = (context is CodeReaderContext ? OriginKind.Source : OriginKind.Generator);
-
-            return new IdentifierName(name, language, origin);
+            return new IdentifierName(name, context.Language, context.DefaultIdentifierOrigin);
         }
 
         public static implicit operator string(IdentifierName identifier)
@@ -148,27 +155,34 @@ namespace MetaPrograms.CodeModel.Imperative
             return identifier.ToString();
         }
 
-        private static List<Fragment> GetFlatListOfFragments(object[] namesAndFragments)
+        private static List<Fragment> GetFlatListOfFragments(object[] anyFragments)
         {
             var fragmentList = new List<Fragment>();
 
-            foreach (var obj in namesAndFragments)
+            foreach (var obj in anyFragments)
             {
                 switch (obj)
                 {
+                    case null:
+                        break;
                     case string s:
                         fragmentList.Add(new Fragment(s));
                         break;
                     case Fragment fragment:
                         fragmentList.Add(fragment);
                         break;
-                    case IdentifierName name:
-                        fragmentList.AddRange(name.Fragments);
+                    case IdentifierName identifier:
+                        fragmentList.AddRange(identifier.Fragments);
+                        break;
+                    case IEnumerable<Fragment> fragmentEnumerable:
+                        fragmentList.AddRange(fragmentEnumerable);
+                        break;
+                    case IEnumerable<string> stringEnumerable:
+                        fragmentList.AddRange(stringEnumerable.Select(s => new Fragment(s)));
                         break;
                     default:
-                        throw new ArgumentException(
-                            $"Unexpected item type: {(obj?.GetType().Name ?? "null")}",
-                            nameof(namesAndFragments));
+                        fragmentList.Add(new Fragment(obj.ToString()));
+                        break;
                 }
             }
 

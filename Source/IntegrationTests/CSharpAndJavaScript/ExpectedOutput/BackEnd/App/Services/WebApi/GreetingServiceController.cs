@@ -12,15 +12,24 @@ namespace Example.App.Services.WebApi
         private readonly IGreetingService _service;
         public GreetingServiceController(IGreetingService service)
         {
-            this._service = service;
+            _service = service;
         }
 
         [InvalidModelAutoResponder, HttpPost("getGreetingForName")]
-        public async Task<IActionResult> GetGreetingForName([FromBody] GetGreetingForNameInvocation requestData)
+        public async Task<IActionResult> GetGreetingForName([FromBody] GreetingServiceController.GetGreetingForNameInvocation requestData)
         {
             string resultValue;
-            resultValue = await this._service.GetGreetingForName(requestData.Name);
+            resultValue = await _service.GetGreetingForName(requestData.Name);
             return this.Json(resultValue);
+        }
+
+        public class GetGreetingForNameInvocation
+        {
+            public string Name
+            {
+                get;
+                set;
+            }
         }
     }
 }

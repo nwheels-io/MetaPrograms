@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Text;
+using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Members;
 
 namespace Example.WebUIModel.Metadata
 {
     public class EventMapMetadata
     {
-        private readonly Dictionary<string, List<IFunctionContext>> _eventMap = new Dictionary<string, List<IFunctionContext>>();
+        private readonly Dictionary<IdentifierName, List<IFunctionContext>> _eventMap = new Dictionary<IdentifierName, List<IFunctionContext>>();
 
-        public void AddHandler(string eventName, IFunctionContext handler)
+        public void AddHandler(IdentifierName eventName, IFunctionContext handler)
         {
             if (!_eventMap.TryGetValue(eventName, out var list))
             {
@@ -20,7 +22,7 @@ namespace Example.WebUIModel.Metadata
             list.Add(handler);
         }
 
-        public IReadOnlyList<IFunctionContext> GetHandlers(string eventName)
+        public IReadOnlyList<IFunctionContext> GetHandlers(IdentifierName eventName)
         {
             if (_eventMap.TryGetValue(eventName, out var list))
             {
@@ -30,6 +32,6 @@ namespace Example.WebUIModel.Metadata
             return new IFunctionContext[0];
         }
 
-        public IEnumerable<string> GetHandledEventNames() => _eventMap.Keys;
+        public IEnumerable<IdentifierName> GetHandledEventNames() => _eventMap.Keys;
     }
 }

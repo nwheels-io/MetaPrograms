@@ -52,11 +52,12 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
 
             WriteOutputToDisk(output, "FrontEnd");
             AssertOutputs(
-                output.SourceFiles, 
+                output.SourceFiles,
+                subFolder: "FrontEnd",
                 "build/index.html", 
                 "src/index.js",
                 "src/components/form.js",
-                "src/services/greetingService.js");
+                "src/services/greeting-service.js");
         }
 
         [Test]
@@ -80,9 +81,9 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             WriteOutputToDisk(output, "BackEnd");
             AssertOutputs(
                 output.SourceFiles,
-                "App/Services/WebApi/GreetingServiceController.cs",
-                "App/Services/WebApi/GetGreetingForNameInvocation.cs",
-                "AspNetAdapter/InvalidModelAutoResponderAttribute.cs");
+                subFolder: "BackEnd",
+                "AspNetAdapter/InvalidModelAutoResponderAttribute.cs",
+                "App/Services/WebApi/GreetingServiceController.cs");
         }
 
         private Workspace LoadExampleWebAppWorkspace()
@@ -108,17 +109,19 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             return codeModel;
         }
 
-        private void AssertOutputs(ImmutableDictionary<string, Stream> outputs, params string[] expectedFileNames)
+        private void AssertOutputs(ImmutableDictionary<string, Stream> actualOutputs, string subFolder, params string[] expectedFileNames)
         {
-            outputs
+            actualOutputs
                 .Select(kvp => kvp.Key)
                 .ShouldBe(expectedFileNames, ignoreOrder: true);
 
-            var expectedOutputsDirectory = Path.Combine(ExamplesRootDirectory, "ExpectedOutput");
+            var expectedOutputsDirectory = Path.Combine(ExamplesRootDirectory, "ExpectedOutput", subFolder);
             
             foreach (var fileName in expectedFileNames)
             {
-                outputs[fileName].ShouldMatchTextFile(Path.Combine(expectedOutputsDirectory, fileName));
+                var actualStream = actualOutputs[fileName];
+                actualStream.Position = 0;
+                actualStream.ShouldMatchTextFile(Path.Combine(expectedOutputsDirectory, fileName));
             }
         }
 

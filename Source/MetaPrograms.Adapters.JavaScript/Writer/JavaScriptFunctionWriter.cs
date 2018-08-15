@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
 using MetaPrograms.CodeModel.Imperative.Statements;
 
@@ -13,7 +14,10 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
         public static void WriteFunction(CodeTextBuilder code, MethodMember method)
         {
             WriteModifiers(code, method);
-            code.Write(method.Name);
+            code.Write(method.Name.GetSealedOrCased(
+                CasingStyle.Camel, 
+                sealOrigin: IdentifierName.OriginKind.Generator, 
+                sealLanguage: LanguageInfo.Entries.JavaScript()));
 
             WriteParameters(code, method.Signature);
             WriteBody(code, method.Body);
@@ -22,6 +26,11 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
 
         public static void WriteArrowFunction(CodeTextBuilder code, MethodSignature signature, BlockStatement body)
         {
+            if (signature.IsAsync)
+            {
+                code.Write("async ");
+            }
+   
             if (signature.Parameters.Count != 1)
             {
                 WriteParameters(code, signature);
@@ -41,7 +50,10 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
                 case 1:
                     if (body.Statements[0] is ReturnStatement @return)
                     {
+                        var needParentheses = (@return.Expression is ObjectInitializerExpression init && init.PropertyValues.Count > 1);
+                        code.WriteIf(needParentheses, "(");                            
                         JavaScriptExpressionWriter.WriteExpression(code, @return.Expression);
+                        code.WriteIf(needParentheses, ")");                            
                     }
                     else
                     {

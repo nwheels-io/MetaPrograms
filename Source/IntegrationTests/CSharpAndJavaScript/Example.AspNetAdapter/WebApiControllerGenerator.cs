@@ -19,7 +19,7 @@ namespace Example.AspNetAdapter
     {
         //TODO: add detection & resolution of duplicate names
         public static TypeMember WebApiController(TypeMember middlewareType, WebApiMetadata api) =>
-            PUBLIC.CLASS(MAKENAME(api.InterfaceType.Name.TrimPrefixFragment("I"), "Controller"), () => {
+            PUBLIC.CLASS(ID(api.InterfaceType.Name.TrimPrefixFragment("I"), "Controller"), () => {
                 EXTENDS<Controller>();
                 ATTRIBUTE<RouteAttribute>("api/[controller]");
 

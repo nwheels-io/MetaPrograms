@@ -1,7 +1,7 @@
-import "babel-polyfill";
+import 'babel-polyfill';
 import { app, h } from 'hyperapp';
 import { Form } from './components/form';
-import { GreetingService } from './services/greetingService';
+import { GreetingService } from './services/greeting-service';
 
 const PageState = {
     model: {
@@ -13,20 +13,23 @@ const PageState = {
 
 const PageActions = {
     getState: () => (state, actions) => state,
-    replaceModel: (newModel) => (state, actions) => { return {model: newModel} },
+    replaceModel: newModel => (state, actions) => {
+        model: newModel
+    },
     form: Form.createActions(),
-    form_submitting: (model) => async (state, actions) => {
+    form_submitting: model => async (state, actions) => {
         let newModel = Object.assign({}, model);
         newModel.greeting = await GreetingService.getGreetingForName(newModel.name);
         actions.replaceModel(newModel);
     }
 };
 
-const PageView = ({ model }, actions) =>
+const PageView = ({ model }, actions) => (
     <Form.component scopeSelector={x => x.form} id="helloPage_form" data={model}>
         <Form.field scopeSelector={x => x.form} formId="helloPage_form" propName="name" label="Name" getter={m => m ? m.name : "???"} setter={(m, v) => m.name = v} validation={{required:true, maxLength:50}} />
         <Form.submit scopeSelector={x => x.form} onSubmitting={data => actions.form_submitting(data)} />
         <Form.field scopeSelector={x => x.form} formId="helloPage_form" propName="greeting" label="Server says:" getter={() => model.greeting} validation={{isOutput:true}} />
-    </Form.component>;
+    </Form.component>
+);
 
-const pageController = app(PageState, PageActions, PageView, document.body);
+const PageController = app(PageState, PageActions, PageView, document.body);

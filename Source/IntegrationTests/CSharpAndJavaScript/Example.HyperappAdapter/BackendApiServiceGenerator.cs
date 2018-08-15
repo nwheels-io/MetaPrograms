@@ -13,16 +13,16 @@ namespace Example.HyperappAdapter
     public static class BackendApiServiceGenerator
     {
         public static ModuleMember BackendApiService(WebApiMetadata api)
-            => MODULE(new[] { "src", "services" }, $"{api.ServiceName}Service", () => {
+            => MODULE(new[] { "src", "services" }, ID(api.ServiceName, "Service"), () => {
                 IMPORT.DEFAULT("axios", out var @axios).FROM("axios");
 
-                EXPORT.CLASS($"{api.ServiceName}Service", () => {
+                EXPORT.CLASS(ID(api.ServiceName, "Service"), () => {
                     api.ApiMethods.ForEach(apiMethod => {
 
                         var methodUrl = api.GetMethodUrl(apiMethod);
                         
                         //TODO: separate language-specific parts of fluent code DSL
-                        //For instance, 'PUBLIC' and 'PRIVATE' have no meaning in JavaScript
+                        //For instance, 'PUBLIC' and 'PRIVATE' are not defined in JavaScript, and 'IMPORT' is not defined in C#
                         
                         PUBLIC.STATIC.FUNCTION(apiMethod.Name, () => {
                             var arguments = apiMethod.Signature.Parameters.Select((parameter, index) => {

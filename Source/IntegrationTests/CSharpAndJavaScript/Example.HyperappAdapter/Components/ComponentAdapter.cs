@@ -37,10 +37,10 @@ namespace Example.HyperappAdapter.Components
             }
         }
 
-        protected void GenerateEventHandlerActionKey(string eventName, IReadOnlyList<IFunctionContext> handlerList)
+        protected void GenerateEventHandlerActionKey(IdentifierName eventName, IReadOnlyList<IFunctionContext> handlerList)
         {
-            KEY($"{Metadata.DeclaredProperty.Name}_{eventName}", LAMBDA(@model
-                => DO.RETURN(LAMBDA((@state, @actions) => {
+            KEY(GetEventActionKeyName(eventName), LAMBDA(@model
+                => DO.RETURN(ASYNC.LAMBDA((@state, @actions) => {
 
                     LOCAL("newModel", out var @newModel, USE("Object").DOT("assign").INVOKE(INITOBJECT(), @model));
 
@@ -64,6 +64,11 @@ namespace Example.HyperappAdapter.Components
                     actions.DOT("replaceModel").INVOKE(@newModel);
                 }))
             ));
+        }
+
+        protected string GetEventActionKeyName(IdentifierName eventName)
+        {
+            return Metadata.DeclaredProperty.Name.ToString(CasingStyle.Camel) + "_" + eventName.ToString(CasingStyle.Camel);
         }
     }
 }

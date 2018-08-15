@@ -53,7 +53,7 @@ namespace Example.WebUIModel.Metadata
             }
         }
 
-        private bool TryParseEventHandlerAttachStatement(AbstractStatement statement, out string eventName, out IFunctionContext handler)
+        private bool TryParseEventHandlerAttachStatement(AbstractStatement statement, out IdentifierName eventName, out IFunctionContext handler)
         {
             eventName = null;
             handler = null;

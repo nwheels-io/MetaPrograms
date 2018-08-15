@@ -24,12 +24,12 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             }
         }
 
-        public static ModuleMember MODULE(string name, Action body)
+        public static ModuleMember MODULE(IdentifierName name, Action body)
         {
             return MODULE(folderPath: null, name, body);
         }
 
-        public static ModuleMember MODULE(string[] folderPath, string name, Action body)
+        public static ModuleMember MODULE(string[] folderPath, IdentifierName name, Action body)
         {
             var context = GetContextOrThrow();
             var module = new ModuleMember() {
@@ -81,10 +81,9 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             }
         }
 
-        public static IdentifierName MAKENAME(params object[] namesAndFragments)
+        public static IdentifierName ID(params object[] anyFragments)
         {
-            var context = CodeContextBase.GetContextOrThrow<CodeContextBase>();
-            return new IdentifierName(namesAndFragments, context.DefaultIdentifierOrigin, context.Language);
+            return new IdentifierName(anyFragments);
         }
 
         public static void NAMED(string name, object value)
@@ -312,6 +311,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
 
         public static AbstractExpression NEW<T>(params object[] constructorArguments)
         {
+            //PopArguments
+
             var context = GetContextOrThrow();
             var type = context.FindType<T>();
             
@@ -321,7 +322,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                     Type = type,
                     Arguments = constructorArguments
                         .Select(value => new Argument {
-                            Expression = context.GetConstantExpression(value) 
+                            Expression = PopExpression(context.GetConstantExpression(value))
                         })
                         .ToList()
                 }
@@ -437,6 +438,8 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             return INVOKE(expression, invocation.GetArguments());
         }
 
+        public static FluentAsyncLambda ASYNC => new FluentAsyncLambda();
+        
         public static AnonymousDelegateExpression LAMBDA(Action bodyNoArgs)
             => PushExpression(CreateAnonymousDelegate(
                 bodyNoArgs,
@@ -457,33 +460,6 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 body3Args,
                 parameters => body3Args?.Invoke(parameters[0], parameters[1], parameters[2]));
 
-        private static AnonymousDelegateExpression CreateAnonymousDelegate(Delegate body, Action<MethodParameter[]> invokeBody)
-        {
-            var context = GetContextOrThrow();
-            
-            var parameters = body.Method.GetParameters().Select((info, index) => new MethodParameter {
-                Position = index,
-                Name = info.Name,
-                Type = context.FindType(info.ParameterType)
-            }).ToArray();
-
-            var lambda = new AnonymousDelegateExpression {
-                Signature = new MethodSignature(),
-                Body = new BlockStatement()
-            };
-            lambda.Signature.Parameters.AddRange(parameters);
-
-            using (context.PushState(lambda))
-            {
-                using (context.PushState(new BlockContext(lambda.Body)))
-                {
-                    invokeBody(parameters);
-                }
-            }
-
-            return lambda;
-        }
-        
         public static AbstractExpression TYPED(object value)
         {
             var context = GetContextOrThrow();
@@ -502,13 +478,13 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             return PushExpression(AbstractExpression.FromValue(value, resolveType: t => null));
         }
 
-        private static T PushExpression<T>(T expression) 
+        internal static T PushExpression<T>(T expression) 
             where T : AbstractExpression
         {
             return BlockContext.Push(expression);
         }
-
-        private static AbstractExpression PopExpression(AbstractExpression expression)
+        
+        internal static AbstractExpression PopExpression(AbstractExpression expression)
         {
             if (expression == null)
             {
@@ -518,7 +494,7 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             return BlockContext.Pop(expression);
         }
 
-        private static TupleExpression MakeTuple(string[] names, TypeMember[] types, out LocalVariable[] variables)
+        internal static TupleExpression MakeTuple(string[] names, TypeMember[] types, out LocalVariable[] variables)
         {
             variables = names.Select((name, index) => new LocalVariable {
                 Name = name,
@@ -526,6 +502,35 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
             }).ToArray();
 
             return new TupleExpression(variables);
+        }
+
+        internal static AnonymousDelegateExpression CreateAnonymousDelegate(Delegate body, Action<MethodParameter[]> invokeBody, bool isAsync = false)
+        {
+            var context = GetContextOrThrow();
+            
+            var parameters = body.Method.GetParameters().Select((info, index) => new MethodParameter {
+                Position = index,
+                Name = info.Name,
+                Type = context.FindType(info.ParameterType)
+            }).ToArray();
+
+            var lambda = new AnonymousDelegateExpression {
+                Signature = new MethodSignature(),
+                Body = new BlockStatement()
+            };
+
+            lambda.Signature.IsAsync = isAsync;
+            lambda.Signature.Parameters.AddRange(parameters);
+
+            using (context.PushState(lambda))
+            {
+                using (context.PushState(new BlockContext(lambda.Body)))
+                {
+                    invokeBody(parameters);
+                }
+            }
+
+            return lambda;
         }
     }
 }
