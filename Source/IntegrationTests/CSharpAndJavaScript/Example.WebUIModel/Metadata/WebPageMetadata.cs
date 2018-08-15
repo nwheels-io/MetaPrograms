@@ -123,7 +123,7 @@ namespace Example.WebUIModel.Metadata
         private PropertyMember FindModelProperty()
         {
             return PageClass
-                .BaseType
+                .BaseType.BaseType
                 .Members.OfType<PropertyMember>()
                 .FirstOrDefault(IsModelProperty);
 

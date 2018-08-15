@@ -70,6 +70,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                     RegisterTypeReader(symbol, systemTypeMetadataName);
                     VisitAttributes(symbol);
                     VisitGenericArguments(symbol);
+                    IncludeType(symbol.BaseType, force: true);
 
                     var allLinkedSymbols = QuerySymbolsLinkedToType(symbol);
 
@@ -210,8 +211,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         private static IEnumerable<ISymbol> QuerySymbolsLinkedToType(INamedTypeSymbol parent)
         {
-            return new ISymbol[] { parent.BaseType }
-                .Concat(parent.Interfaces)
+            return parent.Interfaces
                 .Concat(parent.GetMembers())
                 .Where(s => s != null);
         }
