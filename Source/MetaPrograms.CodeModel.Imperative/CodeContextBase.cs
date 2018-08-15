@@ -219,8 +219,10 @@ namespace MetaPrograms.CodeModel.Imperative
         public static IdentifierName.OriginKind GetDefaultIdentifierOrigin() => 
             GetContextOrThrow<CodeContextBase>().DefaultIdentifierOrigin;
 
+        public static TContext TryGetContext<TContext>() where TContext: CodeContextBase => (TContext)Current.Value;
+
         public static TContext GetContextOrThrow<TContext>() where TContext: CodeContextBase =>
-            (TContext)Current.Value ??
+            TryGetContext<TContext>() ??
             throw new InvalidOperationException(
                 $"No {typeof(TContext).Name} exists in the current call context. " +
                 $"Current operations require a {typeof(TContext).Name}. " +

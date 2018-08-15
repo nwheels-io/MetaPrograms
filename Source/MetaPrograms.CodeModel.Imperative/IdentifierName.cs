@@ -146,8 +146,8 @@ namespace MetaPrograms.CodeModel.Imperative
                 return null;
             }
 
-            var context = CodeContextBase.GetContextOrThrow<CodeContextBase>();
-            return new IdentifierName(name, context.Language, context.DefaultIdentifierOrigin);
+            var context = CodeContextBase.TryGetContext<CodeContextBase>();
+            return new IdentifierName(name, context?.Language, context?.DefaultIdentifierOrigin ?? OriginKind.Generator);
         }
 
         public static implicit operator string(IdentifierName identifier)
