@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using CommonExtensions;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
+using MetaPrograms.Adapters.JavaScript.Writer;
 using MetaPrograms.CodeModel.Imperative;
 using MetaPrograms.CodeModel.Imperative.Expressions;
 using MetaPrograms.CodeModel.Imperative.Members;
@@ -84,6 +85,23 @@ namespace Example.HyperappAdapter.Components
             }
 
             return rootModel;
+        }
+
+        protected XAttribute GetEventHandlerJsxExpression(AbstractExpression @actions, IdentifierName eventName)
+        {
+            var handlers = Metadata.EventMap.GetHandlers(eventName);
+
+            if (handlers.Count > 0)
+            {
+                var attributeName = eventName.AppendPrefixFragments("on").ToString(CasingStyle.Camel);
+                var actionKey = GetEventActionKeyName(eventName);
+
+                return new JsxExpressionAttribute(
+                    attributeName,
+                    LAMBDA(@data => DO.RETURN(@actions.DOT(actionKey).INVOKE(@data))));
+            }
+
+            return null;
         }
     }
 }

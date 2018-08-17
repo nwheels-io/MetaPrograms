@@ -28,6 +28,7 @@ namespace Example.WebUIModel.Metadata
             this.ModelClass = ComponentClass.GenericArguments.FirstOrDefault();
             this.PropertyMap = new Dictionary<IdentifierName, AbstractExpression>();
             this.EventMap = new EventMapMetadata();
+            this.ModelMetadata = new ModelObjectMetadata(ModelClass);
 
             //TODO: add AbstractMember.HasAttribute<T>()/TryGetAttribute<T>()
             this.IsPredefined = (
@@ -55,6 +56,7 @@ namespace Example.WebUIModel.Metadata
         public PropertyMember DeclaredProperty { get; }
         public TypeMember ComponentClass { get; }
         public TypeMember ModelClass { get; }
+        public ModelObjectMetadata ModelMetadata { get; }
         public bool IsPredefined { get; }
         public Dictionary<IdentifierName, AbstractExpression> PropertyMap { get; }
         public EventMapMetadata EventMap { get; }

@@ -43,17 +43,29 @@ namespace Example.HyperappAdapter.Components
                 new XAttribute("id", formHtmlId),
                 new JsxExpressionAttribute("data", GetBoundModelExpression(rootModel: @model)));
 
-            foreach (var inputProp in Metadata.ModelClass.Members.OfType<PropertyMember>())
+            foreach (var field in Metadata.ModelMetadata.Fields.Where(f => f.Direction == FieldDirection.Input))
             {
                 rootElement.Add(new XElement(
                     "Form.field",
                     newScopeSelectorAttribute(),
                     new XAttribute("formId", formHtmlId),
-                    new XAttribute("propName", inputProp.Name.ToString(CasingStyle.Camel))
+                    new XAttribute("propName", field.Property.Name.ToString(CasingStyle.Camel))
                 ));
             }
 
-            rootElement.Add(new XElement("Form.submit", newScopeSelectorAttribute()));
+            rootElement.Add(new XElement("Form.submit",
+                newScopeSelectorAttribute(),
+                GetEventHandlerJsxExpression(@actions, nameof(Component.Submitting))));
+
+            foreach (var field in Metadata.ModelMetadata.Fields.Where(f => f.Direction == FieldDirection.Output))
+            {
+                rootElement.Add(new XElement(
+                    "Form.field",
+                    newScopeSelectorAttribute(),
+                    new XAttribute("formId", formHtmlId),
+                    new XAttribute("propName", field.Property.Name.ToString(CasingStyle.Camel))
+                ));
+            }
 
             return rootElement;
         }
