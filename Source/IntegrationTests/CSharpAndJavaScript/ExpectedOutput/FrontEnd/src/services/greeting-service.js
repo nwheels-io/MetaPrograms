@@ -5,6 +5,6 @@ export class GreetingService {
         const data = {
             name
         };
-        return axios.post('http://localhost:3300/api/index/getGreetingForName', data).then(result => result.data).catch(err => console.log(err));
+        return axios.post("/api/greetingService/getGreetingForName", data).then(result => result.data).catch(err => console.log(err));
     }
 }

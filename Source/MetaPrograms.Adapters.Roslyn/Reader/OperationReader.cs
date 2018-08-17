@@ -28,7 +28,8 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 [OperationKind.Await] = op => ReadAwait((IAwaitOperation)op),
                 [OperationKind.Invocation] = op => ReadInvocation((IInvocationOperation)op),
                 [OperationKind.ObjectCreation] = op => ReadObjectCreation((IObjectCreationOperation)op),
-                [OperationKind.ObjectOrCollectionInitializer] = op => ReadObjectOrCollectionInitializer((IObjectOrCollectionInitializerOperation)op)
+                [OperationKind.ObjectOrCollectionInitializer] = op => ReadObjectOrCollectionInitializer((IObjectOrCollectionInitializerOperation)op),
+                [OperationKind.Conditional] = op => ReadConditional((IConditionalOperation)op),
             };
 
         private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractStatement>> StatementReaderByOperationKind =
@@ -389,6 +390,15 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
                 throw new CodeReadErrorException($"Unrecognized object initializer: {initOp.Syntax}");
             }
+        }
+
+        private static AbstractExpression ReadConditional(IConditionalOperation op)
+        {
+            return new ConditionalExpression {
+                Condition = ReadExpression(op.Condition),
+                WhenTrue = ReadExpression(op.WhenTrue),
+                WhenFalse = ReadExpression(op.WhenFalse)
+            };
         }
 
         private static Argument ReadArgument(IArgumentOperation op)

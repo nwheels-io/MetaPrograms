@@ -19,7 +19,8 @@ namespace Example.WebUIModel.Metadata
             this.ApiMethods = DiscoverApiMethods();
         }
 
-        public string GetMethodUrl(MethodMember method) => $"api/{ServiceName.ToString(CasingStyle.Camel)}/{method.Name.ToString(CasingStyle.Kebab)}";
+        public string GetMethodUrl(MethodMember method) => 
+            $"/api/{ServiceName.AppendSuffixFragments("Service").ToString(CasingStyle.Camel)}/{method.Name.ToString(CasingStyle.Camel)}";
 
         public TypeMember InterfaceType { get; }
         public ImmutableList<MethodMember> ApiMethods { get; }

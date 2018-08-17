@@ -144,6 +144,21 @@ namespace MetaPrograms.CodeModel.Imperative
             return false;
         }
 
+        public static bool operator ==(IdentifierName a, IdentifierName b)
+        {
+            if (ReferenceEquals(a, null))
+            {
+                return ReferenceEquals(b, null);
+            }
+
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(IdentifierName a, IdentifierName b)
+        {
+            return !(a == b);
+        }
+
         public string SourceName => (Origin == OriginKind.Source ? OriginalName : null);
         public string GeneratedName => (Origin == OriginKind.Generator ? OriginalName : null);
 
@@ -338,7 +353,9 @@ namespace MetaPrograms.CodeModel.Imperative
                 case CasingStyle.Snake:
                 case CasingStyle.ScreamingCaps:
                     return UnderscoreSeparator;
-                default:
+                case CasingStyle.UserFriendly:
+                    return " ";
+;                default:
                     return string.Empty;
             }
         }
@@ -383,6 +400,8 @@ namespace MetaPrograms.CodeModel.Imperative
                         return char.ToUpper(Text[0]) + Text.Substring(1);
                     case CasingStyle.ScreamingCaps:
                         return Text.ToUpper();
+                    case CasingStyle.UserFriendly:
+                        return (first ? char.ToUpper(Text[0]) + Text.Substring(1) : Text);
                 }
 
                 throw new ArgumentOutOfRangeException(nameof(style));

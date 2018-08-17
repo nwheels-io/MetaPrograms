@@ -284,8 +284,13 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 MemberName = memberName
             });
 
-        public static AbstractExpression DOT(this LocalVariable target, AbstractMember member) => throw new NotImplementedException();
-        
+        public static AbstractExpression DOT(this LocalVariable target, AbstractMember member)
+            => PushExpression(new MemberExpression {
+                Type = target.Type,
+                Target = PopExpression(target.AsExpression()),
+                Member = member
+            });
+
         public static AbstractExpression DOT(this LocalVariable target, IdentifierName memberName) 
             => PushExpression(new MemberExpression {
                 Type = target.Type,
@@ -293,7 +298,12 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
                 MemberName = memberName
             });
 
-        public static AbstractExpression DOT(this MethodParameter target, AbstractMember member) => throw new NotImplementedException();
+        public static AbstractExpression DOT(this MethodParameter target, AbstractMember member)
+            => PushExpression(new MemberExpression {
+                Type = target.Type,
+                Target = PopExpression(target.AsExpression()),
+                Member = member
+            });
 
         public static AbstractExpression DOT(this MethodParameter target, IdentifierName memberName)
             => PushExpression(new MemberExpression {
@@ -356,6 +366,15 @@ namespace MetaPrograms.CodeModel.Imperative.Fluent
         {
             var initializerContext = GetContextOrThrow().PeekStateOrThrow<ObjectInitializerContext>();
             initializerContext.Add(name, PopExpression(value));
+        }
+
+        public static void IIF(AbstractExpression condition, AbstractExpression whenTrue, AbstractExpression whenFalse)
+        {
+            PushExpression(new ConditionalExpression {
+                Condition = PopExpression(condition),
+                WhenTrue = PopExpression(whenTrue),
+                WhenFalse = PopExpression(whenFalse)
+            });
         }
 
         public static XmlExpression XML(XElement xml)

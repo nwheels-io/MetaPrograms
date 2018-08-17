@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using MetaPrograms.CodeModel.Imperative;
 
@@ -50,29 +51,37 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
             code.Write("\"");
         }
 
-        private static void WriteBool(CodeTextBuilder code, bool b)
+        private static void WriteBool(CodeTextBuilder code, bool value)
         {
-            throw new NotImplementedException();
+            code.Write(value ? "true" : "false");
         }
 
-        private static void WriteInteger(CodeTextBuilder code, int i)
+        private static void WriteInteger(CodeTextBuilder code, int value)
         {
-            throw new NotImplementedException();
+            code.Write(value.ToString());
         }
 
-        private static void WriteFloat(CodeTextBuilder code, float f)
+        private static void WriteFloat(CodeTextBuilder code, float value)
         {
-            throw new NotImplementedException();
+            code.Write(value.ToString(CultureInfo.InvariantCulture));
         }
 
-        private static void WriteNumber(CodeTextBuilder code, double d)
+        private static void WriteNumber(CodeTextBuilder code, double value)
         {
-            throw new NotImplementedException();
+            code.Write(value.ToString(CultureInfo.InvariantCulture));
         }
 
         private static void WriteArray(CodeTextBuilder code, Array array)
         {
-            throw new NotImplementedException();
+            code.WriteListStart(opener: "[", closer: "]", separator: ",");
+
+            foreach (var item in array)
+            {
+                code.WriteListItem();
+                WriteLiteral(code, item);
+            }
+
+            code.WriteListEnd();
         }
     }
 }

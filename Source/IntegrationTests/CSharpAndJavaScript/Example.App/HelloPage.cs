@@ -26,7 +26,7 @@ namespace Example.App
             public string Name { get; set; }
 
             [PropertyContract.Semantic.Output]
-            [PropertyContract.I18n.Label("SystemSaid")]
+            [PropertyContract.I18n.Label("ServerSays")]
             public string Greeting { get; set; }
         }
     }

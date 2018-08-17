@@ -87,7 +87,7 @@ namespace Example.HyperappAdapter.Components
             return rootModel;
         }
 
-        protected XAttribute GetEventHandlerJsxExpression(AbstractExpression @actions, IdentifierName eventName)
+        protected XAttribute GenerateEventHandlerAttribute(AbstractExpression @actions, IdentifierName eventName)
         {
             var handlers = Metadata.EventMap.GetHandlers(eventName);
 
@@ -103,5 +103,9 @@ namespace Example.HyperappAdapter.Components
 
             return null;
         }
+
+        protected JsxExpressionAttribute GenerateScopeSelectorAttribute() => new JsxExpressionAttribute(
+            "scopeSelector",
+            LAMBDA(@x => @x.DOT(Metadata.DeclaredProperty.Name)));
     }
 }

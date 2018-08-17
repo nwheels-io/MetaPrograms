@@ -1,5 +1,6 @@
 ﻿using System.Xml.Linq;
 using MetaPrograms.CodeModel.Imperative.Expressions;
+using MetaPrograms.CodeModel.Imperative.Fluent;
 
 namespace MetaPrograms.Adapters.JavaScript.Writer
 {
@@ -10,7 +11,7 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
         public JsxExpressionAttribute(XName name, AbstractExpression expression)
             : base(name, "")
         {
-            Expression = expression;
+            Expression = BlockContext.Pop(expression);
         }
     }
 }

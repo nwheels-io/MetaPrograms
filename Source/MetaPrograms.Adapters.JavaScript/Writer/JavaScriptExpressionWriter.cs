@@ -26,6 +26,7 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
                 [typeof(MethodCallExpression)] = (c, e) => WriteMethodCall(c, (MethodCallExpression)e),
                 [typeof(ObjectInitializerExpression)] = (c, e) => WriteObjectInitializer(c, (ObjectInitializerExpression)e),
                 [typeof(AwaitExpression)] = (c, e) => WriteAwait(c, (AwaitExpression)e),
+                [typeof(ConditionalExpression)] = (c, e) => WriteConditional(c, (ConditionalExpression)e),
                 [typeof(XmlExpression)] = (c, e) => WriteJsx(c, (XmlExpression)e)
             };
 
@@ -177,6 +178,17 @@ namespace MetaPrograms.Adapters.JavaScript.Writer
         {
             code.Write("await ");
             WriteExpression(code, expression.Expression);
+        }
+
+        private static void WriteConditional(CodeTextBuilder code, ConditionalExpression expression)
+        {
+            code.Write("(");
+            WriteExpression(code, expression.Condition);
+            code.Write(" ? ");
+            WriteExpression(code, expression.WhenTrue);
+            code.Write(" : ");
+            WriteExpression(code, expression.WhenFalse);
+            code.Write(")");
         }
 
         private static void WriteJsx(CodeTextBuilder code, XmlExpression expression)

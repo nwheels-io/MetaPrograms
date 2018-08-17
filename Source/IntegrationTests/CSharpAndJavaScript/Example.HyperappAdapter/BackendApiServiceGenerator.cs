@@ -30,7 +30,7 @@ namespace Example.HyperappAdapter
                                 return @param;
                             }).ToList();
 
-                            LOCAL("data", out var @data, INITOBJECT(() => {
+                            FINAL("data", out var @data, INITOBJECT(() => {
                                 arguments.ForEach(arg => KEY(arg.Name, arg));
                             }));
 
