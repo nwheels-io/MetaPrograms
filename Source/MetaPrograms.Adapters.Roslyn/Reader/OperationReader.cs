@@ -28,6 +28,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 [OperationKind.Await] = op => ReadAwait((IAwaitOperation)op),
                 [OperationKind.Invocation] = op => ReadInvocation((IInvocationOperation)op),
                 [OperationKind.ObjectCreation] = op => ReadObjectCreation((IObjectCreationOperation)op),
+                [OperationKind.ObjectOrCollectionInitializer] = op => ReadObjectOrCollectionInitializer((IObjectOrCollectionInitializerOperation)op)
             };
 
         private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractStatement>> StatementReaderByOperationKind =
@@ -98,7 +99,21 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             
             throw new NotSupportedException($"Operation kind {operation.Kind} (type {operation.GetType().Name}) is not supported.");
         }
-        
+
+        private static AbstractExpression ReadAssignmentValue(IAssignmentOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+
+            if (op.ConstantValue.HasValue)
+            {
+                return context.GetConstantExpression(op.ConstantValue.Value);
+            }
+            else
+            {
+                return ReadExpression(op.Value);
+            }
+        }
+
         /*
         Microsoft.CodeAnalysis.Operations. IAddressOfOperation
         Microsoft.CodeAnalysis.Operations. IAnonymousFunctionOperation
@@ -253,19 +268,10 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         private static AbstractExpression ReadAssignment(IAssignmentOperation op)
         {
-            var context = CodeReaderContext.GetContextOrThrow();
             var result = new AssignmentExpression();
 
             result.Left = (IAssignable)ReadExpression(op.Target);
-
-            if (op.ConstantValue.HasValue)
-            {
-                result.Right = context.GetConstantExpression(op.ConstantValue.Value);
-            }
-            else
-            {
-                result.Right = ReadExpression(op.Value);
-            }
+            result.Right = ReadAssignmentValue(op);
 
             return result;
         }
@@ -353,8 +359,36 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                     Type = objectType,
                     Method = context.CodeModel.Get<ConstructorMember>(op.Constructor),
                     Arguments = op.Arguments.Select(ReadArgument).ToList()
-                }
+                },
+                Initializer = (ObjectInitializerExpression)ReadExpression(op.Initializer)
             };
+        }
+
+        private static AbstractExpression ReadObjectOrCollectionInitializer(IObjectOrCollectionInitializerOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+
+            //TODO: handle collection initializers?
+
+            var result = new ObjectInitializerExpression {
+                PropertyValues = op.Initializers.Select(readInitializer).ToList()
+            };
+
+            return result;
+
+            NamedPropertyValue readInitializer(IOperation initOp)
+            {
+                if (initOp is IAssignmentOperation assignment &&
+                    assignment.Target is IPropertyReferenceOperation propertyRef)
+                {
+                    var property = context.FindMemberOrThrow<PropertyMember>(propertyRef.Property);
+                    var value = ReadAssignmentValue(assignment);
+
+                    return new NamedPropertyValue(property.Name, value);
+                }
+
+                throw new CodeReadErrorException($"Unrecognized object initializer: {initOp.Syntax}");
+            }
         }
 
         private static Argument ReadArgument(IArgumentOperation op)

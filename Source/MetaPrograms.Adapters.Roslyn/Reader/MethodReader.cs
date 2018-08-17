@@ -35,8 +35,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadAttributes()
         {
-            //TODO: implement this
-            //throw new NotImplementedException();
+            Member.Attributes.AddRange(AttributeReader.ReadSymbolAttributes(_modelBuilder, Symbol));
         }
 
         public void ReadImplementation()

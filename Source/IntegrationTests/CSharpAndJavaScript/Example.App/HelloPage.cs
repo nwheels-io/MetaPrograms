@@ -8,7 +8,9 @@ namespace Example.App
     {
         public IGreetingService GreetingService => GetBackendApiProxy<IGreetingService>();
 
-        public FormComponent<HelloModel> Form => new FormComponent<HelloModel>();
+        public FormComponent<HelloModel> Form => new FormComponent<HelloModel> {
+            Model = Model
+        };
 
         public override void Controller()
         {

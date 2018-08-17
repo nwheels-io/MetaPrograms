@@ -42,6 +42,8 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadAttributes()
         {
+            Member.Attributes.AddRange(AttributeReader.ReadSymbolAttributes(_modelBuilder, Symbol));
+
             _getterReader?.ReadAttributes();
             _setterReader?.ReadAttributes();
         }

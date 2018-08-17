@@ -12,6 +12,9 @@ namespace Example.WebUIModel
             {
                 public int MaxLength { get; set; }
                 public bool AllowEmpty { get; set; }
+
+                public static string MaxLengthPropertyName => nameof(MaxLength);
+                public static string AllowEmptyPropertyName => nameof(AllowEmpty);
             }
         }
 

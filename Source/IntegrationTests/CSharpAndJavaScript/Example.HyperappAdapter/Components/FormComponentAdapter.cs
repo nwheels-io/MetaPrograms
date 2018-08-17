@@ -41,7 +41,7 @@ namespace Example.HyperappAdapter.Components
             var rootElement = new XElement("Form.component",
                 newScopeSelectorAttribute(),
                 new XAttribute("id", formHtmlId),
-                new JsxExpressionAttribute("data", @model));
+                new JsxExpressionAttribute("data", GetBoundModelExpression(rootModel: @model)));
 
             foreach (var inputProp in Metadata.ModelClass.Members.OfType<PropertyMember>())
             {
@@ -50,8 +50,6 @@ namespace Example.HyperappAdapter.Components
                     newScopeSelectorAttribute(),
                     new XAttribute("formId", formHtmlId),
                     new XAttribute("propName", inputProp.Name.ToString(CasingStyle.Camel))
-
-                    
                 ));
             }
 

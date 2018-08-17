@@ -35,6 +35,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadAncestors()
         {
+            _mechanism.ReadContainingType();
             _mechanism.ReadBaseType();
             _mechanism.ReadBaseInterfaces();
         }

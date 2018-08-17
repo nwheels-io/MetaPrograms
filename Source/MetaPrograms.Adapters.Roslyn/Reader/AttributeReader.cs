@@ -22,11 +22,20 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                 .Select(kvp => new NamedPropertyValue(kvp.Key, ExpressionReader.ReadTypedConstant(modelBuilder, kvp.Value)))
                 .ToList();
 
-            return new AttributeDescription {
+            var result = new AttributeDescription {
                 AttributeType = modelBuilder.TryGetMember<TypeMember>(data.AttributeClass),
                 ConstructorArguments = constructorArguments,
                 PropertyValues = propertyValues
             };
+
+            return result;
+        }
+
+        public static IEnumerable<AttributeDescription> ReadSymbolAttributes(CodeModelBuilder modelBuilder, ISymbol symbol)
+        {
+            return symbol
+                .GetAttributes()
+                .Select(attr => AttributeReader.ReadAttribute(modelBuilder, attr));
         }
     }
 }

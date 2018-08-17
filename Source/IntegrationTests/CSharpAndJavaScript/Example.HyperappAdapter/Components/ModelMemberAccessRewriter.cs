@@ -11,22 +11,24 @@ namespace Example.HyperappAdapter.Components
     public class ModelMemberAccessRewriter : StatementRewriter
     {
         private readonly WebPageMetadata _metaPage;
-        private readonly LocalVariable _modelVariable;
+        private readonly AbstractExpression _modelMemberReplacement;
 
         public ModelMemberAccessRewriter(WebPageMetadata metaPage, LocalVariable modelVariable)
+            : this(metaPage, modelMemberReplacement: modelVariable.AsExpression())
+        {
+        }
+
+        public ModelMemberAccessRewriter(WebPageMetadata metaPage, AbstractExpression modelMemberReplacement)
         {
             _metaPage = metaPage;
-            _modelVariable = modelVariable;
+            _modelMemberReplacement = modelMemberReplacement;
         }
 
         public override AbstractExpression RewriteMemberExpression(MemberExpression expression)
         {
             if (IsModelPropertyMemberExpression(expression))
             {
-                return new LocalVariableExpression {
-                    Bindings = new BindingCollection(expression.Bindings),
-                    Variable = _modelVariable
-                };
+                return _modelMemberReplacement;
             }
 
             return base.RewriteMemberExpression(expression);

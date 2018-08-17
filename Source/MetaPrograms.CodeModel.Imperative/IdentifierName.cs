@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MetaPrograms.CodeModel.Imperative
 {
-    public class IdentifierName
+    public class IdentifierName : IEquatable<IdentifierName>
     {
         private static readonly string UnderscoreSeparator = "_";
         private static readonly string HyphenSeparator = "-";
@@ -15,6 +15,8 @@ namespace MetaPrograms.CodeModel.Imperative
         public LanguageInfo OriginalLanguage { get; }
         public OriginKind Origin { get; }
         public ImmutableList<Fragment> Fragments { get; }
+
+        private readonly string _comparisonString;
 
         public IdentifierName(string name, LanguageInfo language, OriginKind origin = OriginKind.Generator, CasingStyle? style = null)
         {
@@ -27,6 +29,8 @@ namespace MetaPrograms.CodeModel.Imperative
             this.OriginalLanguage = language;
             this.Origin = origin;
             this.Fragments = ParseFragments(name, style).Select(f => new Fragment(f)).ToImmutableList();
+
+            _comparisonString = MakeComparisonString(Fragments);
         }
 
         public IdentifierName(IEnumerable<string> fragments, OriginKind origin = OriginKind.Generator, LanguageInfo language = null)
@@ -41,6 +45,8 @@ namespace MetaPrograms.CodeModel.Imperative
             this.OriginalName = string.Join("", this.Fragments.Select(f => f.OriginalText));
             this.OriginalLanguage = language ?? LanguageInfo.Current;
             this.Origin = origin;
+
+            _comparisonString = MakeComparisonString(Fragments);
         }
 
         public IdentifierName(object[] anyFragments)
@@ -51,6 +57,8 @@ namespace MetaPrograms.CodeModel.Imperative
             this.Origin = OriginKind.Generator;
             this.OriginalName = string.Join("", fragmentList.Select(f => f.OriginalText));
             this.OriginalLanguage = null;
+
+            _comparisonString = MakeComparisonString(Fragments);
         }
 
         public override string ToString()
@@ -114,6 +122,26 @@ namespace MetaPrograms.CodeModel.Imperative
             }
 
             return result.ToString();
+        }
+
+        public override int GetHashCode()
+        {
+            return _comparisonString.GetHashCode();
+        }
+
+        public bool Equals(IdentifierName other)
+        {
+            return (this._comparisonString == other?._comparisonString);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is IdentifierName other)
+            {
+                return Equals(other);
+            }
+
+            return false;
         }
 
         public string SourceName => (Origin == OriginKind.Source ? OriginalName : null);
@@ -313,6 +341,11 @@ namespace MetaPrograms.CodeModel.Imperative
                 default:
                     return string.Empty;
             }
+        }
+
+        private static string MakeComparisonString(IImmutableList<Fragment> fragments)
+        {
+            return string.Concat(fragments.Select(f => f.Text));
         }
 
         public enum OriginKind

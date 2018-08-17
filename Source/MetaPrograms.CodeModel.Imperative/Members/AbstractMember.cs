@@ -36,5 +36,7 @@ namespace MetaPrograms.CodeModel.Imperative.Members
         public virtual List<AttributeDescription> Attributes { get; set; } = new List<AttributeDescription>();
         public virtual bool IsDefaultExport { get; set; }
         public virtual bool IsTopLevel => (DeclaringType == null && DeclaringModule == null);
+
+        //public 
     }
 }

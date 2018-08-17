@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
+using CommonExtensions;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.CodeModel.Imperative;
@@ -14,11 +15,13 @@ namespace Example.HyperappAdapter.Components
     {
         public WebComponentMetadata Metadata { get; }
         public TComponent Component { get; }
+        public AbstractExpression ModelBinding { get; }
 
         protected ComponentAdapter(WebComponentMetadata metadata, TComponent component)
         {
             this.Metadata = metadata;
             this.Component = component;
+            this.ModelBinding = Metadata.PropertyMap.GetValueOrDefault("Model"); //TODO: find a way to use nameof()
         }
 
         public abstract void GenerateStateKeys();
@@ -70,6 +73,17 @@ namespace Example.HyperappAdapter.Components
         protected string GetEventActionKeyName(IdentifierName eventName)
         {
             return Metadata.DeclaredProperty.Name.ToString(CasingStyle.Camel) + "_" + eventName.ToString(CasingStyle.Camel);
+        }
+
+        protected AbstractExpression GetBoundModelExpression(AbstractExpression rootModel)
+        {
+            if (ModelBinding != null)
+            {
+                var modelMemberAccessRewriter = new ModelMemberAccessRewriter(Metadata.Page, rootModel);
+                return modelMemberAccessRewriter.RewriteExpression(ModelBinding);
+            }
+
+            return rootModel;
         }
     }
 }

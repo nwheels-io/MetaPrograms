@@ -25,8 +25,12 @@ namespace Example.WebUIModel.Metadata
             this.Components = DiscoverComponents();
             this.BackendApis = DiscoverBackendApis();
 
-            var pageClassClrType = pageClass.Bindings.OfType<Type>().First();
-            this.IsIndex = pageClassClrType.IsDefined(typeof(WebUI.Semantic.IndexPageAttribute), inherit: true);
+            this.IsIndex = pageClass.HasAttribute<WebUI.Semantic.IndexPageAttribute>();
+
+            if (ModelProperty != null)
+            {
+                this.ModelMetadata = new ModelObjectMetadata(ModelProperty.PropertyType);
+            }
         }
 
         public TypeMember PageClass { get; }
@@ -36,6 +40,7 @@ namespace Example.WebUIModel.Metadata
         public ImmutableArray<WebApiMetadata> BackendApis { get; }
         public PropertyMember ModelProperty { get; }
         public MethodMember ControllerMethod { get; }
+        public ModelObjectMetadata ModelMetadata { get; }
         public MetadataExtensionMap Extensions { get; } = new MetadataExtensionMap();
 
         private ImmutableArray<WebComponentMetadata> DiscoverComponents()

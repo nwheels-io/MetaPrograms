@@ -14,6 +14,11 @@ namespace MetaPrograms.CodeModel.Imperative
         private readonly Dictionary<MethodParameter, MethodParameter> _methodParameterReplacements = new Dictionary<MethodParameter, MethodParameter>();
         private readonly Dictionary<TypeMember, TypeMember> _typeMemberReplacements = new Dictionary<TypeMember, TypeMember>();
 
+        public virtual AbstractExpression RewriteExpression(AbstractExpression expression)
+        {
+            return expression.AcceptRewriter(this);
+        }
+
         public virtual BlockStatement RewriteBlockStatement(BlockStatement statement)
         {
             var newVariables = statement.Locals.Select(RewriteLocalVariable).ToList();

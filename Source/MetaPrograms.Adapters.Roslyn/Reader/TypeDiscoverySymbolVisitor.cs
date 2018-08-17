@@ -71,6 +71,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                     VisitAttributes(symbol);
                     VisitGenericArguments(symbol);
                     IncludeType(symbol.BaseType, force: true);
+                    IncludeType(symbol.ContainingType, force: true);
 
                     var allLinkedSymbols = QuerySymbolsLinkedToType(symbol);
 
@@ -133,6 +134,15 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
                     bodyOperation.Accept(walker);
                 }
             }
+        }
+
+        public override void VisitProperty(IPropertySymbol symbol)
+        {
+            symbol.Type.Accept(this);
+            VisitAttributes(symbol);
+
+            symbol.GetMethod?.Accept(this);
+            symbol.SetMethod?.Accept(this);
         }
 
         public override void VisitEvent(IEventSymbol symbol)

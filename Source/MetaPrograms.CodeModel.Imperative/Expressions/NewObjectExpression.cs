@@ -20,5 +20,6 @@ namespace MetaPrograms.CodeModel.Imperative.Expressions
         }
 
         public MethodCallExpression ConstructorCall { get; set; }
+        public ObjectInitializerExpression Initializer { get; set; }
     }
 }

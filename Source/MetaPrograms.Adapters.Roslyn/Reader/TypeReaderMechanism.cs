@@ -18,13 +18,13 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public TypeReaderMechanism(CodeModelBuilder modelBuilder, INamedTypeSymbol symbol, string fullyQualifiedMetadataName)
         {
-            ModelBuilder = modelBuilder;
-            MemberBuilder = new TypeMember();
-            Symbol = symbol;
+            this.ModelBuilder = modelBuilder;
+            this.Symbol = symbol;
             this.FullyQualifiedMetadataName = fullyQualifiedMetadataName;
-            ClrType = Type.GetType(FullyQualifiedMetadataName, throwOnError: false);
-            MemberBuilder.Status = MemberStatus.Incomplete;
+            this.ClrType = Type.GetType(FullyQualifiedMetadataName, throwOnError: false);
 
+            this.MemberBuilder = new TypeMember();
+            MemberBuilder.Status = MemberStatus.Incomplete;
             MemberBuilder.Bindings.Add(Symbol);
             MemberBuilder.Bindings.Add(FullyQualifiedMetadataName);
 
@@ -86,6 +86,14 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             }
         }
 
+        public void ReadContainingType()
+        {
+            if (Symbol.ContainingType != null)
+            {
+                MemberBuilder.DeclaringType = ModelBuilder.TryGetMember<TypeMember>(Symbol.ContainingType);
+            }
+        }
+
         public void ReadBaseType()
         {
             MemberBuilder.BaseType = (
@@ -123,10 +131,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
         public void ReadAttributes()
         {
-            MemberBuilder.Attributes.AddRange(Symbol
-                .GetAttributes()
-                .Select(attr => AttributeReader.ReadAttribute(ModelBuilder, attr)));
-
+            MemberBuilder.Attributes.AddRange(AttributeReader.ReadSymbolAttributes(ModelBuilder, Symbol));
             _memberReaders.ForEach(reader => reader.ReadAttributes());
         }
 

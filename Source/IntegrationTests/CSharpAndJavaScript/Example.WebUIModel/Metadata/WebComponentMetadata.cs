@@ -26,13 +26,29 @@ namespace Example.WebUIModel.Metadata
             this.DeclaredProperty = declaredProperty;
             this.ComponentClass = declaredProperty.PropertyType;
             this.ModelClass = ComponentClass.GenericArguments.FirstOrDefault();
+            this.PropertyMap = new Dictionary<IdentifierName, AbstractExpression>();
             this.EventMap = new EventMapMetadata();
 
             //TODO: add AbstractMember.HasAttribute<T>()/TryGetAttribute<T>()
             this.IsPredefined = (
                 ComponentClass.Bindings.FirstOrDefault<Type>()?.GetCustomAttribute<ProgrammingModelAttribute>() != null);
 
+            ParsePropertyValues();
             FindEventHandlers(controllerMethod);
+        }
+
+        private void ParsePropertyValues()
+        {
+            if (DeclaredProperty.Getter.Body.Statements.FirstOrDefault() is ReturnStatement @return)
+            {
+                if (@return.Expression is NewObjectExpression newObj && newObj.Initializer != null)
+                {
+                    foreach (var propValue in newObj.Initializer.PropertyValues)
+                    {
+                        PropertyMap.Add(propValue.Name, propValue.Value);
+                    }
+                }
+            }
         }
 
         public WebPageMetadata Page { get; }
@@ -40,6 +56,7 @@ namespace Example.WebUIModel.Metadata
         public TypeMember ComponentClass { get; }
         public TypeMember ModelClass { get; }
         public bool IsPredefined { get; }
+        public Dictionary<IdentifierName, AbstractExpression> PropertyMap { get; }
         public EventMapMetadata EventMap { get; }
 
         private void FindEventHandlers(MethodMember controllerMethod)
