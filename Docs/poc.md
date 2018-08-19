@@ -2,22 +2,21 @@
 
 <img src="concept-poc.png" align="right" />
 
-Given intentions-as-code of a simplest web app, generate its 
-front-end and backend implementations.
+Given intentions-as-code of a simplest web app, generate its front-end and backend implementations.
 
 ## Modules
 
 Production modules:
 
-- C# language adapter based on Roslyn framework - MetaPrograms.Adapters.Roslyn 
-- JavaScript language adapter - MetaPrograms.Adapters.JavaScript 
+- C# language adapter based on Roslyn framework - [MetaPrograms.Adapters.Roslyn](https://github.com/felix-b/MetaPrograms/tree/master/Source/MetaPrograms.Adapters.Roslyn)
+- JavaScript language adapter - [MetaPrograms.Adapters.JavaScript](https://github.com/felix-b/MetaPrograms/tree/master/Source/MetaPrograms.Adapters.JavaScript)
 
 Proof-of-concept modules:
 
-- Web app expressed through intentions-as-code - Example.App
-- Imaginary web UI programming model (example of domain-specific API) - Example.WebUIModel
-- Sample backend adapter of web UI programming model to ASP.NET Core - Example.AspNetAdapter
-- Sample front-end adapter of web UI programming model to Hyperapp framework - Example.HyperappAdapter
+- Web app expressed through intentions-as-code - [Example.App](https://github.com/felix-b/MetaPrograms/tree/master/Source/IntegrationTests/CSharpAndJavaScript/Example.App)
+- Imaginary web UI programming model (example of domain-specific API) - [Example.WebUIModel](https://github.com/felix-b/MetaPrograms/tree/master/Source/IntegrationTests/CSharpAndJavaScript/Example.WebUIModel)
+- Sample backend adapter of web UI programming model to ASP.NET Core - [Example.AspNetAdapter](https://github.com/felix-b/MetaPrograms/tree/master/Source/IntegrationTests/CSharpAndJavaScript/Example.AspNetAdapter)
+- Sample front-end adapter of web UI programming model to Hyperapp framework - [Example.HyperappAdapter](https://github.com/felix-b/MetaPrograms/tree/master/Source/IntegrationTests/CSharpAndJavaScript/Example.HyperappAdapter)
 
 ## Web app flow
 

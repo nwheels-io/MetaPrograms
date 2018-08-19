@@ -16,7 +16,7 @@ $ dotnet build
 $ dotnet test
 ```
 
-The library passes POC integration test that demonstrates the main use case (explained next).
+The library passes POC integration test that demonstrates the main use case (explained next). See [details here](Docs/poc.md).
 
 ## How it works (current concept)
 
