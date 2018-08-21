@@ -58,7 +58,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
         {
             foreach (var project in workspace.CurrentSolution.Projects)
             {
-                yield return CompileProjectOrThrow(project);
+                yield return CompileProjectOrThrow(project.WithoutInvalidDocuments());
             }
         }
 

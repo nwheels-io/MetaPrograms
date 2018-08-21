@@ -11,11 +11,13 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
     {
         public static Compilation CompileCodeOrThrow(this Workspace workspace)
         {
-            var project = workspace.CurrentSolution.Projects.First();
+            var project = workspace.CurrentSolution.Projects
+                .First()
+                .WithoutInvalidDocuments();
+
             var compilation = project.GetCompilationAsync().Result;
             var allDiagnostics = compilation.GetDiagnostics();
-            var warningsAndErrors = compilation
-                .GetDiagnostics()
+            var warningsAndErrors = allDiagnostics
                 .Where(d => d.Severity >= DiagnosticSeverity.Warning)
                 .ToArray();
 
@@ -28,7 +30,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
 
             return compilation;
         }
-        
+
         public static void AddAssemblyReferences(this Workspace workspace, IEnumerable<string> assemblyReferencePaths)
         {
             var newSolution = workspace.CurrentSolution;
@@ -46,6 +48,21 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             {
                 throw new InvalidOperationException("Failed to set project references");
             }
+        }
+
+        public static Project WithoutInvalidDocuments(this Project project)
+        {
+            var badDocumentIds = project.Documents
+                .Where(doc => doc.FilePath?.EndsWith(".dll", StringComparison.InvariantCultureIgnoreCase) == true)
+                .Select(doc => doc.Id)
+                .ToArray();
+
+            foreach (var id in badDocumentIds)
+            {
+                project = project.RemoveDocument(id);
+            }
+
+            return project;
         }
     }
 }
