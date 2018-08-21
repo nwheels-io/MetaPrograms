@@ -1,27 +1,6 @@
-# MetaPrograms
+# How it works (current concept)
 
-The main purpose of this library is supporting frameworks that implement _intentions as code_ approach. It should also be useful for code generation and analysis tasks, in general.
-
-## Status
-
-In early stages of development: suitable for playing with the concept, but not for production development. Everything is subject to change at any moment.  
-
-## Build & Run
-
-Requirements: .NET Core 2.0 SDK
-
-```
-$ git clone https://github.com/felix-b/MetaPrograms.git
-$ cd Source
-$ dotnet build
-$ dotnet test IntegrationTests/MetaPrograms.IntegrationTests
-```
-
-The library passes POC integration test that demonstrates the main use case. More about [Proof-of-Concept here](Docs/poc.md).
-
-## How it works (current concept)
-
-![Concept illustration](Docs/concept-flow.png)
+![Concept illustration](concept-flow.png)
 
 1. **Original artifacts** contain intentions expressed with minimal amount of concise code. In order to make understanding the intentions a simple task, they should be coded according to a defined convention, or on top of a domain-specific API.
 
@@ -34,3 +13,7 @@ The library passes POC integration test that demonstrates the main use case. Mor
 1. Resulting code models represent the final artifacts. Resulting models are either obtained by manipulating other models, or generated from scratch. Each model is created with a specific language in mind, as concrete language adapters only handle subset of the model that is applicable to the language.
 
 1. Concrete language adapters generate code of the final artifacts from the code models in (5), in specific programming languages.
+
+## Demo
+
+The library passes POC integration test that demonstrates the main use case. [Details here](poc.md).
