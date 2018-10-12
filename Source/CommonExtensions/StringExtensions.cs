@@ -33,25 +33,5 @@
 
             return s;
         }
-
-        public static string ToCamelCase(this string s)
-        {
-            if (s?.Length > 0)
-            {
-                return char.ToLower(s[0]) + s.Substring(1);
-            }
-
-            return s;
-        }
-
-        public static string ToPascalCase(this string s)
-        {
-            if (s?.Length > 0)
-            {
-                return char.ToUpper(s[0]) + s.Substring(1);
-            }
-
-            return s;
-        }
     }
 }
