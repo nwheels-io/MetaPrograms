@@ -1,8 +1,7 @@
 ﻿using System;
-using MetaPrograms;
 using MetaPrograms.Members;
 
-namespace MetaPrograms.Adapters.Reflection.Reader
+namespace MetaPrograms.CSharp.Reader.Reflection
 {
     public class ClrTypeResolver : IClrTypeResolver
     {
