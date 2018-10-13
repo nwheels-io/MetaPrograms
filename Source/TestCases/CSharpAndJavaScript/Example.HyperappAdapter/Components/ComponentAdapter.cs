@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
-using CommonExtensions;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.JavaScript.Writer;
 using MetaPrograms;
 using MetaPrograms.Expressions;
+using MetaPrograms.Extensions;
 using MetaPrograms.Members;
 using static MetaPrograms.Fluent.Generator;
 

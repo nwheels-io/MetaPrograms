@@ -1,7 +1,8 @@
+using MetaPrograms.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
-namespace CommonExtensions.Tests
+namespace MetaPrograms.Tests.Extensions
 {
     [TestFixture]
     public class StringExtensionsTests

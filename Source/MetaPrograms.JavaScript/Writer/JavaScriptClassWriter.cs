@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using CommonExtensions;
 using MetaPrograms;
+using MetaPrograms.Extensions;
 using MetaPrograms.Members;
 
 namespace MetaPrograms.JavaScript.Writer
