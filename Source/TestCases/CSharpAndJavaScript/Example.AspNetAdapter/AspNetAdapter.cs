@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using System.Runtime.CompilerServices;
 using Example.WebUIModel.Metadata;
-using MetaPrograms.Adapters.Reflection.Reader;
 using MetaPrograms.CSharp;
 using MetaPrograms.CSharp.Writer;
 using MetaPrograms;
+using MetaPrograms.CSharp.Reader.Reflection;
 using MetaPrograms.Members;
 using static MetaPrograms.Fluent.Generator;
 

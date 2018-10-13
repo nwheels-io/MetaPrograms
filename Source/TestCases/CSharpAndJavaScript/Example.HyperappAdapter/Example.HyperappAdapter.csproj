@@ -10,7 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\CommonExtensions\CommonExtensions.csproj" />
     <ProjectReference Include="..\..\..\MetaPrograms.JavaScript\MetaPrograms.JavaScript.csproj" />
-    <ProjectReference Include="..\..\..\MetaPrograms.Adapters.Reflection\MetaPrograms.Adapters.Reflection.csproj" />
+    <ProjectReference Include="..\..\..\MetaPrograms.CSharp\MetaPrograms.CSharp.csproj" />
     <ProjectReference Include="..\..\..\MetaPrograms\MetaPrograms.csproj" />
     <ProjectReference Include="..\Example.WebUIModel\Example.WebUIModel.csproj" />
   </ItemGroup>

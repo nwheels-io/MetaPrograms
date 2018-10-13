@@ -7,6 +7,7 @@
     <ProjectReference Include="..\MetaPrograms\MetaPrograms.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Reader" />
     <Folder Include="Writer\" />
   </ItemGroup>
 </Project>

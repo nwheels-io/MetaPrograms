@@ -2,7 +2,7 @@
 using System.Reflection;
 using MetaPrograms.Members;
 
-namespace MetaPrograms.Adapters.Reflection
+namespace MetaPrograms.CSharp.Reader.Reflection
 {
     public static class MemberInfoExtensions
     {

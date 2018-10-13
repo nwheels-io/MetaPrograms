@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using CommonExtensions;
-using MetaPrograms;
 using MetaPrograms.Expressions;
 using MetaPrograms.Members;
 
-namespace MetaPrograms.Adapters.Reflection.Reader
+namespace MetaPrograms.CSharp.Reader.Reflection
 {
     public class ClrTypeReader
     {
