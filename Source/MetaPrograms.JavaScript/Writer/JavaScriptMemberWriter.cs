@@ -4,7 +4,7 @@ using System.Text;
 using MetaPrograms;
 using MetaPrograms.Members;
 
-namespace MetaPrograms.Adapters.JavaScript.Writer
+namespace MetaPrograms.JavaScript.Writer
 {
     public static class JavaScriptMemberWriter
     {

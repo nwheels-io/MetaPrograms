@@ -2,7 +2,7 @@
 using MetaPrograms.Expressions;
 using MetaPrograms.Fluent;
 
-namespace MetaPrograms.Adapters.JavaScript.Writer
+namespace MetaPrograms.JavaScript.Writer
 {
     public class JsxExpressionAttribute : XAttribute
     {

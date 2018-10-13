@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text;
 using MetaPrograms;
 
-namespace MetaPrograms.Adapters.JavaScript.Writer
+namespace MetaPrograms.JavaScript.Writer
 {
     public static class JavaScriptLiteralWriter
     {

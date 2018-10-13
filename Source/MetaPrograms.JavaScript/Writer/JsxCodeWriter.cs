@@ -7,7 +7,7 @@ using System.Xml.Linq;
 using CommonExtensions;
 using MetaPrograms;
 
-namespace MetaPrograms.Adapters.JavaScript.Writer
+namespace MetaPrograms.JavaScript.Writer
 {
     public class JsxCodeWriter
     {
