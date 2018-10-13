@@ -2,8 +2,8 @@
 using System.Runtime.CompilerServices;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.Reflection.Reader;
-using MetaPrograms.Adapters.Roslyn;
-using MetaPrograms.Adapters.Roslyn.Writer;
+using MetaPrograms.CSharp;
+using MetaPrograms.CSharp.Writer;
 using MetaPrograms;
 using MetaPrograms.Members;
 using static MetaPrograms.Fluent.Generator;

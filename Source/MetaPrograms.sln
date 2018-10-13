@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JavaScript", "JavaScript", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.Reflection", "MetaPrograms.Adapters.Reflection\MetaPrograms.Adapters.Reflection.csproj", "{E549BD67-EA4E-4081-ABD6-68F176ACF63D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.Roslyn", "MetaPrograms.Adapters.Roslyn\MetaPrograms.Adapters.Roslyn.csproj", "{A9AE1E9D-4E56-421D-8D99-296E5DC235FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.CSharp", "MetaPrograms.CSharp\MetaPrograms.CSharp.csproj", "{A9AE1E9D-4E56-421D-8D99-296E5DC235FB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.JavaScript", "MetaPrograms.Adapters.JavaScript\MetaPrograms.Adapters.JavaScript.csproj", "{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D}"
 EndProject
@@ -35,7 +35,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.WebUIModel", "Integ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.AspNetAdapter", "IntegrationTests\CSharpAndJavaScript\Example.AspNetAdapter\Example.AspNetAdapter.csproj", "{452A8E88-9779-4C72-9022-52EC50B47953}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.Roslyn.Tests", "MetaPrograms.Adapters.Roslyn.Tests\MetaPrograms.Adapters.Roslyn.Tests.csproj", "{9D8394B4-7BDA-4246-9F6D-233D8EDE828C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.CSharp.Tests", "MetaPrograms.CSharp.Tests\MetaPrograms.CSharp.Tests.csproj", "{9D8394B4-7BDA-4246-9F6D-233D8EDE828C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CommonExtensions", "CommonExtensions", "{53177E45-E4BA-4713-A891-A24CFC9D668B}"
 EndProject
