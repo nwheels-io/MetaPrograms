@@ -1,4 +1,4 @@
-﻿namespace CommonExtensions
+﻿namespace MetaPrograms.Extensions
 {
     public static class StringExtensions
     {

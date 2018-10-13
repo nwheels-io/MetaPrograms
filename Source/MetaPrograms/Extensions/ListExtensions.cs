@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace CommonExtensions
+namespace MetaPrograms.Extensions
 {
     public static class ListExtensions
     {

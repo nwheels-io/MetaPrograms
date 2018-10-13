@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using CommonExtensions;
 using Example.HyperappAdapter.Components;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.JavaScript;

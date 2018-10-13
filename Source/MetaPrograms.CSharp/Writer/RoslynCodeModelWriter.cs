@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommonExtensions;
 using MetaPrograms.CSharp.Writer.SyntaxEmitters;
 using MetaPrograms;
+using MetaPrograms.Extensions;
 using MetaPrograms.Members;
 using Microsoft.CodeAnalysis.CSharp;
 

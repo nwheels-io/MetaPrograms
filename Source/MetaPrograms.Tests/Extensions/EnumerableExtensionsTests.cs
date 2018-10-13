@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
+using MetaPrograms.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
-namespace CommonExtensions.Tests
+namespace MetaPrograms.Tests.Extensions
 {
     [TestFixture]
     public class EnumerableExtensionsTests

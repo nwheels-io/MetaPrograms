@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using CommonExtensions;
 using MetaPrograms;
 
 namespace MetaPrograms.JavaScript.Writer

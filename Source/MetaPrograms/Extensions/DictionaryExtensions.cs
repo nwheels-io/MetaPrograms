@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace CommonExtensions
+namespace MetaPrograms.Extensions
 {
     public static class DictionaryExtensions
     {

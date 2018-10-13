@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using CommonExtensions;
 using MetaPrograms.Expressions;
+using MetaPrograms.Extensions;
 using MetaPrograms.Members;
 
 namespace MetaPrograms.CSharp.Reader.Reflection
