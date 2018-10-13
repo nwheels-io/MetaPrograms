@@ -13,7 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MetaPrograms.Adapters.JavaScript\MetaPrograms.Adapters.JavaScript.csproj" />
-    <ProjectReference Include="..\..\MetaPrograms.Adapters.Roslyn\MetaPrograms.Adapters.Roslyn.csproj" />
+    <ProjectReference Include="..\..\MetaPrograms.CSharp\MetaPrograms.CSharp.csproj" />
     <ProjectReference Include="..\CSharpAndJavaScript\Example.App\Example.App.csproj" />
     <ProjectReference Include="..\CSharpAndJavaScript\Example.AspNetAdapter\Example.AspNetAdapter.csproj" />
     <ProjectReference Include="..\CSharpAndJavaScript\Example.HyperappAdapter\Example.HyperappAdapter.csproj" />
