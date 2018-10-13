@@ -12,7 +12,7 @@
     <PackageReference Include="Moq" Version="4.8.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MetaPrograms.Adapters.JavaScript\MetaPrograms.Adapters.JavaScript.csproj" />
+    <ProjectReference Include="..\..\MetaPrograms.JavaScript\MetaPrograms.JavaScript.csproj" />
     <ProjectReference Include="..\..\MetaPrograms.CSharp\MetaPrograms.CSharp.csproj" />
     <ProjectReference Include="..\CSharpAndJavaScript\Example.App\Example.App.csproj" />
     <ProjectReference Include="..\CSharpAndJavaScript\Example.AspNetAdapter\Example.AspNetAdapter.csproj" />

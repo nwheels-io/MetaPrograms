@@ -5,8 +5,8 @@ using System.Xml.Linq;
 using CommonExtensions;
 using Example.HyperappAdapter.Components;
 using Example.WebUIModel.Metadata;
-using MetaPrograms.Adapters.JavaScript;
-using MetaPrograms.Adapters.JavaScript.Writer;
+using MetaPrograms.JavaScript;
+using MetaPrograms.JavaScript.Writer;
 using MetaPrograms.Adapters.Reflection.Reader;
 using MetaPrograms;
 

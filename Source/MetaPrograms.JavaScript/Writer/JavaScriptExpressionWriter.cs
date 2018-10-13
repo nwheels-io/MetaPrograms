@@ -7,7 +7,7 @@ using System.Xml.Linq;
 using MetaPrograms;
 using MetaPrograms.Expressions;
 
-namespace MetaPrograms.Adapters.JavaScript.Writer
+namespace MetaPrograms.JavaScript.Writer
 {
     public static class JavaScriptExpressionWriter
     {

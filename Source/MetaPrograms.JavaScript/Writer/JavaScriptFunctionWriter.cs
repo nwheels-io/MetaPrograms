@@ -7,7 +7,7 @@ using MetaPrograms.Expressions;
 using MetaPrograms.Members;
 using MetaPrograms.Statements;
 
-namespace MetaPrograms.Adapters.JavaScript.Writer
+namespace MetaPrograms.JavaScript.Writer
 {
     public static class JavaScriptFunctionWriter
     {

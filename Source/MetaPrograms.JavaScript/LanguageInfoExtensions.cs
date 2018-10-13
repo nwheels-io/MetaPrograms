@@ -1,6 +1,6 @@
 ﻿using MetaPrograms;
 
-namespace MetaPrograms.Adapters.JavaScript
+namespace MetaPrograms.JavaScript
 {
     public static class LanguageInfoExtensions
     {

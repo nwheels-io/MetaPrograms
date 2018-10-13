@@ -3,7 +3,7 @@ using System.Xml.Linq;
 using CommonExtensions;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
-using MetaPrograms.Adapters.JavaScript.Writer;
+using MetaPrograms.JavaScript.Writer;
 using MetaPrograms;
 using MetaPrograms.Expressions;
 using MetaPrograms.Members;

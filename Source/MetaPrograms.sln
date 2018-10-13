@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.Refle
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.CSharp", "MetaPrograms.CSharp\MetaPrograms.CSharp.csproj", "{A9AE1E9D-4E56-421D-8D99-296E5DC235FB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.JavaScript", "MetaPrograms.Adapters.JavaScript\MetaPrograms.Adapters.JavaScript.csproj", "{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.JavaScript", "MetaPrograms.JavaScript\MetaPrograms.JavaScript.csproj", "{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms", "MetaPrograms\MetaPrograms.csproj", "{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172}"
 EndProject
