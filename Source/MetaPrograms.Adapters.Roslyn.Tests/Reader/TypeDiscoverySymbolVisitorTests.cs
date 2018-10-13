@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MetaPrograms.Adapters.Roslyn.Reader;
-using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using Shouldly;

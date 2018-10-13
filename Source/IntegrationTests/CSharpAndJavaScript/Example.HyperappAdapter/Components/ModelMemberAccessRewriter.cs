@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Example.WebUIModel.Metadata;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Expressions;
+using MetaPrograms.Members;
 
 namespace Example.HyperappAdapter.Components
 {

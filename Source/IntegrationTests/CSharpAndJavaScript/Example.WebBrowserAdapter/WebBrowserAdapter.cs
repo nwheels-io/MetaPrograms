@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.IO;
-using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms;
 
 namespace Example.WebBrowserAdapter
 {

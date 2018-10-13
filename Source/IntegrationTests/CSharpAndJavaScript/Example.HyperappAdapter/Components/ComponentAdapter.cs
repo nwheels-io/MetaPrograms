@@ -4,10 +4,10 @@ using CommonExtensions;
 using Example.WebUIModel;
 using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.JavaScript.Writer;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
-using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
+using MetaPrograms;
+using MetaPrograms.Expressions;
+using MetaPrograms.Members;
+using static MetaPrograms.Fluent.Generator;
 
 namespace Example.HyperappAdapter.Components
 {

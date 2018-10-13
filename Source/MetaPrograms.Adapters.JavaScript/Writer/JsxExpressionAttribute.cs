@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Fluent;
+using MetaPrograms.Expressions;
+using MetaPrograms.Fluent;
 
 namespace MetaPrograms.Adapters.JavaScript.Writer
 {

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.Expressions;
+using MetaPrograms.Members;
 
 namespace Example.WebUIModel.Metadata
 {

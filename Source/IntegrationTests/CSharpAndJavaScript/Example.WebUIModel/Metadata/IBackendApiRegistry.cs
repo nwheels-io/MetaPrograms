@@ -1,4 +1,4 @@
-﻿using MetaPrograms.CodeModel.Imperative.Members;
+﻿using MetaPrograms.Members;
 
 namespace Example.WebUIModel.Metadata
 {

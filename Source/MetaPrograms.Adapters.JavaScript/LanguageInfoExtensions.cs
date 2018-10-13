@@ -1,4 +1,4 @@
-﻿using MetaPrograms.CodeModel.Imperative;
+﻿using MetaPrograms;
 
 namespace MetaPrograms.Adapters.JavaScript
 {

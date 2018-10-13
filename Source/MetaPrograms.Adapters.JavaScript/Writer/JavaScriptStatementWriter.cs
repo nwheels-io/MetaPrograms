@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Statements;
+using MetaPrograms;
+using MetaPrograms.Statements;
 
 namespace MetaPrograms.Adapters.JavaScript.Writer
 {

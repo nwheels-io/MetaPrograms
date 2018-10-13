@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using Buildalyzer;
 using Buildalyzer.Environment;
 using Buildalyzer.Workspaces;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.Members;
 using Microsoft.CodeAnalysis;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader

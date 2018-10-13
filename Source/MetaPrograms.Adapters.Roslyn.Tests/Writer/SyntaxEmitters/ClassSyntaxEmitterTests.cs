@@ -1,7 +1,7 @@
 ﻿#if false
 
 using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.Members;
 using System;
 using System.Collections.Generic;
 using System.Text;

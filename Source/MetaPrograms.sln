@@ -17,9 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.Rosly
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Adapters.JavaScript", "MetaPrograms.Adapters.JavaScript\MetaPrograms.Adapters.JavaScript.csproj", "{CC74D0F2-7F31-447C-86E5-5B5DDB8BA92D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.CodeModel.Imperative", "MetaPrograms.CodeModel.Imperative\MetaPrograms.CodeModel.Imperative.csproj", "{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms", "MetaPrograms\MetaPrograms.csproj", "{0CF1372A-DBDB-4416-A9B0-76F7AEF6F172}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.CodeModel.Imperative.Tests", "MetaPrograms.CodeModel.Imperative.Tests\MetaPrograms.CodeModel.Imperative.Tests.csproj", "{AFDBA58E-DB68-4CEE-B475-87E80B49ECFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaPrograms.Tests", "MetaPrograms.Tests\MetaPrograms.Tests.csproj", "{AFDBA58E-DB68-4CEE-B475-87E80B49ECFB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{98B7A394-086F-429C-B701-8749C2BECDF2}"
 EndProject

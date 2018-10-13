@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Fluent;
-using MetaPrograms.CodeModel.Imperative.Members;
-using MetaPrograms.CodeModel.Imperative.Statements;
+using MetaPrograms;
+using MetaPrograms.Expressions;
+using MetaPrograms.Fluent;
+using MetaPrograms.Members;
+using MetaPrograms.Statements;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;

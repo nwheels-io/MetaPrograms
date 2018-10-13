@@ -10,7 +10,7 @@ using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.Reflection.Reader;
 using MetaPrograms.Adapters.Roslyn;
 using MetaPrograms.Adapters.Roslyn.Reader;
-using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using Shouldly;

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using System.Collections.Immutable;
 using CommonExtensions;
 using Example.WebUIModel.Metadata;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Members;
 using Microsoft.AspNetCore.Mvc;
-using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
+using static MetaPrograms.Fluent.Generator;
 
 // ReSharper disable InconsistentNaming
 

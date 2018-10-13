@@ -1,8 +1,8 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using CommonExtensions;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Members;
 
 namespace Example.WebUIModel.Metadata
 {

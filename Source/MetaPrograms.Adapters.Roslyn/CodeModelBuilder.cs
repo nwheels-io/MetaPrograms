@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.Members;
 using Microsoft.CodeAnalysis;
 
-namespace MetaPrograms.CodeModel.Imperative
+namespace MetaPrograms
 {
     public class CodeModelBuilder
     {

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using Example.HyperappAdapter.Metadata;
 using Example.WebUIModel.Metadata;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Expressions;
+using MetaPrograms.Members;
 
 namespace Example.HyperappAdapter.Components
 {

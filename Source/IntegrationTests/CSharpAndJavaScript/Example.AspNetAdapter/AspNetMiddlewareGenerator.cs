@@ -1,9 +1,9 @@
 ﻿using System;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Members;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
+using static MetaPrograms.Fluent.Generator;
 
 namespace Example.AspNetAdapter
 {

@@ -1,6 +1,6 @@
 ﻿//using System;
-//using MetaPrograms.CodeModel.Imperative;
-//using MetaPrograms.CodeModel.Imperative.Members;
+//using MetaPrograms;
+//using MetaPrograms.Members;
 //using Microsoft.CodeAnalysis;
 
 //namespace MetaPrograms.Adapters.Roslyn.Reader

@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 using Example.WebUIModel.Metadata;
-using MetaPrograms.CodeModel.Imperative.Expressions;
+using MetaPrograms.Expressions;
 
 namespace Example.HyperappAdapter.Components
 {
