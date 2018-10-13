@@ -2,9 +2,9 @@
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
-using MetaPrograms.CodeModel.Imperative.Statements;
+using MetaPrograms.Expressions;
+using MetaPrograms.Members;
+using MetaPrograms.Statements;
 using System;
 using System.Collections.Generic;
 using System.Text;

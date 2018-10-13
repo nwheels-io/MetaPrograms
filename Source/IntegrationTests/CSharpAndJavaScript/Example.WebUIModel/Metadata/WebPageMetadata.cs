@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
-using MetaPrograms.CodeModel.Imperative.Statements;
+using MetaPrograms;
+using MetaPrograms.Expressions;
+using MetaPrograms.Members;
+using MetaPrograms.Statements;
 
 namespace Example.WebUIModel.Metadata
 {

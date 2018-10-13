@@ -1,6 +1,6 @@
 ﻿#if false
 
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.Members;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 

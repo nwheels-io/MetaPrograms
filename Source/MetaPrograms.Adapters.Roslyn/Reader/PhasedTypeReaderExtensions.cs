@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.Members;
 
 namespace MetaPrograms.Adapters.Roslyn.Reader
 {

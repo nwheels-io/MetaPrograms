@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms;
 
 namespace MetaPrograms.Adapters.JavaScript.Writer
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms;
 
 namespace MetaPrograms.IntegrationTests
 {

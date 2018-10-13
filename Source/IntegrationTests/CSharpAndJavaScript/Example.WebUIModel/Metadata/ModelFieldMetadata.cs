@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Members;
 using static Example.WebUIModel.PropertyContract;
 
 namespace Example.WebUIModel.Metadata

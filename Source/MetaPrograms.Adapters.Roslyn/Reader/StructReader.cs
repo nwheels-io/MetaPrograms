@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Members;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

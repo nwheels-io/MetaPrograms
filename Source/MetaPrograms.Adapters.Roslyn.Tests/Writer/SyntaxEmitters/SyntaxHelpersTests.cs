@@ -3,8 +3,8 @@
 using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using NWheels.Compilation.Adapters.Roslyn.SyntaxEmitters;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.Expressions;
+using MetaPrograms.Members;
 using System;
 using System.Collections.Generic;
 using System.Text;

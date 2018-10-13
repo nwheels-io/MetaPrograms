@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Members;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -35,7 +35,7 @@ namespace MetaPrograms.Adapters.Roslyn.Reader
             }
         }
 
-        public CodeModel.Imperative.ImperativeCodeModel GetCodeModel() => ModelBuilder.GetCodeModel();
+        public ImperativeCodeModel GetCodeModel() => ModelBuilder.GetCodeModel();
 
         public Workspace Workspace { get; }
         public CodeModelBuilder ModelBuilder { get; private set; }

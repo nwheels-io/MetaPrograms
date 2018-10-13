@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using CommonExtensions;
-using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms;
 
 namespace MetaPrograms.Adapters.JavaScript.Writer
 {

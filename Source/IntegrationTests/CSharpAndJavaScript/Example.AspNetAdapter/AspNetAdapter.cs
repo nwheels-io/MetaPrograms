@@ -4,9 +4,9 @@ using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.Reflection.Reader;
 using MetaPrograms.Adapters.Roslyn;
 using MetaPrograms.Adapters.Roslyn.Writer;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Members;
-using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
+using MetaPrograms;
+using MetaPrograms.Members;
+using static MetaPrograms.Fluent.Generator;
 
 namespace Example.AspNetAdapter
 {

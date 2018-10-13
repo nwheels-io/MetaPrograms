@@ -8,7 +8,7 @@ using Example.WebUIModel.Metadata;
 using MetaPrograms.Adapters.JavaScript;
 using MetaPrograms.Adapters.JavaScript.Writer;
 using MetaPrograms.Adapters.Reflection.Reader;
-using MetaPrograms.CodeModel.Imperative;
+using MetaPrograms;
 
 namespace Example.HyperappAdapter
 {

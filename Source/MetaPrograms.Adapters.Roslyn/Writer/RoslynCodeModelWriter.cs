@@ -3,8 +3,8 @@ using System.IO;
 using System.Linq;
 using CommonExtensions;
 using MetaPrograms.Adapters.Roslyn.Writer.SyntaxEmitters;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Members;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace MetaPrograms.Adapters.Roslyn.Writer

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Members;
 
 namespace MetaPrograms.Adapters.JavaScript.Writer
 {

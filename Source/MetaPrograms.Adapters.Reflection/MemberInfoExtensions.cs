@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.Members;
 
 namespace MetaPrograms.Adapters.Reflection
 {

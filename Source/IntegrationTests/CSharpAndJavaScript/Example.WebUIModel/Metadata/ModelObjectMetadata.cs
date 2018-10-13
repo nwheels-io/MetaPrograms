@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms.Members;
 
 namespace Example.WebUIModel.Metadata
 {

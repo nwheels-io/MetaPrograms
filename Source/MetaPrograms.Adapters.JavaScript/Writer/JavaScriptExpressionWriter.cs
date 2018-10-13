@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Expressions;
+using MetaPrograms;
+using MetaPrograms.Expressions;
 
 namespace MetaPrograms.Adapters.JavaScript.Writer
 {

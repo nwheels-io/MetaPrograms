@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using CommonExtensions;
 using Example.WebUIModel.Metadata;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
-using static MetaPrograms.CodeModel.Imperative.Fluent.Generator;
+using MetaPrograms.Expressions;
+using MetaPrograms.Members;
+using static MetaPrograms.Fluent.Generator;
 
 namespace Example.HyperappAdapter
 {

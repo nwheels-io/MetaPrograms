@@ -2,9 +2,9 @@
 
 using System;
 using System.Collections.Generic;
-using MetaPrograms.CodeModel.Imperative;
-using MetaPrograms.CodeModel.Imperative.Expressions;
-using MetaPrograms.CodeModel.Imperative.Members;
+using MetaPrograms;
+using MetaPrograms.Expressions;
+using MetaPrograms.Members;
 
 namespace MetaPrograms.Adapters.Reflection.Reader
 {
