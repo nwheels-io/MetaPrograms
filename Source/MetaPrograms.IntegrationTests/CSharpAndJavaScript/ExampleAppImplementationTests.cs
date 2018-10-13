@@ -161,6 +161,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
                     "..",
                     "..",
                     "..",
+                    "TestCases",
                     "CSharpAndJavaScript"
                 );
             }
