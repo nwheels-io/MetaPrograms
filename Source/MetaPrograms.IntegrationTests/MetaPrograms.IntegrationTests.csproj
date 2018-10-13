@@ -18,10 +18,10 @@
         <ProjectReference Include="..\MetaPrograms\MetaPrograms.csproj" />
         <ProjectReference Include="..\MetaPrograms.JavaScript\MetaPrograms.JavaScript.csproj" />
         <ProjectReference Include="..\MetaPrograms.CSharp\MetaPrograms.CSharp.csproj" />
-        <ProjectReference Include="..\..\TestCases\CSharpAndJavaScript\Example.App\Example.App.csproj" />
-        <ProjectReference Include="..\..\TestCases\CSharpAndJavaScript\Example.AspNetAdapter\Example.AspNetAdapter.csproj" />
-        <ProjectReference Include="..\..\TestCases\CSharpAndJavaScript\Example.HyperappAdapter\Example.HyperappAdapter.csproj" />
-        <ProjectReference Include="..\..\TestCases\CSharpAndJavaScript\Example.WebUIModel\Example.WebUIModel.csproj" />
+        <ProjectReference Include="..\TestCases\CSharpAndJavaScript\Example.App\Example.App.csproj" />
+        <ProjectReference Include="..\TestCases\CSharpAndJavaScript\Example.AspNetAdapter\Example.AspNetAdapter.csproj" />
+        <ProjectReference Include="..\TestCases\CSharpAndJavaScript\Example.HyperappAdapter\Example.HyperappAdapter.csproj" />
+        <ProjectReference Include="..\TestCases\CSharpAndJavaScript\Example.WebUIModel\Example.WebUIModel.csproj" />
     </ItemGroup>
 
 </Project>

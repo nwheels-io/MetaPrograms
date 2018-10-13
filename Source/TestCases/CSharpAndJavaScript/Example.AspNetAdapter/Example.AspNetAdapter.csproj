@@ -9,10 +9,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Source\CommonExtensions\CommonExtensions.csproj" />
-    <ProjectReference Include="..\..\..\Source\MetaPrograms.Adapters.Reflection\MetaPrograms.Adapters.Reflection.csproj" />
-    <ProjectReference Include="..\..\..\Source\MetaPrograms.CSharp\MetaPrograms.CSharp.csproj" />
-    <ProjectReference Include="..\..\..\Source\MetaPrograms\MetaPrograms.csproj" />
+    <ProjectReference Include="..\..\..\CommonExtensions\CommonExtensions.csproj" />
+    <ProjectReference Include="..\..\..\MetaPrograms.Adapters.Reflection\MetaPrograms.Adapters.Reflection.csproj" />
+    <ProjectReference Include="..\..\..\MetaPrograms.CSharp\MetaPrograms.CSharp.csproj" />
+    <ProjectReference Include="..\..\..\MetaPrograms\MetaPrograms.csproj" />
     <ProjectReference Include="..\Example.WebUIModel\Example.WebUIModel.csproj" />
   </ItemGroup>
 </Project>
