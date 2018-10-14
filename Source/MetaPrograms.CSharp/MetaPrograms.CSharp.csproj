@@ -3,6 +3,12 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
+  
+  <PropertyGroup>
+    <Version>0.0.0-dev</Version>
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\MetaPrograms\MetaPrograms.csproj" />
   </ItemGroup>
