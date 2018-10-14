@@ -1,0 +1,21 @@
+version: 0.1.0-{build}-{branch}-ci
+
+image: ubuntu1804
+
+configuration: Release
+
+nuget:
+  project_feed: true
+
+install:
+- cd Source && dotnet restore
+
+build:
+  project: Source/MetaPrograms.sln
+  verbosity: minimal
+  publish_nuget: true
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
