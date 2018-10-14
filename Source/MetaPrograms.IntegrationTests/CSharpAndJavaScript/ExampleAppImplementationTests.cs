@@ -50,7 +50,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
 
             // assert
 
-            WriteOutputToDisk(output, "FrontEnd");
+            //WriteOutputToDisk(output, "FrontEnd");
             AssertOutputs(
                 output.SourceFiles,
                 subFolder: "FrontEnd",
@@ -78,7 +78,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
 
             // assert
 
-            WriteOutputToDisk(output, "BackEnd");
+            //WriteOutputToDisk(output, "BackEnd");
             AssertOutputs(
                 output.SourceFiles,
                 subFolder: "BackEnd",
