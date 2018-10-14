@@ -4,9 +4,6 @@ image: ubuntu1804
 
 configuration: Release
 
-nuget:
-  project_feed: true
-
 install:
 - cd Source && dotnet restore
 
