@@ -1,0 +1,28 @@
+version: 0.1.0-alpha1
+
+image: ubuntu
+
+environment:
+  nuget_org_api_key:
+    secure: xfJ9FLt4Rm9JKGbPUgITlkUvMzbLNmufaoYmNfZHo3/LCX71z43sM7LSsoTdXBDC
+
+configuration: Release
+
+install:
+- cd Source && dotnet restore
+
+build:
+  project: Source/MetaPrograms.sln
+  verbosity: minimal
+  publish_nuget: true
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+
+deploy:
+  provider: NuGet
+  api_key:
+    secure: nuget_org_api_key
+  skip_symbols: true
