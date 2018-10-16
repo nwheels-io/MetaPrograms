@@ -5,8 +5,17 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <Version>0.0.0-dev</Version>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <Version>0.0.0-dev</Version>
+    <Description>
+      Parse, transform, and generate code in an extensible set of languages.
+      This package is allows generating code in JavaScript language (ES6) with JSX support.
+    </Description>
+    <Authors>Felix Berman</Authors>
+    <Copyright>Copyright © Felix Berman 2018</Copyright>
+    <PackageProjectUrl>https://github.com/nwheels-io/MetaPrograms</PackageProjectUrl>
+    <PackageIconUrl>https://avatars1.githubusercontent.com/u/13036333</PackageIconUrl>
+    <PackageLicenseUrl>https://github.com/nwheels-io/MetaPrograms/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
   
   <ItemGroup>
