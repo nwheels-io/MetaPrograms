@@ -34,3 +34,11 @@ The library passes POC integration test that demonstrates the main use case. Mor
 1. Resulting code models represent the final artifacts. Resulting models are either obtained by manipulating other models, or generated from scratch. Each model is created with a specific language in mind, as concrete language adapters only handle subset of the model that is applicable to the language.
 
 1. Concrete language adapters generate code of the final artifacts from the code models in (5), in specific programming languages.
+
+## Code Coverage
+
+- dotnet tool install --global coverlet.console
+- coverlet MetaPrograms.Tests/bin/Release/netcoreapp2.0/MetaPrograms.Tests.dll --target "dotnet" --targetargs "test MetaPr
+ograms.Tests -c Release --no-build" --format opencover
+- dotnet tool install --global dotnet-reportgenerator-globaltool --version 4.0.0-rc11
+- reportgenerator -reports:coverage.opencover.xml -targetdir:./coverage
