@@ -5,7 +5,7 @@ image: ubuntu
 configuration: Release
 
 install:
-- cd Build && curl -s https://codecov.io/bash -o codecov.sh && chmod u+x codecov.sh && chmod u+x test.sh 
+- cd Build && curl -s https://codecov.io/bash -o codecov.sh && chmod u+x codecov.sh && chmod u+x test.sh && cd ..
 - cd Source && dotnet restore
 
 build:
