@@ -5,8 +5,9 @@ image: ubuntu
 configuration: Release
 
 install:
+- printenv
 - cd Build && curl -s https://codecov.io/bash -o codecov.sh && chmod u+x codecov.sh && chmod u+x test.sh && cd ..
-- cd Source && dotnet restore
+- cd Source && dotnet restore && cd ..
 
 build:
   project: Source/MetaPrograms.sln
