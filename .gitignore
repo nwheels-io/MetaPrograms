@@ -286,3 +286,9 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# macOS cache files
+.DS_Store
+
+# code coverage results
+*.opencover.xml
