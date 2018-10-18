@@ -16,3 +16,10 @@ dotnet_csproj:
   patch: true
   file: '**\*.csproj'
   version: '{version}'
+
+test_script:
+- cd Source && for PROJECT in $(find . -type d -name '*Tests' | cut -c3-); do \
+    DLL=./$PROJECT/bin/Release/netcoreapp2.0/$PROJECT.dll; \
+    echo "--- $PROJECT ---"; \
+    dotnet test $PROJECT /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./$PROJECT.opencover.xml ; \
+    done
