@@ -19,4 +19,4 @@ dotnet_csproj:
   version: '{version}'
 
 test_script:
-- $APPVEYOR_BUILD_FOLDER/test.sh
+- $APPVEYOR_BUILD_FOLDER/Build/test.sh
