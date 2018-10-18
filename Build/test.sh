@@ -5,11 +5,26 @@ printenv
 script_dir=`dirname "$0"` 
 cd $script_dir/../Source 
 
+test_exit_code=0
+
 for project_name in $(find . -type d -name '*Tests' | cut -c3-)
 do
     dll_path=./$project_name/bin/Release/netcoreapp2.0/$project_name.dll
     echo "--- $project_name ---"
-    dotnet test $project_name /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./$project_name.opencover.xml
+    
+    dotnet test $project_name \
+        /p:CollectCoverage=true \
+        /p:CoverletOutputFormat=opencover \
+        /p:CoverletOutput=./$project_name.opencover.xml
+    
+    if [ $test_exit_code -eq 0 ]
+    then
+        test_exit_code=$?
+    fi
 done
 
-find . -type f -name '*.opencover.xml' | xargs -n1 $script_dir/codecov.sh -t $CODECOV_TOKEN -f 
+exit $test_exit_code
+
+
+# find . -type f -name '*.opencover.xml' | xargs -n1 $script_dir/codecov.sh -t $CODECOV_TOKEN -f 
+# codecov
