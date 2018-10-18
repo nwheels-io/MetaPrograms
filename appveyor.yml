@@ -6,9 +6,10 @@ configuration: Release
 
 environment:
   CODECOV_TOKEN:
-    secure: zOZIeJJCtnAAysvgFDJhnY8mgvoWCldVw0Smc4fjDTn4EITn0fKm9rJX9p0Y5tVV
+    secure: 0Ir8q06A8QxsknKh0JLhTA==
 
 install:
+- printenv
 - cd $APPVEYOR_BUILD_FOLDER/Build && curl -s https://codecov.io/bash -o codecov.sh && chmod u+x codecov.sh && chmod u+x test.sh
 - cd $APPVEYOR_BUILD_FOLDER/Source && dotnet restore
 
