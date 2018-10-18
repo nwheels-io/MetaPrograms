@@ -25,6 +25,5 @@ done
 
 exit $test_exit_code
 
-
-# find . -type f -name '*.opencover.xml' | xargs -n1 $script_dir/codecov.sh -t $CODECOV_TOKEN -f 
-# codecov
+# temporarily using a clear-text token; it will be regenerated
+find . -type f -name '*.opencover.xml' | xargs -n1 $script_dir/codecov.sh -t 0effad4c-9e98-48c8-a598-47e3e4c77e93 -f 
