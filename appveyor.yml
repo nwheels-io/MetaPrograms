@@ -5,9 +5,8 @@ image: ubuntu
 configuration: Release
 
 install:
-- printenv
-- cd Build && curl -s https://codecov.io/bash -o codecov.sh && chmod u+x codecov.sh && chmod u+x test.sh && cd ..
-- cd Source && dotnet restore && cd ..
+- cd $APPVEYOR_BUILD_FOLDER/Build && curl -s https://codecov.io/bash -o codecov.sh && chmod u+x codecov.sh && chmod u+x test.sh
+- cd $APPVEYOR_BUILD_FOLDER/Source && dotnet restore
 
 build:
   project: Source/MetaPrograms.sln
@@ -20,4 +19,4 @@ dotnet_csproj:
   version: '{version}'
 
 test_script:
-- cd Build && ./test.sh
+- $APPVEYOR_BUILD_FOLDER/test.sh
