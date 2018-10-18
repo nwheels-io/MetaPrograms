@@ -5,6 +5,7 @@ image: ubuntu
 configuration: Release
 
 install:
+- curl -s https://codecov.io/bash
 - cd Source && dotnet restore
 
 build:
@@ -18,5 +19,5 @@ dotnet_csproj:
   version: '{version}'
 
 test_script:
-- chmod +ox ./Build/test.sh
-
+- chmod x+u ./Build/test.sh
+- ./Build/test.sh
