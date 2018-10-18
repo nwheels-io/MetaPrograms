@@ -10,7 +10,7 @@ environment:
 
 install:
 - pip install --user codecov
-- cd $APPVEYOR_BUILD_FOLDER/Build && chmod u+x test.sh
+- cd $APPVEYOR_BUILD_FOLDER/Build && curl -s https://codecov.io/bash -o codecov.sh && chmod u+x codecov.sh && chmod u+x test.sh
 - cd $APPVEYOR_BUILD_FOLDER/Source && dotnet restore
 
 build:
@@ -25,6 +25,3 @@ dotnet_csproj:
 
 test_script:
 - $APPVEYOR_BUILD_FOLDER/Build/test.sh
-
-after_test:
-- codecov -t 0effad4c-9e98-48c8-a598-47e3e4c77e93  # this is a temporary token; it will be changed shortly
