@@ -1,10 +1,15 @@
 # MetaPrograms
 
-The main purpose of this library is supporting frameworks that implement _intentions as code_ approach. It should also be useful for code generation and analysis tasks, in general.
+[![Build](https://img.shields.io/appveyor/ci/felix-b/metaprograms/master.svg)](https://ci.appveyor.com/project/felix-b/metaprograms)
+[![Tests](https://img.shields.io/appveyor/tests/felix-b/metaprograms/master.svg)](https://ci.appveyor.com/project/felix-b/metaprograms)
+[![Coverage](https://img.shields.io/codecov/c/github/nwheels-io/metaprograms/master.svg)](https://codecov.io/gh/nwheels-io/MetaPrograms)
+[![Nuget](https://img.shields.io/nuget/vpre/MetaPrograms.svg)](http://www.nuget.org/packages/MetaPrograms/)
+
+This library supports frameworks that implement _intentions-as-code_ approach. You may also find it useful for code generation and analysis tasks, in general.
 
 ## Status
 
-In early stages of development: suitable for playing with the concept, but not for production development. Everything is subject to change at any moment.  
+In early stages of development. Suitable for playing with the concept. Everything is subject to change at any moment.  
 
 ## Build & Run
 
