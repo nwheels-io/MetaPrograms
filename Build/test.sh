@@ -13,6 +13,8 @@ do
     echo "--- $project_name ---"
     
     dotnet test $project_name \
+        -c Release \
+        --logger:Appveyor \
         /p:CollectCoverage=true \
         /p:CoverletOutputFormat=opencover \
         /p:CoverletOutput=./$project_name.opencover.xml
