@@ -2,7 +2,7 @@
 
 ### Why
 
-We develop applications by translating our intentions (or requirements) into code. Often, a signle intention is projected into many pieces of code across multiple layers, tiers, and services. For example, take a single requirement like "user's email must be unique". Its implementation can include, for example:
+We develop applications by translating our intentions (or requirements) into code. Often, a signle intention is projected into many pieces of code across multiple layers, tiers, and services. For instance, implementation of a requirement like "user's email must be unique" can include:
 
 - database script that adds a unique constraint
 - error reporting when inserting a new user into DB fails because of duplicate email
