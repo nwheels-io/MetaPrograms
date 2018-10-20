@@ -5,11 +5,7 @@
 [![Coverage](https://img.shields.io/codecov/c/github/nwheels-io/metaprograms/master.svg)](https://codecov.io/gh/nwheels-io/MetaPrograms)
 [![Nuget](https://img.shields.io/nuget/vpre/MetaPrograms.svg)](http://www.nuget.org/packages/MetaPrograms/)
 
-This library supports frameworks that implement _intentions-as-code_ approach, explained next. You may also find it useful for code generation and analysis tasks, in general.
-
-## Intentions-as-code 
-
-![Intentions-as-code concept illustration](Docs/concept-intentions-as-code.png)
+This library supports frameworks that implement _intentions-as-code_ approach (see [introduction to intentions-as-code](Docs/intentions-as-code.md)). You may also find it useful for code generation and analysis tasks, in general.
 
 ## Status
 
