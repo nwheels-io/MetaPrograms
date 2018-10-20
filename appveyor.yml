@@ -1,5 +1,10 @@
 version: 0.1.0-{build}-{branch}-ci
 
+skip_commits:
+  files:
+    - Docs/*
+    - '**/*.md'
+
 image: ubuntu
 
 configuration: Release
