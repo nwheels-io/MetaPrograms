@@ -2,17 +2,20 @@
 
 ### Why
 
-We develop applications by translating our intentions (or requirements) into code. Often, a signle intention is projected into many pieces of code across multiple layers, tiers, and services. For example, take a single requirement like "user's email must be unique". Its implementation can be scattered across:
+We develop applications by translating our intentions (or requirements) into code. Often, a signle intention is projected into many pieces of code across multiple layers, tiers, and services. For example, take a single requirement like "user's email must be unique". Its implementation can include, for example:
 
-- database scripts
-- domain logic
-- RESTful API
-- UI cues and validations
-  - multiplied by the number of UI platforms involved (web/mobile/desktop...)
-- IVR (interactive voice response) flows
-- tests that cover all of the above
+- database script that adds a unique constraint
+- error reporting when inserting a new user into DB fails because of duplicate email
+- validation in UI apps, while the user is typing her email address, including:
+  - a call to backend API that checks unique email
+  - presenting a error when the email is not unique
+  - debouncing while the user is typing
+  - the above is multiplied by the number of UI platforms involved (web/mobile/desktop/IVR...)
+- new REST API route that checks unique email
+- new operations in the domain and ORM layers that check unique email
+- tests of all above
 
-Traditionally, we write and maintain these pieces of code by ourselves. However, they are just mechanical derivatives of our original intentions, and can be produced by some kind of automated mechanism. 
+So traditionally, we write and maintain these pieces of code by ourselves. However, those are just mechanical derivatives of our original intentions, and can be produced by some kind of automated mechanism. 
 
 If such mechanism exists, we will only need to code and maintain the intentions, not their implementations. Our codebase will be much smaller. It will be clean from technology details, and express just the distilled concepts of the application. 
 
@@ -23,11 +26,11 @@ The mechanism must be able to:
 1. understand the intentions
 1. provide templated implementations across relevant layers
 
-It's actually simpler than it sounds, at least when enterprise applications are considered. From my experience, commonality in both functional and non-functional requirements here is dramatically higher than variability. Which means, we can create a catalog of common intentions (or requirements), together with their templated implementations. 
+It's actually simpler than it sounds, at least when considering SaaS and enterprise applications. From my experience, commonality in both functional and non-functional requirements here is dramatically higher than variability. Which means, we can create a catalog of common intentions (or requirements), together with their templated implementations. 
 
 #### Programming models
 
-The understanding of the intentions is done through static analysis of the intentions code. To make this task easier, we require the intentions to follow certain conventions. Moreover, we provide special _programming model APIs_, and require the intentions to be coded on top of those APIs (from here on, _programming models_). The programming models provide clear anchors to static analysis logic, thus greatly simplifying it.   
+The understanding of the intentions is done through static analysis of the intentions code. To make this task easier, we provide special _programming model APIs_, and require the intentions to be coded on top of those APIs (from here on, _programming models_). The programming models provide unambiguous anchors to static analysis logic, thus greatly simplifying it.   
 
 The result of understanding the intentions is represented in the form of data structures, named _metadata_. Each programming model provides its own metadata, which captures the analyzed intentions, together with parameters/configurations of every occurrence. 
 
