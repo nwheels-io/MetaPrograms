@@ -5,6 +5,19 @@
 [![Coverage](https://img.shields.io/codecov/c/github/nwheels-io/metaprograms/master.svg)](https://codecov.io/gh/nwheels-io/MetaPrograms)
 [![Nuget](https://img.shields.io/nuget/vpre/MetaPrograms.svg)](http://www.nuget.org/packages/MetaPrograms/)
 
+Enables **easy meta-programming** by providing **static analysis**, transformation, and **code generation** mechanisms in an **extensible** set of **programming languages**.
+
+> **New to meta-programming?** it's a technique in which programs treat other programs as their data. It means a program can be designed to read other programs, transform them, and generate derived programs automatically. This allows programmers to minimize amount of code to express a solution, reducing the development time. It also allows programs greater flexibility, such as running on new technology stacks without being rewritten. [Read more on Wikipedia](https://en.wikipedia.org/wiki/Metaprogramming).
+
+
+### Intentions as code
+
+This applied to full-stack applications 
+
+
+ and is a fundamental step towards [_intentions-as-code_](Docs/intentions-as-code.md) approach.
+
+
 This library supports frameworks that implement [_intentions-as-code_ approach](Docs/intentions-as-code.md). You may also find it useful for code generation and analysis tasks, in general.
 
 ## Status
