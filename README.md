@@ -7,18 +7,11 @@
 
 Enables **easy meta-programming** by providing **static analysis**, transformation, and **code generation** mechanisms in an **extensible** set of **programming languages**.
 
-> **New to meta-programming?** it's a technique in which programs treat other programs as their data. It means a program can be designed to read other programs, transform them, and generate derived programs automatically. This allows programmers to minimize amount of code to express a solution, reducing the development time. It also allows programs greater flexibility, such as running on new technology stacks without being rewritten. [Read more on Wikipedia](https://en.wikipedia.org/wiki/Metaprogramming).
-
+> **New to meta-programming?** it's a technique in which programs treat other programs as their data. It means a program can be designed to read other programs, transform them, and generate derived programs automatically. This allows programmers to minimize amount of code to express a solution, reducing the development time. [Read more on Wikipedia](https://en.wikipedia.org/wiki/Metaprogramming).
 
 ### Intentions as code
 
-This applied to full-stack applications 
-
-
- and is a fundamental step towards [_intentions-as-code_](Docs/intentions-as-code.md) approach.
-
-
-This library supports frameworks that implement [_intentions-as-code_ approach](Docs/intentions-as-code.md). You may also find it useful for code generation and analysis tasks, in general.
+This is an approach, which applies meta-programming to full-stack development of SaaS and enteaprise applications.   It aims to let developers express the application with minimal amout of clean conceptual code, and have the rest generated per selected technology stack. [Read more here](Docs/intentions-as-code.md).
 
 ## Status
 
