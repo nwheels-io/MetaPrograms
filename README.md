@@ -1,4 +1,5 @@
-# MetaPrograms
+MetaPrograms
+=====
 
 [![Build](https://img.shields.io/appveyor/ci/felix-b/metaprograms/master.svg)](https://ci.appveyor.com/project/felix-b/metaprograms)
 [![Tests](https://img.shields.io/appveyor/tests/felix-b/metaprograms/master.svg)](https://ci.appveyor.com/project/felix-b/metaprograms)
@@ -8,6 +9,8 @@
 Enables **easy meta-programming** by providing **static analysis**, transformation, and **code generation** mechanisms in an **extensible** set of **programming languages**.
 
 > **New to meta-programming?** it's a technique in which programs treat other programs as their data. It means, a program can be designed to read other programs, transform them, and generate derived programs automatically. This allows programmers to minimize amount of code to express a solution, reducing the development time. [Read more on Wikipedia](https://en.wikipedia.org/wiki/Metaprogramming).
+
+<img align="right" width="367" height="463" src="Docs/concept-flow-narrow.png">
 
 ## Goal
 
@@ -20,8 +23,6 @@ Provide meta-programming infrastructure layer to full-stack _intentions-as-code_
 In early stages of development. Good for experimenting with the concept, but not for production. No backward compatibility is matintained at this time. 
 
 ## Languages and platforms
-
-<img alirn="right" width="367" height="463" src="Docs/concept-flow-narrow.png">
 
 **MetaPrograms** is developed in C# for .NET Core, and runs on Linux, macOS, and Windows. 
 
