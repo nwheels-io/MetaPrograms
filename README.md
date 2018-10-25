@@ -91,6 +91,7 @@ You can use any development environment that works with .NET Core (Visual Studio
   - note that the demo supports exactly one page class
 - create your own view model with properties you want
   - note that the demo only supports flat view models (no nested objects or collections)
+- create any number of backend services, like this: [IGreetingService.cs](Source/TestCases/CSharpAndJavaScript/Example.App/Services/IGreetingService.cs)
 
 Make sure your project successfully builds, then:
 
