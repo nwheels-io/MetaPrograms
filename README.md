@@ -37,7 +37,7 @@ Requirements: [.NET Core 2.1 SDK](https://www.microsoft.com/net/download/dotnet-
 
 For more details, read about [proof-of-conept integration test](Docs/poc.md).
 
-### How to rum
+### How to run
 
 ```
 $ git clone https://github.com/nwheels-io/MetaPrograms.git
@@ -46,17 +46,11 @@ $ dotnet build
 $ dotnet run
 ```
 
-### Results
+### What to expect
 
-Once the run completes, the results will be in the DemoResults folder:
-
-```
-$ ls -l DemoResults/FrontEnd
-$ ls -l DemoResults/BackEnd
-```
-
-
-
+Once the run completes, the generated projects will be placwd in the `DemoResults` subfolder:
+- `DemoResults/FrontEnd` will contain `npm` project of Hyperapp-based web app (client side)
+- `DemoResults/BackEnd` will contain `.NET Core` of ASP.NET Core Web API (server side)
 
 
 ## Languages and platforms
