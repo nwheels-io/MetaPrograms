@@ -30,12 +30,12 @@ Requirements: [.NET Core 2.1 SDK](https://www.microsoft.com/net/download/dotnet-
 
 ### What's in the demo
 
-- Sample programming model of single-page web apps 
-- Sample technology adapter that generates JavaScript web app based on the Hyperapp framework 
-- Sample technology adapter that generates C# backend service based on ASP.NET Core.
-- Intentions-of-code (in C#) of a sample web app, including simple backend logic 
+- [Example.WebUIModel](Source/TestCases/CSharpAndJavaScript/Example.WebUIModel): a sample **programming model** of single-page web apps 
+- [Example.HyperappAdapter](Source/TestCases/CSharpAndJavaScript/Example.HyperappAdapter): a sample **technology adapter** that generates JavaScript web app based on the [Hyperapp](https://github.com/hyperapp/hyperapp) framework 
+- [Example.AspNetAdapter](Source/TestCases/CSharpAndJavaScript/Example.AspNetAdapter): a sample **technology adapter** that generates C# backend service based on [ASP.NET Core](https://github.com/aspnet/Home) Web API.
+- [Example.App](Source/TestCases/CSharpAndJavaScript/Example.App): intentions-of-code (in C#) of a sample web app, including some simple backend logic 
 
-For more details, read about [proof-of-conept integration test](Docs/poc.md).
+For more details on the above modules, read about [proof-of-conept integration test](Docs/poc.md).
 
 ### How to run
 
@@ -43,56 +43,32 @@ For more details, read about [proof-of-conept integration test](Docs/poc.md).
 $ git clone https://github.com/nwheels-io/MetaPrograms.git
 $ cd MetaPrograms/Source/Demo
 $ dotnet build
-$ dotnet run
+$ dotnet run -- 
 ```
 
 ### What to expect
 
 Once the run completes, the generated projects will be placwd in the `DemoResults` subfolder:
-- `DemoResults/FrontEnd` will contain `npm` project of Hyperapp-based web app (client side)
-- `DemoResults/BackEnd` will contain `.NET Core` of ASP.NET Core Web API (server side)
+- `DemoResults/FrontEnd` will contain an **npm** project of Hyperapp web app (client side)
+- `DemoResults/BackEnd` will contain **.NET Core** project of ASP.NET Core Web API (server side)
 
 
 ## Languages and platforms
 
 **MetaPrograms** is developed in C# for .NET Core, and runs on Linux, macOS, and Windows. 
 
-The set of languages supported by the framework is extensible. Moreover, there is absolutely no limit on platforms, frameworks, and products that can be targeted by the generated code.
+The set of languages supported by the framework is extensible. Also, there is no limit on platforms, frameworks, and products that can be targeted by the generated code.
 
 In order to analyze and generate code in specific languages, corresponding language-specific packages must be used in addition to the base **MetaPrograms** package. 
 
-The following language-specific packages currently exist:
+The following languages are currently supported:
 
 Language|Package|Analysis|Generation|Remarks
 ---|---|---|---|---
 C#|[MetaPrograms.CSharp](Source/MetaPrograms.CSharp)|V|V|based on [Roslyn](https://github.com/dotnet/roslyn)
 JavaScript|[MetaPrograms.JavaScript](Source/MetaPrograms.JavaScript)|X|V|ES6 + JSX
 
-The list will eventually include dozens of languages. Note that not every package supports both analysis and generation.
+The idea is to include dozens of different languages in the above list. Note that not every package supports both the analysis and the generation.
 
 The library passes POC integration test that demonstrates the main use case. [Read details here](Docs/poc.md).
 
-## Contribute
-
-```
-$ git clone https://github.com/nwheels-io/MetaPrograms.git
-$ cd Source
-$ dotnet build
-$ dotnet test IntegrationTests/MetaPrograms.IntegrationTests
-```
-
-
-## Status
-
-The project is currently in early stage of development. You can play with the concept, but do not use it for production. Everything is subject to change, and no backward compatibility is maintained at this stage.  
-
-## Build & Run
-
-Requirements: [.NET Core 2.1 SDK](https://www.microsoft.com/net/download/dotnet-core/2.1) (runs on Linux, macOS, and Windows)
-
-```
-$ git clone https://github.com/nwheels-io/MetaPrograms.git
-$ cd Source
-$ dotnet build
-$ dotnet test IntegrationTests/MetaPrograms.IntegrationTests
-```
