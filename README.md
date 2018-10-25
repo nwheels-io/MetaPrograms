@@ -20,7 +20,7 @@ Provide meta-programming infrastructure layer to full-stack _intentions-as-code_
 
 ## Status
 
-> WARNING: In early stages of development. Good for experimenting with the concept,  but not for production. No backward compatibility is matintained at this time. 
+> WARNING: In early stages of development. Good for experimenting with the concept, but not for production. No backward compatibility is matintained at this time. 
 
 ## Demo
 
@@ -33,7 +33,7 @@ Requirements: [.NET Core 2.1 SDK](https://www.microsoft.com/net/download/dotnet-
 - [Example.WebUIModel](Source/TestCases/CSharpAndJavaScript/Example.WebUIModel): a sample **programming model** of single-page web apps 
 - [Example.HyperappAdapter](Source/TestCases/CSharpAndJavaScript/Example.HyperappAdapter): a sample **technology adapter** that generates JavaScript web app based on the [Hyperapp](https://github.com/hyperapp/hyperapp) framework 
 - [Example.AspNetAdapter](Source/TestCases/CSharpAndJavaScript/Example.AspNetAdapter): a sample **technology adapter** that generates C# backend service based on [ASP.NET Core](https://github.com/aspnet/Home) Web API.
-- [Example.App](Source/TestCases/CSharpAndJavaScript/Example.App): intentions-of-code (in C#) of a sample web app, including some simple backend logic 
+- [Example.App](Source/TestCases/CSharpAndJavaScript/Example.App): intentions-of-code (in C#) of a sample web app, including some simple backend logic. You may also write your own intentions-as-code project, and run it with the demo (explained in the **Getting Started** section).
 
 For more details on the above modules, read about [proof-of-conept integration test](Docs/poc.md).
 
@@ -43,7 +43,7 @@ For more details on the above modules, read about [proof-of-conept integration t
 $ git clone https://github.com/nwheels-io/MetaPrograms.git
 $ cd MetaPrograms/Source/Demo
 $ dotnet build
-$ dotnet run -- 
+$ dotnet run
 ```
 
 ### What to expect
@@ -51,7 +51,6 @@ $ dotnet run --
 Once the run completes, the generated projects will be placwd in the `DemoResults` subfolder:
 - `DemoResults/FrontEnd` will contain an **npm** project of Hyperapp web app (client side)
 - `DemoResults/BackEnd` will contain **.NET Core** project of ASP.NET Core Web API (server side)
-
 
 ## Languages and platforms
 
@@ -68,7 +67,48 @@ Language|Package|Analysis|Generation|Remarks
 C#|[MetaPrograms.CSharp](Source/MetaPrograms.CSharp)|V|V|based on [Roslyn](https://github.com/dotnet/roslyn)
 JavaScript|[MetaPrograms.JavaScript](Source/MetaPrograms.JavaScript)|X|V|ES6 + JSX
 
-The idea is to include dozens of different languages in the above list. Note that not every package supports both the analysis and the generation.
+The roadmap for this list is to include a dozen of languages. Note that not every package supports both the analysis and the generation: some packages only support one of the two.
 
-The library passes POC integration test that demonstrates the main use case. [Read details here](Docs/poc.md).
+## Getting started
 
+This section assumes you have cloned and built the repository, as explained in the **Demo** section. If you haven't done that yet:
+
+```
+$ git clone https://github.com/nwheels-io/MetaPrograms.git
+$ cd MetaPrograms/Source/Demo
+$ dotnet build
+```
+
+In the following instructions, `<clone_folder>` is the folder where you cloned the repository. 
+
+### Demo with your own intentions-as-code
+
+You can use any development environment that works with .NET Core (Visual Studio 2017, Visual Studio Code, or Rider).
+
+- create a new class library project that targets `netstandard2.0`
+- add a reference to `Example.WebUIModel` project, located at the path: `<clone_folder>/Source/TestCases/CSharpAndJavaScript/Example.WebUIModel/Example.WebUIModel.csproj` 
+- create a page class; to get the idea of how to do it, look at [HelloPage.cs](Source/TestCases/CSharpAndJavaScript/Example.App/HelloPage.cs) from the demo
+  - note that the demo supports exactly one page class
+- create your own view model with properties you want
+  - note that the demo only supports flat view models (no nested objects or collections)
+
+Make sure your project successfully builds, then:
+
+- in terminal, go to folder `<clone_folder>/Source/Demo` 
+- run (replace `/path/to/your/project` with the path to fodler where your project is located):
+  ```
+  $ dotnet run -- /path/to/your/project
+  ```
+- the results will be placed in the `<clone_folder>/Source/Demo/DemoResults` folder, the same as explained in the **Demo** section.
+
+### Writing your own programming model
+
+TBD
+
+### Writing technology adapters for your programming model
+
+TBD
+
+## Contributing
+
+TBD
