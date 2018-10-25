@@ -20,7 +20,44 @@ Provide meta-programming infrastructure layer to full-stack _intentions-as-code_
 
 ## Status
 
-In early stages of development. Good for experimenting with the concept, but not for production. No backward compatibility is matintained at this time. 
+> WARNING: In early stages of development. Good for experimenting with the concept,  but not for production. No backward compatibility is matintained at this time. 
+
+## Demo
+
+<img src="Docs/concept-poc.png" align="left" />
+
+Requirements: [.NET Core 2.1 SDK](https://www.microsoft.com/net/download/dotnet-core/2.1) (runs on Linux, macOS, and Windows)
+
+### What's in the demo
+
+- Sample programming model of single-page web apps 
+- Sample technology adapter that generates JavaScript web app based on the Hyperapp framework 
+- Sample technology adapter that generates C# backend service based on ASP.NET Core.
+- Intentions-of-code (in C#) of a sample web app, including simple backend logic 
+
+For more details, read about [proof-of-conept integration test](Docs/poc.md).
+
+### How to rum
+
+```
+$ git clone https://github.com/nwheels-io/MetaPrograms.git
+$ cd MetaPrograms/Source/Demo
+$ dotnet build
+$ dotnet run
+```
+
+### Results
+
+Once the run completes, the results will be in the DemoResults folder:
+
+```
+$ ls -l DemoResults/FrontEnd
+$ ls -l DemoResults/BackEnd
+```
+
+
+
+
 
 ## Languages and platforms
 
@@ -35,13 +72,21 @@ The following language-specific packages currently exist:
 Language|Package|Analysis|Generation|Remarks
 ---|---|---|---|---
 C#|[MetaPrograms.CSharp](Source/MetaPrograms.CSharp)|V|V|based on [Roslyn](https://github.com/dotnet/roslyn)
-JavaScript|[MetaPrograms.JavaScript](Source/MetaPrograms.JavaScript)|X|V|
+JavaScript|[MetaPrograms.JavaScript](Source/MetaPrograms.JavaScript)|X|V|ES6 + JSX
 
 The list will eventually include dozens of languages. Note that not every package supports both analysis and generation.
 
-## Demo
-
 The library passes POC integration test that demonstrates the main use case. [Read details here](Docs/poc.md).
+
+## Contribute
+
+```
+$ git clone https://github.com/nwheels-io/MetaPrograms.git
+$ cd Source
+$ dotnet build
+$ dotnet test IntegrationTests/MetaPrograms.IntegrationTests
+```
+
 
 ## Status
 
