@@ -86,6 +86,18 @@ In the following instructions, `<clone_folder>` is the folder where you cloned t
 You can use any development environment that works with .NET Core (Visual Studio 2017, Visual Studio Code, or Rider).
 
 - create a new class library project that targets `netstandard2.0`
+  ```
+  <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>7.2</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Example.WebUIModel\Example.WebUIModel.csproj" />
+  </ItemGroup>
+  </Project>
+  ```
 - add a reference to `Example.WebUIModel` project, located at the path: `<clone_folder>/Source/TestCases/CSharpAndJavaScript/Example.WebUIModel/Example.WebUIModel.csproj` 
 - create a page class; to get the idea of how to do it, look at [HelloPage.cs](Source/TestCases/CSharpAndJavaScript/Example.App/HelloPage.cs) from the demo
   - note that the demo supports exactly one page class
