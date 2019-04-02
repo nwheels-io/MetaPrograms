@@ -17,6 +17,7 @@ namespace MetaPrograms.CSharp.Reader
     {
         private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractExpression>> ExpressionReaderByOperationKind =
             new Dictionary<OperationKind, Func<IOperation, AbstractExpression>> {
+                [OperationKind.Literal] = op => ReadLiteral((ILiteralOperation)op),
                 [OperationKind.SimpleAssignment] = op => ReadAssignment((IAssignmentOperation)op),
                 [OperationKind.EventAssignment] = op => ReadEventAssignment((IEventAssignmentOperation)op),
                 [OperationKind.InstanceReference] = op => ReadInstanceReference(op),
@@ -30,6 +31,7 @@ namespace MetaPrograms.CSharp.Reader
                 [OperationKind.ObjectCreation] = op => ReadObjectCreation((IObjectCreationOperation)op),
                 [OperationKind.ObjectOrCollectionInitializer] = op => ReadObjectOrCollectionInitializer((IObjectOrCollectionInitializerOperation)op),
                 [OperationKind.Conditional] = op => ReadConditional((IConditionalOperation)op),
+                [OperationKind.Conversion] = op => ReadConversion((IConversionOperation)op)
             };
 
         private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractStatement>> StatementReaderByOperationKind =
@@ -267,6 +269,17 @@ namespace MetaPrograms.CSharp.Reader
             };
         }
 
+        private static AbstractExpression ReadLiteral(ILiteralOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+            var type = context.FindMemberOrThrow<TypeMember>(binding: op.Type);
+
+            return new ConstantExpression {
+                Type = type,
+                Value = op.ConstantValue.HasValue ? op.ConstantValue : null
+            };
+        }
+
         private static AbstractExpression ReadAssignment(IAssignmentOperation op)
         {
             var result = new AssignmentExpression();
@@ -399,6 +412,11 @@ namespace MetaPrograms.CSharp.Reader
                 WhenTrue = ReadExpression(op.WhenTrue),
                 WhenFalse = ReadExpression(op.WhenFalse)
             };
+        }
+
+        private static AbstractExpression ReadConversion(IConversionOperation op)
+        {
+            return ReadExpression(op.Operand);
         }
 
         private static Argument ReadArgument(IArgumentOperation op)
