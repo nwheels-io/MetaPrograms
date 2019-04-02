@@ -5,6 +5,7 @@ using System.Text;
 using MetaPrograms;
 using MetaPrograms.Members;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 
@@ -54,7 +55,7 @@ namespace MetaPrograms.CSharp.Reader
         }
 
         private void IncludeType(INamedTypeSymbol symbol, bool force = false)
-        {
+        {            
             if (symbol != null && (force || ShouldIncludeType(symbol)) && _includedSymbols.Add(symbol))
             {
                 var systemTypeMetadataName = symbol.GetSystemTypeMetadataName();
@@ -122,16 +123,12 @@ namespace MetaPrograms.CSharp.Reader
                 linkedSymbol.Accept(this);
             }
 
-            if (!symbol.IsAbstract && symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is MethodDeclarationSyntax methodSyntax)
+            if (!symbol.IsAbstract)
             {
-                var compilation = _modelBuilder.GetCompilation(methodSyntax.SyntaxTree);
-                var methodSemantic = compilation.GetSemanticModel(methodSyntax.SyntaxTree, ignoreAccessibility: true);
-                var bodyOperation = methodSemantic.GetOperation(methodSyntax.Body);
-
-                if (bodyOperation != null)
+                var syntaxRef = symbol.DeclaringSyntaxReferences.FirstOrDefault();
+                if (syntaxRef != null)
                 {
-                    var walker = new TypeDiscoveryOperationWalker(type => type.Accept(this));
-                    bodyOperation.Accept(walker);
+                    VisitMethodBody(syntaxRef.GetSyntax());
                 }
             }
         }
@@ -216,6 +213,21 @@ namespace MetaPrograms.CSharp.Reader
             if (TypeHasSourceCode(type))
             {
                 _codedTypeDescendLevel--;
+            }
+        }
+
+        private void VisitMethodBody(SyntaxNode memberSyntax)
+        {
+            var compilation = _modelBuilder.GetCompilation(memberSyntax.SyntaxTree);
+            var methodSemantic = compilation.GetSemanticModel(memberSyntax.SyntaxTree, ignoreAccessibility: true);
+
+            var bodySyntax = (memberSyntax is MethodDeclarationSyntax method ? method.Body : memberSyntax);            
+            var bodyOperation = methodSemantic.GetOperation(bodySyntax);
+
+            if (bodyOperation != null)
+            {
+                var walker = new TypeDiscoveryOperationWalker(type => type.Accept(this));
+                bodyOperation.Accept(walker);
             }
         }
 
