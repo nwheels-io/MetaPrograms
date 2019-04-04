@@ -62,6 +62,11 @@ namespace MetaPrograms.CSharp.Reader
             base.VisitDeclarationPattern(operation);
         }
 
+        public override void VisitTypeOf(ITypeOfOperation operation)
+        {
+            base.VisitTypeOf(operation);
+        }
+
         public override void VisitPatternCaseClause(IPatternCaseClauseOperation operation)
         {
             base.VisitPatternCaseClause(operation);
