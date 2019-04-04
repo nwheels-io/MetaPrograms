@@ -46,6 +46,26 @@ namespace MetaPrograms
             return null;
         }
 
+        public TypeMember TryGetClrTypeMember(Type clrType)
+        {
+            return TryGet<TypeMember>(new SystemTypeNameBinding(clrType));
+        }
+
+        public TypeMember TryGetClrTypeMember<T>()
+        {
+            return TryGetClrTypeMember(typeof(T));
+        }
+
+        public TypeMember GetTypeClrTypeMember(Type clrType)
+        {
+            return Get<TypeMember>(new SystemTypeNameBinding(clrType));
+        }
+
+        public TypeMember GetClrTypeMember<T>()
+        {
+            return GetTypeClrTypeMember(typeof(T));
+        }
+
         public void Add<TMember>(TMember member, bool isTopLevel = false)
             where TMember : AbstractMember
         {
