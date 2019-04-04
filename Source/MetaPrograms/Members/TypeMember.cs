@@ -13,7 +13,6 @@ namespace MetaPrograms.Members
         public TypeMember BaseType { get; set; }
         public HashSet<TypeMember> Interfaces { get; } = new HashSet<TypeMember>();
         public TypeMemberKind TypeKind { get; set; }
-        public bool IsAbstract { get; set; }
         public bool IsValueType { get; set; }
         public bool IsCollection { get; set; }
         public bool IsArray { get; set; }

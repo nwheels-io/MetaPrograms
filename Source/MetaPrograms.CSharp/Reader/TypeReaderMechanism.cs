@@ -25,6 +25,7 @@ namespace MetaPrograms.CSharp.Reader
 
             this.MemberBuilder = new TypeMember();
             MemberBuilder.Status = MemberStatus.Incomplete;
+            MemberBuilder.Modifier = symbol.GetMemberModifier();
             MemberBuilder.Bindings.Add(Symbol);
             MemberBuilder.Bindings.Add(FullyQualifiedMetadataName);
             MemberBuilder.Bindings.Add(new SystemTypeNameBinding(Symbol.GetSystemTypeMetadataName()));
@@ -54,7 +55,7 @@ namespace MetaPrograms.CSharp.Reader
 
         public void RegisterFinalType()
         {
-            MemberBuilder.Status = MemberStatus.Compiled;
+            MemberBuilder.Status = (Symbol.HasSourceCode() ? MemberStatus.Parsed : MemberStatus.Compiled);
         }
 
         public void ReadName()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MetaPrograms;
+using MetaPrograms.Extensions;
 using MetaPrograms.Members;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -36,6 +37,13 @@ namespace MetaPrograms.CSharp.Reader
             foreach (var attribute in attributes)
             {
                 attribute.AttributeClass.Accept(this);
+                attribute.ConstructorArguments.ForEach((arg, index) => {
+                    arg.Type.Accept(this);
+                    if (arg.Value is INamedTypeSymbol typeSymbol)
+                    {
+                        IncludeType(typeSymbol, force: true);
+                    }
+                });
             }
         }
 
@@ -90,7 +98,11 @@ namespace MetaPrograms.CSharp.Reader
 
         private void VisitGenericArguments(INamedTypeSymbol symbol)
         {
-            foreach (var argument in symbol.TypeArguments.OfType<INamedTypeSymbol>())
+            var validArguments = symbol.TypeArguments
+                .OfType<INamedTypeSymbol>()
+                .Where(arg => !(arg is IErrorTypeSymbol));
+            
+            foreach (var argument in validArguments)
             {
                 IncludeType(argument, force: true);
             }
@@ -169,7 +181,7 @@ namespace MetaPrograms.CSharp.Reader
 
             var referencedByIncludedType = (_codedTypeDescendLevel > 0);
             var externalFarFromCode = (_anyTypeDescendLevel - _codedTypeDescendLevel > 1);
-            return (TypeHasSourceCode(symbol) || (referencedByIncludedType && !externalFarFromCode));
+            return (symbol.HasSourceCode() || (referencedByIncludedType && !externalFarFromCode));
         }
 
         private void RegisterTypeReader(INamedTypeSymbol symbol, string systemTypeMetadataName)
@@ -200,7 +212,7 @@ namespace MetaPrograms.CSharp.Reader
         {
             _anyTypeDescendLevel++;
 
-            if (TypeHasSourceCode(type))
+            if (type.HasSourceCode())
             {
                 _codedTypeDescendLevel++;
             }
@@ -210,7 +222,7 @@ namespace MetaPrograms.CSharp.Reader
         {
             _anyTypeDescendLevel--;
 
-            if (TypeHasSourceCode(type))
+            if (type.HasSourceCode())
             {
                 _codedTypeDescendLevel--;
             }
@@ -244,7 +256,5 @@ namespace MetaPrograms.CSharp.Reader
                 .Concat(parent.Parameters)
                 .Where(s => s != null);
         }
-
-        private static bool TypeHasSourceCode(INamedTypeSymbol type) => (type.DeclaringSyntaxReferences.Length > 0);
     }
 }

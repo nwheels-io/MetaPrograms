@@ -56,6 +56,11 @@ namespace MetaPrograms.CSharp.Reader
             return (symbol is INamespaceSymbol ns && ns.IsGlobalNamespace);
         }
 
+        public static bool HasSourceCode(this ISymbol symbol)
+        {
+            return (symbol.DeclaringSyntaxReferences.Length > 0);
+        }
+
         public static MemberVisibility GetMemberVisibility(this ISymbol symbol)
         {
             switch (symbol.DeclaredAccessibility)

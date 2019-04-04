@@ -9,7 +9,7 @@ namespace MetaPrograms
 
         public SystemTypeNameBinding(Type clrType)
         {
-            this.SystemTypeMetadataName = clrType.FullName;
+            this.SystemTypeMetadataName = clrType.FullName + "," + clrType.Assembly.GetName().Name;
         }
 
         public SystemTypeNameBinding(string systemTypeMetadataName)
