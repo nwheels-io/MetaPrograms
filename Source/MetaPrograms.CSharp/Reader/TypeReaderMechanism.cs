@@ -27,11 +27,14 @@ namespace MetaPrograms.CSharp.Reader
             MemberBuilder.Status = MemberStatus.Incomplete;
             MemberBuilder.Bindings.Add(Symbol);
             MemberBuilder.Bindings.Add(FullyQualifiedMetadataName);
+            MemberBuilder.Bindings.Add(new SystemTypeNameBinding(Symbol.GetSystemTypeMetadataName()));
 
             if (ClrType != null)
             {
                 MemberBuilder.Bindings.Add(ClrType);
             }
+            
+            AssignAssemblyAndModuleName();
         }
 
         public CodeModelBuilder ModelBuilder { get; }
@@ -187,6 +190,20 @@ namespace MetaPrograms.CSharp.Reader
                 method.MethodKind == MethodKind.Destructor ||
                 method.MethodKind == MethodKind.StaticConstructor ||
                 method.MethodKind == MethodKind.Constructor);
+        }
+        
+        private void AssignAssemblyAndModuleName()
+        {
+            if (ClrType != null)
+            {
+                MemberBuilder.AssemblyName = ClrType.Assembly.GetName().Name;
+                MemberBuilder.ModuleName = ClrType.Module.Name;
+            }
+            else
+            {
+                MemberBuilder.AssemblyName = Symbol.ContainingAssembly?.Name;
+                MemberBuilder.ModuleName = Symbol.ContainingModule?.Name;
+            }
         }
 
         //public TypeMember CreateTypeMemberWithBindings(bool shouldCreateProxy)

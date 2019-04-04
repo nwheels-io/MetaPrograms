@@ -20,10 +20,9 @@ namespace MetaPrograms.CSharp.Reader
         {
             _clrTypeResolver = clrTypeResolver;
             
-            var compilations = CompileAllProjects(workspace);
-
             this.Workspace = workspace;
-            this.ModelBuilder = new CodeModelBuilder(compilations);
+            this.Compilations = CompileAllProjects(Workspace);
+            this.ModelBuilder = new CodeModelBuilder(Compilations);
         }
 
         public void Read()
@@ -34,11 +33,31 @@ namespace MetaPrograms.CSharp.Reader
                 ReadAllTypes();
             }
         }
+        
+        public PortableExecutableReference TryGetAssemblyPEReference(TypeMember type)
+        {
+            var typeSymbol = type.GetBindingOrThrow<INamedTypeSymbol>();
+            PortableExecutableReference reference;
+
+            if (typeSymbol.ContainingAssembly != null)
+            {
+                reference = Compilations
+                    .Select(x => x.GetMetadataReference(typeSymbol.ContainingAssembly))
+                    .OfType<PortableExecutableReference>()
+                    .FirstOrDefault();
+            }
+            else
+            {
+                reference = null;
+            }
+
+            return reference;
+        }
 
         public ImperativeCodeModel GetCodeModel() => ModelBuilder.GetCodeModel();
-
         public Workspace Workspace { get; }
         public CodeModelBuilder ModelBuilder { get; private set; }
+        public IEnumerable<Compilation> Compilations { get; }
 
         private void DiscoverAllTypes()
         {

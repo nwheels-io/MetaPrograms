@@ -31,7 +31,8 @@ namespace MetaPrograms.CSharp.Reader
                 [OperationKind.ObjectCreation] = op => ReadObjectCreation((IObjectCreationOperation)op),
                 [OperationKind.ObjectOrCollectionInitializer] = op => ReadObjectOrCollectionInitializer((IObjectOrCollectionInitializerOperation)op),
                 [OperationKind.Conditional] = op => ReadConditional((IConditionalOperation)op),
-                [OperationKind.Conversion] = op => ReadConversion((IConversionOperation)op)
+                [OperationKind.Conversion] = op => ReadConversion((IConversionOperation)op),
+                [OperationKind.TypeOf] = op => ReadTypeOf((ITypeOfOperation)op)
             };
 
         private static readonly IReadOnlyDictionary<OperationKind, Func<IOperation, AbstractStatement>> StatementReaderByOperationKind =
@@ -416,7 +417,16 @@ namespace MetaPrograms.CSharp.Reader
 
         private static AbstractExpression ReadConversion(IConversionOperation op)
         {
+            //TODO: enrich AbstractExpression with conversion info
             return ReadExpression(op.Operand);
+        }
+
+        private static AbstractExpression ReadTypeOf(ITypeOfOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+            var operand = context.CodeModel.Get<TypeMember>(op.TypeOperand);
+
+            return new TypeReferenceExpression(operand);
         }
 
         private static Argument ReadArgument(IArgumentOperation op)
