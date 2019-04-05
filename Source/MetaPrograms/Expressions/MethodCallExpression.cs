@@ -26,6 +26,8 @@ namespace MetaPrograms.Expressions
             return rewriter.RewriteMethodCallExpression(this);
         }
 
+        public IdentifierName SafeGetMethodName() => Method?.Name ?? MethodName;
+
         public AbstractExpression Target { get; set; }
         public MethodMemberBase Method { get; set; }
         public IdentifierName MethodName { get; set; }

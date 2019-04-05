@@ -96,6 +96,21 @@ namespace MetaPrograms.Members
             }
         }
 
+        public bool IsAssignableFrom(TypeMember other)
+        {
+            while (!ReferenceEquals(other, null))
+            {
+                if (ReferenceEquals(other, this))
+                {
+                    return true;
+                }
+
+                other = other.BaseType;
+            }
+
+            return false;
+        }
+        
         public TypeMember MakeGenericType(params TypeMember[] typeArguments)
         {
             //TODO: validate type arguments
