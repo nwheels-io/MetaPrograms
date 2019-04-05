@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using MetaPrograms.Expressions;
 using MetaPrograms.Members;
 
 namespace MetaPrograms
@@ -56,14 +57,14 @@ namespace MetaPrograms
             return TryGetClrTypeMember(typeof(T));
         }
 
-        public TypeMember GetTypeClrTypeMember(Type clrType)
+        public TypeMember GetClrTypeMember(Type clrType)
         {
             return Get<TypeMember>(new SystemTypeNameBinding(clrType));
         }
 
         public TypeMember GetClrTypeMember<T>()
         {
-            return GetTypeClrTypeMember(typeof(T));
+            return GetClrTypeMember(typeof(T));
         }
 
         public void Add<TMember>(TMember member, bool isTopLevel = false)

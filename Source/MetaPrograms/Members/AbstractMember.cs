@@ -36,6 +36,11 @@ namespace MetaPrograms.Members
         {
             return Bindings.OfType<T>().FirstOrDefault();
         }
+
+        public AttributeDescription TryGetAttribute(TypeMember attributeType)
+        {
+            return Attributes.FirstOrDefault(attr => attr.AttributeType == attributeType);
+        }
         
         public override string ToString()
         {
