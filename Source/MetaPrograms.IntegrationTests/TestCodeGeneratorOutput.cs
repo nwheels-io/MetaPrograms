@@ -14,19 +14,15 @@ namespace MetaPrograms.IntegrationTests
             SourceFiles = ImmutableDictionary<string, Stream>.Empty;
         }
 
-        public void AddSourceFile(IEnumerable<string> folderPath, string fileName, string contents)
+        public void AddSourceFile(FilePath path, string contents)
         {
-            var filePath = Path
-                .Combine(folderPath.Concat(new[] { fileName }).ToArray())
-                .Replace(Path.DirectorySeparatorChar, '/');
-
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             
             writer.Write(contents);
             writer.Flush();
 
-            SourceFiles = SourceFiles.Add(filePath, stream);
+            SourceFiles = SourceFiles.Add(path.NormalizedFullPath, stream);
         }
 
         public CodeTextOptions TextOptions => CodeTextOptions.Default;
