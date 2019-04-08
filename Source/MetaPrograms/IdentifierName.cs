@@ -198,6 +198,17 @@ namespace MetaPrograms
             return identifier.ToString();
         }
 
+        public static string ConvertCasing(string original, CasingStyle originalCasing, CasingStyle newCasing)
+        {
+            var name = new IdentifierName(original, language: null, style: originalCasing);
+            return name.ToString(newCasing);
+        }
+
+        public static string Unqualify(string qualifiedName)
+        {
+            return qualifiedName?.Split('.').LastOrDefault();
+        }
+        
         private static List<Fragment> GetFlatListOfFragments(object[] anyFragments)
         {
             var fragmentList = new List<Fragment>();

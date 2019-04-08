@@ -30,13 +30,46 @@ namespace MetaPrograms
         {
             return new FilePath(_subFolder.Append(_fileName).Concat(pathAndName).ToArray());
         }
-        
+
+        public FilePath ReplaceFileName(string newFileName)
+        {
+            return new FilePath(_subFolder, newFileName);
+        }
+
+        public FilePath ReplaceSubFolder(IEnumerable<string> newSubFolder)
+        {
+            return new FilePath(newSubFolder, _fileName);
+        }
+
+        public FilePath Up(int count = 1)
+        {
+            return new FilePath(_subFolder.Take(_subFolder.Length - count + 1).ToArray());
+        }
+
+        public FilePath Tail(int count = 1)
+        {
+            return new FilePath(
+                _subFolder
+                .Skip(_subFolder.Length - count + 1)
+                .Append(_fileName)
+                .ToArray());
+        }
+
+        public override string ToString()
+        {
+            return FullPath;
+        }
+
         public IReadOnlyList<string> SubFolder => _subFolder;
         public string FileName => _fileName;
         public string FolderPath => Path.Combine(_subFolder);
         public string FullPath => Path.Combine(FolderPath, _fileName);
-        
-        public string NormalizedFolderPath => FolderPath.Replace(Path.DirectorySeparatorChar, '/');
-        public string NormalizedFullPath => FullPath.Replace(Path.DirectorySeparatorChar, '/');
+        public string NormalizedFolderPath => Normalize(FolderPath);
+        public string NormalizedFullPath => Normalize(FullPath);
+
+        public static string Normalize(string path)
+        {
+            return path?.Replace(Path.DirectorySeparatorChar, '/');
+        }
     }
 }
