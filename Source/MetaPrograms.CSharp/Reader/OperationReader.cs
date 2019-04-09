@@ -277,7 +277,7 @@ namespace MetaPrograms.CSharp.Reader
 
             return new ConstantExpression {
                 Type = type,
-                Value = op.ConstantValue.HasValue ? op.ConstantValue : null
+                Value = op.ConstantValue.HasValue ? op.ConstantValue.Value : null
             };
         }
 
