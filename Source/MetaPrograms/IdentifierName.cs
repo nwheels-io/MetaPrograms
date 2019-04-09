@@ -204,9 +204,26 @@ namespace MetaPrograms
             return name.ToString(newCasing);
         }
 
-        public static string Unqualify(string qualifiedName)
+        public static IdentifierName Unqualify(string qualifiedName, CasingStyle currentCasing, string separator = ".")
         {
-            return qualifiedName?.Split('.').LastOrDefault();
+            var unqualifiedString = qualifiedName
+                ?.Split(new[] {separator}, StringSplitOptions.RemoveEmptyEntries)
+                .LastOrDefault(); 
+            
+            return new IdentifierName(
+                unqualifiedString,
+                language: null, 
+                style: currentCasing);
+        }
+        
+        public static IdentifierName Flatten(string qualifiedName, CasingStyle currentCasing, string separator = ".")
+        {
+            var flattenedString = qualifiedName?.Replace(separator, string.Empty);
+
+            return new IdentifierName(
+                flattenedString, 
+                language: null, 
+                style: currentCasing);
         }
         
         private static List<Fragment> GetFlatListOfFragments(object[] anyFragments)
@@ -428,5 +445,6 @@ namespace MetaPrograms
             public int HyphenCount;
             public int UnderscoreCount;
         }
+
     }
 }
