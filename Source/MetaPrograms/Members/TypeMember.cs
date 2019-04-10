@@ -105,6 +105,11 @@ namespace MetaPrograms.Members
                     return true;
                 }
 
+                if (other.Interfaces.Contains(this))
+                {
+                    return true;
+                }
+
                 other = other.BaseType;
             }
 
