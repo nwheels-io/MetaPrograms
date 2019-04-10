@@ -23,12 +23,15 @@ namespace MetaPrograms.CSharp.Reader
                 [OperationKind.InstanceReference] = op => ReadInstanceReference(op),
                 [OperationKind.MethodReference] = op => ReadMethodReference((IMethodReferenceOperation)op),
                 [OperationKind.PropertyReference] = op => ReadPropertyReference((IPropertyReferenceOperation)op),
+                [OperationKind.FieldReference] = op => ReadFieldReference((IFieldReferenceOperation)op),
                 [OperationKind.EventReference] = op => ReadEventReference((IEventReferenceOperation)op),
+                [OperationKind.ParameterReference] = op => ReadParameterReference((IParameterReferenceOperation)op),
                 [OperationKind.DelegateCreation] = op => ReadDelegateCreation((IDelegateCreationOperation)op),
                 [OperationKind.AnonymousFunction] = op => ReadAnonymousFunction((IAnonymousFunctionOperation)op),
                 [OperationKind.Await] = op => ReadAwait((IAwaitOperation)op),
                 [OperationKind.Invocation] = op => ReadInvocation((IInvocationOperation)op),
                 [OperationKind.ObjectCreation] = op => ReadObjectCreation((IObjectCreationOperation)op),
+                [OperationKind.ArrayCreation] = op => ReadArrayCreation((IArrayCreationOperation)op),
                 [OperationKind.ObjectOrCollectionInitializer] = op => ReadObjectOrCollectionInitializer((IObjectOrCollectionInitializerOperation)op),
                 [OperationKind.Conditional] = op => ReadConditional((IConditionalOperation)op),
                 [OperationKind.Conversion] = op => ReadConversion((IConversionOperation)op),
@@ -320,6 +323,16 @@ namespace MetaPrograms.CSharp.Reader
             };
         }
 
+        private static AbstractExpression ReadFieldReference(IFieldReferenceOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+
+            return new MemberExpression {
+                Target = ReadExpression(op.Instance),
+                Member = context.FindMemberOrThrow<FieldMember>(op.Field)
+            };
+        }
+
         private static AbstractExpression ReadEventReference(IEventReferenceOperation op)
         {
             var context = CodeReaderContext.GetContextOrThrow();
@@ -330,6 +343,15 @@ namespace MetaPrograms.CSharp.Reader
             };
         }
         
+        private static AbstractExpression ReadParameterReference(IParameterReferenceOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+            
+            return new ParameterExpression() {
+                // TODO: implement properly
+            };
+        }
+
         private static AbstractExpression ReadDelegateCreation(IDelegateCreationOperation op)
         {
             return ReadExpression(op.Target);
@@ -379,6 +401,13 @@ namespace MetaPrograms.CSharp.Reader
             };
         }
 
+        private static AbstractExpression ReadArrayCreation(IArrayCreationOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+            //TODO: implement properly
+            return new NewArrayExpression();
+        }
+
         private static AbstractExpression ReadObjectOrCollectionInitializer(IObjectOrCollectionInitializerOperation op)
         {
             var context = CodeReaderContext.GetContextOrThrow();
@@ -394,9 +423,9 @@ namespace MetaPrograms.CSharp.Reader
             NamedPropertyValue readInitializer(IOperation initOp)
             {
                 if (initOp is IAssignmentOperation assignment &&
-                    assignment.Target is IPropertyReferenceOperation propertyRef)
+                    assignment.Target is IMemberReferenceOperation memberRef)
                 {
-                    var property = context.FindMemberOrThrow<PropertyMember>(propertyRef.Property);
+                    var property = context.FindMemberOrThrow<AbstractMember>(memberRef.Member);
                     var value = ReadAssignmentValue(assignment);
 
                     return new NamedPropertyValue(property.Name, value);

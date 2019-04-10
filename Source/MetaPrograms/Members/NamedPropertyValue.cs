@@ -10,6 +10,7 @@ namespace MetaPrograms.Members
             Value = value;
         }
 
+        public AbstractMember Member { get; }
         public IdentifierName Name { get; }
         public AbstractExpression Value { get; }
     }
