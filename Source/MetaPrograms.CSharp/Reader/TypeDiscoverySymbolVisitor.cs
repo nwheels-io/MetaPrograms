@@ -78,6 +78,7 @@ namespace MetaPrograms.CSharp.Reader
                 {
                     RegisterTypeReader(symbol, systemTypeMetadataName);
                     VisitAttributes(symbol);
+                    //VisitGenericDefinition(symbol); //TODO: fix generic type definition
                     VisitGenericArguments(symbol);
                     IncludeType(symbol.BaseType, force: true);
                     IncludeType(symbol.ContainingType, force: true);
@@ -93,6 +94,15 @@ namespace MetaPrograms.CSharp.Reader
                 {
                     ExitType(symbol);
                 }
+            }
+        }
+
+        //TODO: fix generic type definition
+        private void VisitGenericDefinition(INamedTypeSymbol symbol)
+        {
+            if (symbol.IsGenericType && !symbol.IsDefinition && symbol.OriginalDefinition != null)
+            {
+                IncludeType(symbol.OriginalDefinition, force: true);
             }
         }
 
