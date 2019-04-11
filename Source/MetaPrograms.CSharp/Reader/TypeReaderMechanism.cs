@@ -6,6 +6,7 @@ using MetaPrograms.Members;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 //TODO: refactor following switch to mutable code model
 
@@ -73,8 +74,13 @@ namespace MetaPrograms.CSharp.Reader
             {
                 MemberBuilder.GenericParameters.AddRange(Symbol.TypeParameters.Select(GetTypeParameterOrArgument));
                 MemberBuilder.GenericArguments.AddRange(Symbol.TypeArguments.Select(GetTypeParameterOrArgument));
-            }
 
+                if (!Symbol.IsDefinition && Symbol.OriginalDefinition != null)
+                {
+                    MemberBuilder.GenericTypeDefinition = ModelBuilder.TryGetMember<TypeMember>(Symbol.OriginalDefinition);
+                }
+            }
+            
             TypeMember GetTypeParameterOrArgument(ITypeSymbol symbol)
             {
                 if (symbol is INamedTypeSymbol argument)
