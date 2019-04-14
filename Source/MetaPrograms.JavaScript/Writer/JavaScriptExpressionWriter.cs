@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml.Linq;
 using MetaPrograms;
@@ -29,7 +30,8 @@ namespace MetaPrograms.JavaScript.Writer
                 [typeof(AwaitExpression)] = (c, e) => WriteAwait(c, (AwaitExpression)e),
                 [typeof(ConditionalExpression)] = (c, e) => WriteConditional(c, (ConditionalExpression)e),
                 [typeof(BinaryExpression)] = (c, e) => WriteBinary(c, (BinaryExpression)e),
-                [typeof(XmlExpression)] = (c, e) => WriteJsx(c, (XmlExpression)e)
+                [typeof(XmlExpression)] = (c, e) => WriteJsx(c, (XmlExpression)e),
+                [typeof(InterpolatedStringExpression)] = (c, e) => WriteInterpolatedString(c, (InterpolatedStringExpression)e),
             };
 
         private static readonly Dictionary<BinaryOperator, string> BinarySyntaxByOperator =
@@ -53,6 +55,14 @@ namespace MetaPrograms.JavaScript.Writer
                 {BinaryOperator.GreaterThanOrEqual, ">="},
                 {BinaryOperator.LessThanOrEqual, "<="},
                 {BinaryOperator.NullCoalesce, "||"}
+            };
+
+        private static readonly Dictionary<char, string> InterpolatedEscapes =
+            new Dictionary<char, string> {
+                { '\\', "\\\\" },
+                { '\t', "\\t" },
+                { '$', "\\$" },
+                { '`', "\\`" }
             };
 
         public static void WriteExpression(CodeTextBuilder code, AbstractExpression expression)
@@ -257,6 +267,43 @@ namespace MetaPrograms.JavaScript.Writer
             jsxWriter.Write(expression.Xml);
             
             code.WriteListEnd();
+        }
+        
+        private static void WriteInterpolatedString(CodeTextBuilder code, InterpolatedStringExpression expression)
+        {
+            code.Write("`");
+
+            foreach (var part in expression.Parts)
+            {
+                switch (part)
+                {
+                    case InterpolatedStringExpression.TextPart text:
+                        WriteTextPart(text.Text);
+                        break;
+                    case InterpolatedStringExpression.InterpolationPart interpolation:
+                        WriteInterpolationPart(interpolation);
+                        break;
+                }
+            }
+
+            code.Write("`");
+
+            void WriteTextPart(string s)
+            {
+                for (int i = 0; i < s.Length; i++)
+                {
+                    code.Write(InterpolatedEscapes.TryGetValue(s[i], out var escape)
+                        ? escape 
+                        : string.Empty + s[i]);
+                }
+            }
+
+            void WriteInterpolationPart(InterpolatedStringExpression.InterpolationPart interpolation)
+            {
+                code.Write("${");
+                WriteExpression(code, interpolation.Value);
+                code.Write("}");
+            }
         }
     }
 }

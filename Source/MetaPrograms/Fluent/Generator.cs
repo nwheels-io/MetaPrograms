@@ -387,6 +387,32 @@ namespace MetaPrograms.Fluent
             initializerContext.Add(name, PopExpression(value));
         }
 
+        public static InterpolatedStringExpression INTERPOLATE(params object[] parts)
+        {
+            var expressionParts = parts.Select(CreatePart);
+
+            return new InterpolatedStringExpression {
+                Parts = expressionParts.ToList()
+            };
+
+            InterpolatedStringExpression.Part CreatePart(object obj)
+            {
+                switch (obj)
+                {
+                    case string text:
+                        return new InterpolatedStringExpression.TextPart {
+                            Text = text
+                        };
+                    case AbstractExpression expression:
+                        return new InterpolatedStringExpression.InterpolationPart {
+                            Value = PopExpression(expression)
+                        };
+                    default:
+                        throw new ArgumentException($"Unexpected element for interpolated string.", nameof(parts));
+                }
+            }
+        }
+        
         public static void IIF(AbstractExpression condition, AbstractExpression whenTrue, AbstractExpression whenFalse)
         {
             PushExpression(new ConditionalExpression {
@@ -428,7 +454,7 @@ namespace MetaPrograms.Fluent
                 Right = PopExpression(value) 
             });
 
-        public static AbstractExpression EQUALS(this AbstractExpression left, AbstractExpression right)
+        public static AbstractExpression EQ(this AbstractExpression left, AbstractExpression right)
             => PushExpression(new BinaryExpression {
                 Left = PopExpression(left),
                 Right = PopExpression(right),

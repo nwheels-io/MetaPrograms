@@ -8,6 +8,15 @@ namespace MetaPrograms.JavaScript.Writer
 {
     public static class JavaScriptLiteralWriter
     {
+        private static readonly Dictionary<char, string> CharacterEscapes =
+            new Dictionary<char, string> {
+                { '\\', "\\\\" },
+                { '\r', "\\r" },
+                { '\n', "\\n" },
+                { '\t', "\\t" },
+                { '"', "\\\"" },
+            };
+
         public static void WriteLiteral(CodeTextBuilder code, object value)
         {
             if (value == null)
@@ -46,9 +55,23 @@ namespace MetaPrograms.JavaScript.Writer
 
         private static void WriteString(CodeTextBuilder code, string s)
         {
-            code.Write("\"");
-            code.Write(s.Replace("\"", "\\\""));
-            code.Write("\"");
+            var result = new StringBuilder(capacity: s.Length + 4);
+            result.Append("\"");
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (CharacterEscapes.TryGetValue(s[i], out var escape))
+                {
+                    result.Append(escape);
+                }
+                else
+                {
+                    result.Append(s[i]);
+                }
+            }
+            
+            result.Append("\"");
+            code.Write(result.ToString());
         }
 
         private static void WriteBool(CodeTextBuilder code, bool value)

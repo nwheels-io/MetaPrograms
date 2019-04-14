@@ -11,7 +11,7 @@ namespace MetaPrograms.Expressions
                 switch (p)
                 {
                     case TextPart text:
-                        text.Text?.AcceptVisitor(visitor);
+                        //text.Text?.AcceptVisitor(visitor);
                         break;
                     case InterpolationPart interpolation:
                         interpolation.Value?.AcceptVisitor(visitor);
@@ -35,7 +35,7 @@ namespace MetaPrograms.Expressions
 
         public class TextPart : Part
         {
-            public AbstractExpression Text { get; set; }
+            public string Text { get; set; }
         }
 
         public class InterpolationPart : Part

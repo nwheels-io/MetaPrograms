@@ -22,12 +22,6 @@ namespace MetaPrograms
 
         protected CodeContextBase(ImperativeCodeModel codeModel, IClrTypeResolver typeResolver, LanguageInfo language)
         {
-//            if (Current.Value != null)
-//            {
-//                throw new InvalidOperationException(
-//                    "Another instance of CodeContextBase is already associated with the current call context.");
-//            }
-
             _previousContext = Current.Value; 
             Current.Value = this;
 

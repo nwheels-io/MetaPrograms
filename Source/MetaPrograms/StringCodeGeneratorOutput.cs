@@ -18,6 +18,6 @@ namespace MetaPrograms
 
         public CodeTextOptions TextOptions { get; }
 
-        public string GetOutput() => _output.ToString();
+        public string GetString() => _output.ToString();
     }
 }
