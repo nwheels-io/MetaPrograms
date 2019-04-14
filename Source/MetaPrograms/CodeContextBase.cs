@@ -14,6 +14,7 @@ namespace MetaPrograms
         protected static readonly AsyncLocal<CodeContextBase> Current = new AsyncLocal<CodeContextBase>();
 
         private readonly Stack<object> _stateStack = new Stack<object>();
+        private readonly CodeContextBase _previousContext;
 
         public ImperativeCodeModel CodeModel { get; }
         public IClrTypeResolver ClrTypeResolver { get; }
@@ -21,12 +22,13 @@ namespace MetaPrograms
 
         protected CodeContextBase(ImperativeCodeModel codeModel, IClrTypeResolver typeResolver, LanguageInfo language)
         {
-            if (Current.Value != null)
-            {
-                throw new InvalidOperationException(
-                    "Another instance of CodeContextBase is already associated with the current call context.");
-            }
+//            if (Current.Value != null)
+//            {
+//                throw new InvalidOperationException(
+//                    "Another instance of CodeContextBase is already associated with the current call context.");
+//            }
 
+            _previousContext = Current.Value; 
             Current.Value = this;
 
             this.CodeModel = codeModel;
@@ -38,7 +40,7 @@ namespace MetaPrograms
         {
             if (Current.Value == this)
             {
-                Current.Value = null;
+                Current.Value = _previousContext;
             }
         }
 

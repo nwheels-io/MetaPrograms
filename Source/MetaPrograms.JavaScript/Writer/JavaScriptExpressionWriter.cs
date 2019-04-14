@@ -14,6 +14,7 @@ namespace MetaPrograms.JavaScript.Writer
         private static readonly Dictionary<Type, Action<CodeTextBuilder, AbstractExpression>> WriterByExpressionType =
             new Dictionary<Type, Action<CodeTextBuilder, AbstractExpression>> {
                 [typeof(NullExpression)] = (c, e) => WriteNull(c, (NullExpression)e),
+                [typeof(NewArrayExpression)] = (c, e) => WriteNewArray(c, (NewArrayExpression)e),
                 [typeof(ConstantExpression)] = (c, e) => WriteConstant(c, (ConstantExpression)e),
                 [typeof(TupleExpression)] = (c, e) => WriteTuple(c, (TupleExpression)e),
                 [typeof(LocalVariableExpression)] = (c, e) => WriteVariable(c, (LocalVariableExpression)e),
@@ -27,7 +28,31 @@ namespace MetaPrograms.JavaScript.Writer
                 [typeof(ObjectInitializerExpression)] = (c, e) => WriteObjectInitializer(c, (ObjectInitializerExpression)e),
                 [typeof(AwaitExpression)] = (c, e) => WriteAwait(c, (AwaitExpression)e),
                 [typeof(ConditionalExpression)] = (c, e) => WriteConditional(c, (ConditionalExpression)e),
+                [typeof(BinaryExpression)] = (c, e) => WriteBinary(c, (BinaryExpression)e),
                 [typeof(XmlExpression)] = (c, e) => WriteJsx(c, (XmlExpression)e)
+            };
+
+        private static readonly Dictionary<BinaryOperator, string> BinarySyntaxByOperator =
+            new Dictionary<BinaryOperator, string>() {
+                {BinaryOperator.Add, "+"},
+                {BinaryOperator.Subtract, "-"},
+                {BinaryOperator.Multiply, "*"},
+                {BinaryOperator.Divide, "/"},
+                {BinaryOperator.Modulus, "%"},
+                {BinaryOperator.LogicalAnd, "&&"},
+                {BinaryOperator.LogicalOr, "||"},
+                {BinaryOperator.BitwiseAnd, "&"},
+                {BinaryOperator.BitwiseOr, "|"},
+                {BinaryOperator.BitwiseXor, "^"},
+                {BinaryOperator.LeftShift, "<<"},
+                {BinaryOperator.RightShift, ">>"},
+                {BinaryOperator.Equal, "==="},
+                {BinaryOperator.NotEqual, "!=="},
+                {BinaryOperator.GreaterThan, ">"},
+                {BinaryOperator.LessThan, "<"},
+                {BinaryOperator.GreaterThanOrEqual, ">="},
+                {BinaryOperator.LessThanOrEqual, "<="},
+                {BinaryOperator.NullCoalesce, "||"}
             };
 
         public static void WriteExpression(CodeTextBuilder code, AbstractExpression expression)
@@ -46,6 +71,22 @@ namespace MetaPrograms.JavaScript.Writer
         private static void WriteNull(CodeTextBuilder code, NullExpression expression)
         {
             JavaScriptLiteralWriter.WriteLiteral(code, null);
+        }
+
+        private static void WriteNewArray(CodeTextBuilder code, NewArrayExpression expression)
+        {
+            code.WriteListStart(opener: "[", closer: "]", separator: ",", newLine: true);
+
+            if (expression.DimensionInitializerValues != null)
+            {
+                foreach (var item in expression.DimensionInitializerValues.SelectMany(x => x))
+                {
+                    code.WriteListItem();
+                    WriteExpression(code, item);
+                }
+            }
+            
+            code.WriteListEnd();
         }
 
         public static void WriteConstant(CodeTextBuilder code, ConstantExpression constant)
@@ -190,6 +231,14 @@ namespace MetaPrograms.JavaScript.Writer
             WriteExpression(code, expression.WhenFalse);
             code.Write(")");
         }
+
+        private static void WriteBinary(CodeTextBuilder code, BinaryExpression expression)
+        {
+            WriteExpression(code, expression.Left);
+            code.Write($" {BinarySyntaxByOperator[expression.Operator]} ");
+            WriteExpression(code, expression.Right);
+        }
+
 
         private static void WriteJsx(CodeTextBuilder code, XmlExpression expression)
         {

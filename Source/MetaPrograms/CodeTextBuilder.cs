@@ -43,7 +43,7 @@ namespace MetaPrograms
             _text.AppendLine(s);
             WriteIndent(_indentLevel);
         }
-
+        
         public void Indent(int delta = 1)
         {
             var oldLevel = _indentLevel;

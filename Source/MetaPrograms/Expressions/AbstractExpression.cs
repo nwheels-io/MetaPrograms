@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using MetaPrograms.Members;
 
 namespace MetaPrograms.Expressions
@@ -32,16 +33,42 @@ namespace MetaPrograms.Expressions
                 return expr;
             }
 
-            var type = resolveType(value.GetType());
+            var clrType = value.GetType();
+            var type = resolveType(clrType);
             
-            if (type != null && type.IsArray)
+            if (value is IList valueAsList)
             {
-                return InitializedArrayAsConstantExpression(type, (IList)value, resolveType);
+                return InitializedArrayAsConstantExpression(type, valueAsList, resolveType);
+            }
+
+            if (value is IDictionary dictionary)
+            {
+                return InitializedDictionaryAsConstantExpression(dictionary, resolveType);
+            }
+
+            if ((clrType.IsClass || (clrType.IsValueType && !clrType.IsPrimitive)) && !(value is string))
+            {
+                return InitializedObjectAsConstantExpression(type, value, resolveType);
             }
 
             return new ConstantExpression {
                 Type = type,
                 Value = value
+            };
+        }
+
+        private static AbstractExpression InitializedDictionaryAsConstantExpression(
+            IDictionary dictionary, 
+            Func<Type, TypeMember> resolveType)
+        {
+            return new ObjectInitializerExpression {
+                Type = null, // TODO: populate Type
+                PropertyValues = dictionary.Keys
+                    .Cast<object>()
+                    .Select(key => new NamedPropertyValue {
+                        Name = key.ToString(),
+                        Value = FromValue(dictionary[key])
+                    }).ToList()
             };
         }
 
@@ -57,9 +84,27 @@ namespace MetaPrograms.Expressions
 
             return new NewArrayExpression {
                 Type = arrayType,
-                ElementType = arrayType.UnderlyingType,
+                ElementType = arrayType?.UnderlyingType,
                 Length = FromValue(arrayObject.Count, resolveType),
                 DimensionInitializerValues = new List<List<AbstractExpression>> {arrayItems}
+            };
+        }
+
+        private static AbstractExpression InitializedObjectAsConstantExpression(
+            TypeMember objectType,
+            object obj, 
+            Func<Type, TypeMember> resolveType)
+        {
+            var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var propertyValues = properties.Select(p => new NamedPropertyValue {
+                //Member = objectType.Members.OfType<PropertyMember>().FirstOrDefault(m => m.Name == p.Name),
+                Name = new IdentifierName(p.Name, language: null, style: CasingStyle.Pascal),
+                Value = FromValue(p.GetValue(obj))
+            }).ToList();
+
+            return new ObjectInitializerExpression {
+                Type = objectType,
+                PropertyValues = propertyValues
             };
         }
     }
