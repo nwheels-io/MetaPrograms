@@ -41,23 +41,23 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
 
             // act
                         
-            // var codeModel = ReadCodeModel(workspace);
-            // var uiMetadata = new WebUIMetadata(codeModel);
-            //
-            // var output = new TestCodeGeneratorOutput();
-            // var adapter = new HyperappAdapter(codeModel, new ComponentAdapterFactory(), output);
-            // adapter.GenerateImplementations(uiMetadata);
-            //
-            // // assert
-            //
-            // //WriteOutputToDisk(output, "FrontEnd");
-            // AssertOutputs(
-            //     output.SourceFiles,
-            //     subFolder: "FrontEnd",
-            //     "build/index.html", 
-            //     "src/index.js",
-            //     "src/components/form.js",
-            //     "src/services/greeting-service.js");
+            var codeModel = ReadCodeModel(workspace);
+            var uiMetadata = new WebUIMetadata(codeModel);
+            
+            var output = new TestCodeGeneratorOutput();
+            var adapter = new HyperappAdapter(codeModel, new ComponentAdapterFactory(), output);
+            adapter.GenerateImplementations(uiMetadata);
+            
+            // assert
+            
+            //WriteOutputToDisk(output, "FrontEnd");
+            AssertOutputs(
+                output.SourceFiles,
+                subFolder: "FrontEnd",
+                "build/index.html", 
+                "src/index.js",
+                "src/components/form.js",
+                "src/services/greeting-service.js");
         }
 
         [Test]
