@@ -533,7 +533,7 @@ namespace MetaPrograms.CSharp.Reader
                 {
                     case IInterpolatedStringTextOperation text:
                         result.Parts.Add(new InterpolatedStringExpression.TextPart {
-                            Text = ReadExpression(text.Text)
+                            Text = ReadExpression(text.Text).GetConstantValueOrNull() as string
                         });
                         break;
                     case IInterpolationOperation interpolation:
