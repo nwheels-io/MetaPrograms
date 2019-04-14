@@ -20,6 +20,7 @@ namespace MetaPrograms.Expressions
         }
 
         public MethodCallExpression ConstructorCall { get; set; }
-        public ObjectInitializerExpression Initializer { get; set; }
+        public ObjectInitializerExpression ObjectInitializer { get; set; }
+        public CollectionInitializerExpression CollectionInitializer { get; set; }
     }
 }

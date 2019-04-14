@@ -166,7 +166,17 @@ namespace MetaPrograms
             VisitAbstractExpression(expression);
         }
 
+        public virtual void VisitCollectionInitializerExpression(CollectionInitializerExpression expression)
+        {
+            VisitAbstractExpression(expression);
+        }
+
         public virtual void VisitParameterExpression(ParameterExpression expression)
+        {
+            VisitAbstractExpression(expression);
+        }
+        
+        public virtual void VisitInrerpolatedStringExpression(InterpolatedStringExpression expression)
         {
             VisitAbstractExpression(expression);
         }
