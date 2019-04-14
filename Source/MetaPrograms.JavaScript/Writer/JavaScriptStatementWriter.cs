@@ -14,7 +14,8 @@ namespace MetaPrograms.JavaScript.Writer
                 [typeof(BlockStatement)] = (c, s) => WriteBlock(c, (BlockStatement)s),
                 [typeof(ExpressionStatement)] = (c, s) => WriteExpression(c, (ExpressionStatement)s),
                 [typeof(VariableDeclarationStatement)] = (c, s) => WriteVariableDeclaration(c, (VariableDeclarationStatement)s),
-                [typeof(ReturnStatement)] = (c, s) => WriteReturn(c, (ReturnStatement)s)
+                [typeof(ReturnStatement)] = (c, s) => WriteReturn(c, (ReturnStatement)s),
+                [typeof(IfStatement)] = (c, s) => WriteIf(c, (IfStatement)s)
             };
 
         private static void WriteBlock(CodeTextBuilder code, BlockStatement block)
@@ -74,6 +75,32 @@ namespace MetaPrograms.JavaScript.Writer
                 code.Write(" ");
                 JavaScriptExpressionWriter.WriteExpression(code, statement.Expression);
             }
+        }
+        
+        private static void WriteIf(CodeTextBuilder code, IfStatement statement)
+        {
+            code.Write("if (");
+            JavaScriptExpressionWriter.WriteExpression(code, statement.Condition);
+            code.WriteLine(") ");
+
+            WriteBlockInsideBraces(code, statement.ThenBlock);
+
+            if (statement.ElseBlock != null)
+            {
+                WriteBlockInsideBraces(code, statement.ElseBlock);
+            }
+        }
+
+        private static void WriteBlockInsideBraces(CodeTextBuilder code, BlockStatement block)
+        {
+            code.WriteListStart(opener: "{", closer: "}", separator: "", newLine: true);
+            
+            if (block != null)
+            {
+                WriteBlock(code, block);
+            }
+            
+            code.WriteListEnd();
         }
     }
 }

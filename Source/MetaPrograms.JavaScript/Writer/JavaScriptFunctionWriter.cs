@@ -57,7 +57,11 @@ namespace MetaPrograms.JavaScript.Writer
                     }
                     else
                     {
-                        JavaScriptStatementWriter.WriteStatement(code, body.Statements[0]);                        
+                        code.WriteLine();
+                        code.Indent(1);
+                        JavaScriptStatementWriter.WriteStatement(code, body.Statements[0]);
+                        code.WriteLine();
+                        code.Indent(-1);
                     }
                     break;
                 default:

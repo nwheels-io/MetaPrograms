@@ -341,6 +341,25 @@ namespace MetaPrograms.Fluent
 
         public static AbstractExpression NEW(TypeMember type, params object[] constructorArguments) => throw new NotImplementedException();
 
+        public static AbstractExpression NEWARRAY(params AbstractExpression[] items)
+        {
+            return NEWARRAY(null, items);
+        }
+
+        public static AbstractExpression NEWARRAY(TypeMember elementType, params AbstractExpression[] items) 
+        {
+            var context = GetContextOrThrow();
+            
+            return PushExpression(new NewArrayExpression {
+                //TODO: populate Type
+                ElementType = elementType,
+                Length = AbstractExpression.FromValue(items.Length),
+                DimensionInitializerValues = new List<List<AbstractExpression>> {
+                    items.Select(PopExpression).ToList()
+                }
+            });
+        }
+        
         public static ObjectInitializerExpression INITOBJECT(params (string key, AbstractExpression value)[] initializers)
             => PushExpression(new ObjectInitializerExpression {
                 PropertyValues = initializers.Select(init => 
@@ -409,6 +428,13 @@ namespace MetaPrograms.Fluent
                 Right = PopExpression(value) 
             });
 
+        public static AbstractExpression EQUALS(this AbstractExpression left, AbstractExpression right)
+            => PushExpression(new BinaryExpression {
+                Left = PopExpression(left),
+                Right = PopExpression(right),
+                Operator = BinaryOperator.Equal
+            });
+        
         public static AbstractExpression INVOKE(this AbstractExpression expression, params AbstractExpression[] arguments)
             => INVOKE(expression, arguments.Select(arg => new Argument {
                 Expression = arg 
