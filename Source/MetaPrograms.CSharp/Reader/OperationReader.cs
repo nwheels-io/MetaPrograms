@@ -34,7 +34,9 @@ namespace MetaPrograms.CSharp.Reader
                 [OperationKind.ArrayCreation] = op => ReadArrayCreation((IArrayCreationOperation)op),
                 [OperationKind.ObjectOrCollectionInitializer] = op => ReadObjectOrCollectionInitializer((IObjectOrCollectionInitializerOperation)op),
                 [OperationKind.Conditional] = op => ReadConditional((IConditionalOperation)op),
+                [OperationKind.BinaryOperator] = op => ReadBinaryOperator((IBinaryOperation)op),
                 [OperationKind.Conversion] = op => ReadConversion((IConversionOperation)op),
+                [OperationKind.InterpolatedString] = op => ReadInterpolatedString((IInterpolatedStringOperation)op),
                 [OperationKind.TypeOf] = op => ReadTypeOf((ITypeOfOperation)op)
             };
 
@@ -43,6 +45,29 @@ namespace MetaPrograms.CSharp.Reader
                 [OperationKind.Block] = op => ReadBlock((IBlockOperation)op),
                 [OperationKind.ExpressionStatement] = op => ReadExpressionStatement((IExpressionStatementOperation)op),
                 [OperationKind.Return] = op => ReadReturn((IReturnOperation)op)
+            };
+
+        private static readonly IReadOnlyDictionary<BinaryOperatorKind, BinaryOperator> BinaryOperatorByOperatorKind =
+            new Dictionary<BinaryOperatorKind, BinaryOperator>() {
+                { BinaryOperatorKind.Add, BinaryOperator.Add },
+                { BinaryOperatorKind.Subtract, BinaryOperator.Subtract },
+                { BinaryOperatorKind.Multiply, BinaryOperator.Multiply },
+                { BinaryOperatorKind.Divide, BinaryOperator.Divide },
+                { BinaryOperatorKind.IntegerDivide, BinaryOperator.Divide },
+                { BinaryOperatorKind.Remainder, BinaryOperator.Modulus },
+                { BinaryOperatorKind.LeftShift, BinaryOperator.LeftShift },
+                { BinaryOperatorKind.RightShift, BinaryOperator.RightShift },
+                { BinaryOperatorKind.And, BinaryOperator.BitwiseAnd },
+                { BinaryOperatorKind.Or, BinaryOperator.BitwiseOr },
+                { BinaryOperatorKind.ExclusiveOr, BinaryOperator.BitwiseXor },
+                { BinaryOperatorKind.ConditionalAnd, BinaryOperator.LogicalAnd },
+                { BinaryOperatorKind.ConditionalOr, BinaryOperator.LogicalOr },
+                { BinaryOperatorKind.Equals, BinaryOperator.Equal },
+                { BinaryOperatorKind.NotEquals, BinaryOperator.NotEqual },
+                { BinaryOperatorKind.LessThan, BinaryOperator.LessThan },
+                { BinaryOperatorKind.LessThanOrEqual, BinaryOperator.LessThanOrEqual },
+                { BinaryOperatorKind.GreaterThanOrEqual, BinaryOperator.GreaterThanOrEqual },
+                { BinaryOperatorKind.GreaterThan, BinaryOperator.GreaterThan }
             };
 
         private readonly CodeModelBuilder _codeModel;
@@ -389,7 +414,8 @@ namespace MetaPrograms.CSharp.Reader
         {
             var context = CodeReaderContext.GetContextOrThrow();
             var objectType = context.CodeModel.Get<TypeMember>(op.Type);
-
+            var initializer = ReadExpression(op.Initializer);
+            
             return new NewObjectExpression {
                 Type = objectType,
                 ConstructorCall = new MethodCallExpression {
@@ -397,7 +423,8 @@ namespace MetaPrograms.CSharp.Reader
                     Method = context.CodeModel.Get<ConstructorMember>(op.Constructor),
                     Arguments = op.Arguments.Select(ReadArgument).ToList()
                 },
-                Initializer = (ObjectInitializerExpression)ReadExpression(op.Initializer)
+                ObjectInitializer = initializer as ObjectInitializerExpression,
+                CollectionInitializer = initializer as CollectionInitializerExpression
             };
         }
 
@@ -410,10 +437,22 @@ namespace MetaPrograms.CSharp.Reader
 
         private static AbstractExpression ReadObjectOrCollectionInitializer(IObjectOrCollectionInitializerOperation op)
         {
+            if (IsObjectInitializer(op))
+            {
+                return ReadObjectInitializer(op);
+            }
+
+            return ReadCollectionInitializer(op);
+        }
+
+        private static bool IsObjectInitializer(IObjectOrCollectionInitializerOperation op)
+        {
+            return op.Initializers.All(init => init is IAssignmentOperation);
+        }
+
+        private static AbstractExpression ReadObjectInitializer(IObjectOrCollectionInitializerOperation op)
+        {
             var context = CodeReaderContext.GetContextOrThrow();
-
-            //TODO: handle collection initializers?
-
             var result = new ObjectInitializerExpression {
                 PropertyValues = op.Initializers.Select(readInitializer).ToList()
             };
@@ -435,6 +474,28 @@ namespace MetaPrograms.CSharp.Reader
             }
         }
 
+        private static AbstractExpression ReadCollectionInitializer(IObjectOrCollectionInitializerOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+            var result = new CollectionInitializerExpression {
+                Items = op.Initializers.Select(readInitializer).ToList()
+            };
+
+            return result;
+
+            CollectionInitializerExpression.ItemInitializer readInitializer(IOperation initOp)
+            {
+                if (initOp is IInvocationOperation invocation)
+                {
+                    var item = new CollectionInitializerExpression.ItemInitializer();
+                    item.ItemArguments.AddRange(invocation.Arguments.Select(arg => ReadExpression(arg.Value)));
+                    return item;
+                }
+
+                throw new CodeReadErrorException($"Unrecognized collection initializer: {initOp.Syntax}");
+            }
+        }
+
         private static AbstractExpression ReadConditional(IConditionalOperation op)
         {
             return new ConditionalExpression {
@@ -444,10 +505,48 @@ namespace MetaPrograms.CSharp.Reader
             };
         }
 
+        private static AbstractExpression ReadBinaryOperator(IBinaryOperation op)
+        {
+            var context = CodeReaderContext.GetContextOrThrow();
+
+            return new BinaryExpression {
+                Left = ReadExpression(op.LeftOperand),
+                Right = ReadExpression(op.RightOperand),
+                Type =  context.CodeModel.TryGet<TypeMember>(op.Type),
+                Operator = BinaryOperatorByOperatorKind[op.OperatorKind]
+            };
+        }
+
         private static AbstractExpression ReadConversion(IConversionOperation op)
         {
             //TODO: enrich AbstractExpression with conversion info
             return ReadExpression(op.Operand);
+        }
+
+        private static AbstractExpression ReadInterpolatedString(IInterpolatedStringOperation op)
+        {
+            var result = new InterpolatedStringExpression();
+
+            foreach (var part in op.Parts)
+            {
+                switch (part)
+                {
+                    case IInterpolatedStringTextOperation text:
+                        result.Parts.Add(new InterpolatedStringExpression.TextPart {
+                            Text = ReadExpression(text.Text)
+                        });
+                        break;
+                    case IInterpolationOperation interpolation:
+                        result.Parts.Add(new InterpolatedStringExpression.InterpolationPart {
+                            Value = ReadExpression(interpolation.Expression),
+                            Alignment = ReadExpression(interpolation.Alignment),
+                            FormatString = ReadExpression(interpolation.FormatString)
+                        });
+                        break;
+                }
+            }
+
+            return result;
         }
 
         private static AbstractExpression ReadTypeOf(ITypeOfOperation op)

@@ -14,7 +14,7 @@ namespace MetaPrograms.CSharp.Reader
         public EnumReader(TypeReaderMechanism mechanism)
         {
             _mechanism = mechanism;
-            _mechanism.MemberBuilder.TypeKind = TypeMemberKind.Struct;
+            _mechanism.MemberBuilder.TypeKind = TypeMemberKind.Enum;
         }
 
         public void RegisterProxy()
@@ -38,7 +38,7 @@ namespace MetaPrograms.CSharp.Reader
 
         public void ReadMemberDeclarations()
         {
-            _mechanism.ReadEnumMembers();
+            _mechanism.ReadMemberDeclarations();
         }
 
         public void ReadAttributes()

@@ -42,9 +42,9 @@ namespace Example.WebUIModel.Metadata
         {
             if (DeclaredProperty.Getter.Body.Statements.FirstOrDefault() is ReturnStatement @return)
             {
-                if (@return.Expression is NewObjectExpression newObj && newObj.Initializer != null)
+                if (@return.Expression is NewObjectExpression newObj && newObj.ObjectInitializer != null)
                 {
-                    foreach (var propValue in newObj.Initializer.PropertyValues)
+                    foreach (var propValue in newObj.ObjectInitializer.PropertyValues)
                     {
                         PropertyMap.Add(propValue.Name, propValue.Value);
                     }

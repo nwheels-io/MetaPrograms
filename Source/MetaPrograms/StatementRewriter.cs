@@ -219,6 +219,11 @@ namespace MetaPrograms
             return expression;
         }
 
+        public virtual InterpolatedStringExpression RewriteInterpolatedStringExpression(InterpolatedStringExpression expression)
+        {
+            return expression;
+        }
+
         public virtual IndexerExpression RewriteIndexerExpression(IndexerExpression expression)
         {
             return expression;
@@ -301,6 +306,11 @@ namespace MetaPrograms
         }
 
         public virtual ObjectInitializerExpression RewriteObjectInitializerExpression(ObjectInitializerExpression expression)
+        {
+            return expression;
+        }
+
+        public virtual CollectionInitializerExpression RewriteCollectionInitializerExpression(CollectionInitializerExpression expression)
         {
             return expression;
         }
