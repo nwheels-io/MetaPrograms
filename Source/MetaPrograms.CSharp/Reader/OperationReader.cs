@@ -19,6 +19,7 @@ namespace MetaPrograms.CSharp.Reader
             new Dictionary<OperationKind, Func<IOperation, AbstractExpression>> {
                 [OperationKind.Literal] = op => ReadLiteral((ILiteralOperation)op),
                 [OperationKind.SimpleAssignment] = op => ReadAssignment((IAssignmentOperation)op),
+                [OperationKind.CompoundAssignment] = op => ReadCompoundAssignment((ICompoundAssignmentOperation)op),
                 [OperationKind.EventAssignment] = op => ReadEventAssignment((IEventAssignmentOperation)op),
                 [OperationKind.InstanceReference] = op => ReadInstanceReference(op),
                 [OperationKind.MethodReference] = op => ReadMethodReference((IMethodReferenceOperation)op),
@@ -68,6 +69,20 @@ namespace MetaPrograms.CSharp.Reader
                 { BinaryOperatorKind.LessThanOrEqual, BinaryOperator.LessThanOrEqual },
                 { BinaryOperatorKind.GreaterThanOrEqual, BinaryOperator.GreaterThanOrEqual },
                 { BinaryOperatorKind.GreaterThan, BinaryOperator.GreaterThan }
+            };
+        
+        private static readonly IReadOnlyDictionary<BinaryOperatorKind, CompoundAssignmentOperator> CompoundAssignmentByOperatorKind =
+            new Dictionary<BinaryOperatorKind, CompoundAssignmentOperator> {
+                [BinaryOperatorKind.Add] = CompoundAssignmentOperator.Addition,
+                [BinaryOperatorKind.Subtract] = CompoundAssignmentOperator.Subtraction,
+                [BinaryOperatorKind.Multiply] = CompoundAssignmentOperator.Multiplication,
+                [BinaryOperatorKind.Divide] = CompoundAssignmentOperator.Division,
+                [BinaryOperatorKind.Remainder] = CompoundAssignmentOperator.Remaninder,
+                [BinaryOperatorKind.And] = CompoundAssignmentOperator.And,
+                [BinaryOperatorKind.Or] = CompoundAssignmentOperator.Or,
+                [BinaryOperatorKind.NotEquals] = CompoundAssignmentOperator.Not,
+                [BinaryOperatorKind.LeftShift] = CompoundAssignmentOperator.LeftShift,
+                [BinaryOperatorKind.RightShift] = CompoundAssignmentOperator.RightShift
             };
 
         private readonly CodeModelBuilder _codeModel;
@@ -301,7 +316,9 @@ namespace MetaPrograms.CSharp.Reader
         private static AbstractExpression ReadLiteral(ILiteralOperation op)
         {
             var context = CodeReaderContext.GetContextOrThrow();
-            var type = context.FindMemberOrThrow<TypeMember>(binding: op.Type);
+            var type = (op.Type != null
+                ? context.FindMemberOrThrow<TypeMember>(binding: op.Type)
+                : null);
 
             return new ConstantExpression {
                 Type = type,
@@ -319,6 +336,19 @@ namespace MetaPrograms.CSharp.Reader
             return result;
         }
         
+        private static AbstractExpression ReadCompoundAssignment(ICompoundAssignmentOperation op)
+        {
+            if (!CompoundAssignmentByOperatorKind.TryGetValue(op.OperatorKind, out var compoundOp))
+            {
+                throw new NotSupportedException(
+                    $"Compound assignment kind {op.OperatorKind} ({op.GetType().Name}) is not supported"); 
+            }
+            
+            var result = (AssignmentExpression)ReadAssignment(op);
+            result.CompoundOperator = compoundOp;
+            return result;
+        }
+
         private static AbstractExpression ReadEventAssignment(IEventAssignmentOperation op)
         {
             return new AssignmentExpression {

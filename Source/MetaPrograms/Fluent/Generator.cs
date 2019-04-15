@@ -220,7 +220,7 @@ namespace MetaPrograms.Fluent
             });
         }
 
-        public static void LOADRAW(string embeddedResourcePath)
+        public static void INCLUDE(string embeddedResourcePath)
         {
             var assembly = Assembly.GetCallingAssembly();
             var fullResourcePath = $"{assembly.GetName().Name}.{embeddedResourcePath}";
