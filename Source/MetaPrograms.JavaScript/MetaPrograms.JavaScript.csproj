@@ -21,4 +21,8 @@
   <ItemGroup>
     <ProjectReference Include="..\MetaPrograms\MetaPrograms.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Expressions" />
+  </ItemGroup>
 </Project>

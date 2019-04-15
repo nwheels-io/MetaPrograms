@@ -14,14 +14,27 @@ namespace MetaPrograms.JavaScript.Writer
             _output = output;
         }
         
-        public void WriteModule(ModuleMember module)
+        public void WriteModule(ModuleMember module, bool privateScope = false)
         {
             _code = new CodeTextBuilder(_output.TextOptions);
 
             WriteImports(module);
+
+            if (privateScope)
+            {
+                _code.WriteLine("(function() {");
+                _code.Indent(1);
+            }
+            
             WriteMembers(module);
             WriteGlobalBlock(module);
-            
+
+            if (privateScope)
+            {
+                _code.Indent(-1);
+                _code.WriteLine("}());");
+            }
+
             _output.AddSourceFile(module.FolderPath, $"{module.Name.ToString(CasingStyle.Kebab)}.js", _code.ToString());
         }
 
