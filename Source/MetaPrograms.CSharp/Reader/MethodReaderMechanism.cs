@@ -55,7 +55,7 @@ namespace MetaPrograms.CSharp.Reader
         {
             var syntax = symbol.DeclaringSyntaxReferences
                 .Select(syntaxRef => syntaxRef.GetSyntax())
-                .FirstOrDefault(node => node is MethodDeclarationSyntax || node is ArrowExpressionClauseSyntax);
+                .FirstOrDefault(node => node is BaseMethodDeclarationSyntax || node is ArrowExpressionClauseSyntax);
 
             if (syntax != null)
             {
