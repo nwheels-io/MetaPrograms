@@ -15,7 +15,8 @@ namespace MetaPrograms.JavaScript.Writer
                 [typeof(ExpressionStatement)] = (c, s) => WriteExpression(c, (ExpressionStatement)s),
                 [typeof(VariableDeclarationStatement)] = (c, s) => WriteVariableDeclaration(c, (VariableDeclarationStatement)s),
                 [typeof(ReturnStatement)] = (c, s) => WriteReturn(c, (ReturnStatement)s),
-                [typeof(IfStatement)] = (c, s) => WriteIf(c, (IfStatement)s)
+                [typeof(IfStatement)] = (c, s) => WriteIf(c, (IfStatement)s),
+                [typeof(RawCodeStatement)] = (c, s) => WriteRawCode(c, (RawCodeStatement)s)
             };
 
         private static void WriteBlock(CodeTextBuilder code, BlockStatement block)
@@ -101,6 +102,11 @@ namespace MetaPrograms.JavaScript.Writer
             }
             
             code.WriteListEnd();
+        }
+
+        private static void WriteRawCode(CodeTextBuilder code, RawCodeStatement raw)
+        {
+            code.WriteLine(raw.Code);
         }
     }
 }
