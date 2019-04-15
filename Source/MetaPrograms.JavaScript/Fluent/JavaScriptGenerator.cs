@@ -64,7 +64,7 @@ namespace MetaPrograms.JavaScript.Fluent
                         .Cast<object>()
                         .Select(key => new NamedPropertyValue {
                             Name = key.ToString(),
-                            Value = AbstractExpression.FromValue(dictionary[key])
+                            Value = JSON(dictionary[key])
                         }).ToList()
                 };
             }
