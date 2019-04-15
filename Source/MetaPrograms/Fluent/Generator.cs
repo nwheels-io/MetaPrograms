@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
@@ -208,6 +209,32 @@ namespace MetaPrograms.Fluent
         {
             var type = GetContextOrThrow().FindType<T>();
             FINAL(type, name, out @ref, value);
+        }
+
+        public static void RAW(string code)
+        {
+            var block = BlockContext.GetBlockOrThrow();
+
+            block.AppendStatement(new RawCodeStatement {
+                Code = code
+            });
+        }
+
+        public static void LOADRAW(string embeddedResourcePath)
+        {
+            var assembly = Assembly.GetCallingAssembly();
+            var fullResourcePath = $"{assembly.GetName().Name}.{embeddedResourcePath}";
+            var resource = assembly.GetManifestResourceStream(fullResourcePath);
+
+            if (resource == null)
+            {
+                throw new ArgumentException(
+                    $"Embedded resource not found: {fullResourcePath}", 
+                    nameof(embeddedResourcePath));
+            }
+
+            var code = new StreamReader(resource).ReadToEnd();
+            RAW(code);
         }
 
         public static LocalVariableExpression USE(string name) 
