@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
-namespace MetaPrograms.IntegrationTests
+namespace MetaPrograms.Testability
 {
     [TestFixture]
     public class ShouldlyExtensionsTests

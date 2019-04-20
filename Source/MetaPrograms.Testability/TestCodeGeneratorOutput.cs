@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
-using MetaPrograms;
 
-namespace MetaPrograms.IntegrationTests
+namespace MetaPrograms.Testability
 {
     public class TestCodeGeneratorOutput : ICodeGeneratorOutput
     {
