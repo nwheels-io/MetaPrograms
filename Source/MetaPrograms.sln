@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.AspNetAdapter", "Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.App", "TestCases\CSharpAndJavaScript\Example.App\Example.App.csproj", "{9087F0B9-7D94-493A-898D-E87DDF69C28C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaPrograms.Testability", "MetaPrograms.Testability\MetaPrograms.Testability.csproj", "{6CE65985-1721-4BD5-8E6C-D0A456B5CE91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{9087F0B9-7D94-493A-898D-E87DDF69C28C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9087F0B9-7D94-493A-898D-E87DDF69C28C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9087F0B9-7D94-493A-898D-E87DDF69C28C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CE65985-1721-4BD5-8E6C-D0A456B5CE91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CE65985-1721-4BD5-8E6C-D0A456B5CE91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CE65985-1721-4BD5-8E6C-D0A456B5CE91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CE65985-1721-4BD5-8E6C-D0A456B5CE91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{58682F3D-1124-4A0B-8DB2-E9E74713693A} = {7D61CB4F-8A2C-48E3-A7D0-5DFCEC51F80B}
 		{807B5EB2-AAA3-47B6-9057-8DA90C93CA8E} = {7D61CB4F-8A2C-48E3-A7D0-5DFCEC51F80B}
 		{9087F0B9-7D94-493A-898D-E87DDF69C28C} = {7D61CB4F-8A2C-48E3-A7D0-5DFCEC51F80B}
+		{6CE65985-1721-4BD5-8E6C-D0A456B5CE91} = {D8A78448-1DED-4FA7-B8EA-6544629A7F3D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {150905B7-0BC7-470A-90D3-229DADEA4A4F}

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using DiffMatchPatch;
 using NUnit.Framework;
 using Shouldly;
+using DiffMatchPatch;
 
-namespace MetaPrograms.IntegrationTests
+namespace MetaPrograms.Testability
 {
     public static class ShouldlyExtensions
     {
@@ -22,7 +22,7 @@ namespace MetaPrograms.IntegrationTests
         public static string NormalizeCode(string code)
         {
             var tokens = code.Split(new[] {' ', '\t', '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
-            var normalized = string.Join(' ', tokens);
+            var normalized = string.Join(" ", tokens);
             return normalized;
         }
 
