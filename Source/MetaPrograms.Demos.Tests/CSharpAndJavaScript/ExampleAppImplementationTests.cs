@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -53,7 +54,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             
             //WriteOutputToDisk(output, "FrontEnd");
             AssertOutputs(
-                output.SourceFiles,
+                output.IndexSourceFilesByNormalPath(),
                 subFolder: "FrontEnd",
                 "build/index.html", 
                 "src/index.js",
@@ -81,7 +82,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
 
             //WriteOutputToDisk(output, "BackEnd");
             AssertOutputs(
-                output.SourceFiles,
+                output.IndexSourceFilesByNormalPath(),
                 subFolder: "BackEnd",
                 "AspNetAdapter/InvalidModelAutoResponderAttribute.cs",
                 "App/Services/WebApi/GreetingServiceController.cs");
@@ -110,13 +111,13 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
             return codeModel;
         }
 
-        private void AssertOutputs(ImmutableDictionary<string, Stream> actualOutputs, string subFolder, params string[] expectedFileNames)
+        private void AssertOutputs(IDictionary<string, Stream> actualOutputs, string subFolder, params string[] expectedFileNames)
         {
             actualOutputs
                 .Select(kvp => kvp.Key)
                 .ShouldBe(expectedFileNames, ignoreOrder: true);
 
-            var expectedOutputsDirectory = Path.Combine(ExamplesRootDirectory, "ExpectedOutput", subFolder);
+            var expectedOutputsDirectory = Path.Combine(ExamplesRootDirectory, "..", "ExpectedOutput", subFolder);
             
             foreach (var fileName in expectedFileNames)
             {
@@ -130,7 +131,7 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
         {
             var outputPath = Path.Combine(@"C:\temp\codegen", subFolder);
             
-            foreach (var pair in output.SourceFiles)
+            foreach (var pair in output.IndexSourceFilesByNormalPath())
             {
                 var filePath = Path.Combine(outputPath, pair.Key);
                 var folderPath = Path.GetDirectoryName(filePath);
@@ -162,8 +163,10 @@ namespace MetaPrograms.IntegrationTests.CSharpAndJavaScript
                     "..",
                     "..",
                     "..",
-                    "TestCases",
-                    "CSharpAndJavaScript"
+                    "..",
+                    "Demos",
+                    "01-cs-and-js",
+                    "Source"
                 );
             }
         }

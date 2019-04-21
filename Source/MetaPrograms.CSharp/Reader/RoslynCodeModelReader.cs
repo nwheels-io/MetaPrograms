@@ -25,6 +25,15 @@ namespace MetaPrograms.CSharp.Reader
             this.ModelBuilder = new CodeModelBuilder(Compilations);
         }
 
+        public RoslynCodeModelReader(Compilation compilation, IClrTypeResolver clrTypeResolver)
+        {
+            _clrTypeResolver = clrTypeResolver;
+            
+            this.Workspace = null;
+            this.Compilations = new[] { compilation };
+            this.ModelBuilder = new CodeModelBuilder(Compilations);
+        }
+
         public void Read()
         {
             using (var context = new CodeReaderContext(ModelBuilder.GetCodeModel(), _clrTypeResolver, LanguageInfo.Entries.CSharp()))
