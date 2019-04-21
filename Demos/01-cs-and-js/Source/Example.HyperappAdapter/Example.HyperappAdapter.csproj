@@ -8,9 +8,9 @@
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\MetaPrograms.JavaScript\MetaPrograms.JavaScript.csproj" />
-    <ProjectReference Include="..\..\..\MetaPrograms.CSharp\MetaPrograms.CSharp.csproj" />
-    <ProjectReference Include="..\..\..\MetaPrograms\MetaPrograms.csproj" />
+    <ProjectReference Include="..\..\..\..\Source\MetaPrograms.JavaScript\MetaPrograms.JavaScript.csproj" />
+    <ProjectReference Include="..\..\..\..\Source\MetaPrograms.CSharp\MetaPrograms.CSharp.csproj" />
+    <ProjectReference Include="..\..\..\..\Source\MetaPrograms\MetaPrograms.csproj" />
     <ProjectReference Include="..\Example.WebUIModel\Example.WebUIModel.csproj" />
   </ItemGroup>
   <ItemGroup>
